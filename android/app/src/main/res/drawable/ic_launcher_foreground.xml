@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The phone outline on the launcher icon's 108 dp canvas, inside its 66 dp safe zone -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="1.75"
+        android:scaleY="1.75"
+        android:translateX="33"
+        android:translateY="33">
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="1.6"
+            android:pathData="M8,2h8a2,2 0,0 1,2 2v16a2,2 0,0 1,-2 2h-8a2,2 0,0 1,-2 -2v-16a2,2 0,0 1,2 -2z" />
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M10.5,17.5h3a0.9,0.9 0,0 1,0 1.8h-3a0.9,0.9 0,0 1,0 -1.8z" />
+    </group>
+</vector>

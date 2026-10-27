@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "docs/progress.html"
+        ],
+        "createdAt": "2026-10-27T09:55:54.874Z",
+        "reason": "agent decision: status stripes mark entry type on the internal decision page, same convention as the user's nano-chat progress page; tushar-mode asks for straight square-ended stripes"
+      }
+    ]
+  }
+}

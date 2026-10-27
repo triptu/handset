@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Handset</string>
+    <string name="accessibility_label">Handset</string>
+    <string name="accessibility_description">Lets the AI agent you connect read the screen and tap, type and scroll for you when you ask it to. When Screen text is on in Handset\'s Settings, it also keeps the text of the screens you open, on this phone, for 30 days.</string>
+    <string name="pause_tile_label">Pause record</string>
+</resources>

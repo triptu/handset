@@ -1,0 +1,19 @@
+# Gradle and build output
+.gradle/
+.kotlin/
+build/
+captures/
+*.apk
+*.aab
+
+# Machine-specific
+local.properties
+.idea/
+*.iml
+.DS_Store
+.env*
+
+# Signing keys live in ~/.config/handset, never here
+*.jks
+*.keystore
+*.password

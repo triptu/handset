@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Handset, design round two</title>
+<link rel="stylesheet" href="assets/phosphor-regular.css">
+<style>
+@font-face { font-family: 'Google Sans Flex'; font-weight: 400 700; font-display: block; src: url(assets/fonts/GoogleSansFlex.woff2) format('woff2'); }
+@font-face { font-family: 'Newsreader'; font-weight: 400 500; font-display: block; src: url(assets/fonts/Newsreader.woff2) format('woff2'); }
+
+:root {
+  --sans: 'Google Sans Flex', Roboto, system-ui, sans-serif;
+  --serif: 'Newsreader', Georgia, serif;
+  --fast: 150ms; --slow: 220ms; --ease: cubic-bezier(.2, 0, 0, 1);
+}
+
+/* Page chrome (not the app) */
+html { background: #E9E7E2; color: #1E1C19; }
+html.dark { background: #121211; color: #E6E3DD; }
+html.dark .device { box-shadow: 0 0 0 1px rgb(255 255 255 / .14); }
+body { margin: 0; font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+.page { max-width: 1840px; margin: 0 auto; padding: 32px 32px 80px; }
+.top { display: flex; flex-wrap: wrap; gap: 16px 40px; align-items: end; justify-content: space-between; margin-bottom: 8px; }
+.top h1 { font: 500 22px/1.3 var(--sans); margin: 0 0 4px; }
+.top p { margin: 0; max-width: 62ch; color: #5F5A52; }
+html.dark .top p, html.dark .note { color: #A8A39A; }
+.controls { display: flex; flex-wrap: wrap; gap: 20px; }
+.seg { display: flex; gap: 2px; align-items: center; }
+.seg span { font-size: 13px; color: #6B665E; margin-right: 6px; }
+html.dark .seg span { color: #9C978E; }
+.seg button { font: 500 14px var(--sans); color: inherit; background: transparent; border: 0; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+.seg button:hover { background: rgb(0 0 0 / .06); }
+html.dark .seg button:hover { background: rgb(255 255 255 / .07); }
+.seg button[aria-pressed=true] { background: rgb(0 0 0 / .09); }
+html.dark .seg button[aria-pressed=true] { background: rgb(255 255 255 / .12); }
+.variation { margin-top: 56px; }
+.variation > h2 { font: 500 18px/1.3 var(--sans); margin: 0 0 4px; }
+.variation > p { margin: 0 0 24px; max-width: 80ch; }
+.grid { display: flex; flex-wrap: wrap; gap: 40px 32px; align-items: flex-start; }
+figure { margin: 0; }
+figcaption { font-size: 13px; color: #6B665E; margin: 0 0 10px 4px; }
+html.dark figcaption { color: #9C978E; }
+.pick { margin-top: 72px; max-width: 80ch; }
+.pick > h2 { font: 500 18px/1.3 var(--sans); margin: 0 0 8px; }
+.pick li { margin-bottom: 6px; }
+:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+/* Phone hardware */
+.device { background: #0B0B0B; padding: 10px; border-radius: 44px; box-shadow: 0 1px 2px rgb(0 0 0 / .2), 0 12px 32px rgb(0 0 0 / .12); }
+.device.inner { border-radius: 30px; }
+.phone { position: relative; overflow: hidden; border-radius: 34px; width: 412px; height: 916px; display: flex; flex-direction: column; }
+.device.inner .phone { width: 840px; height: 930px; border-radius: 20px; }
+
+/* App tokens. A and C: warm. B: tinted neutral with one accent. */
+.phone {
+  --bg: #F6F4EF; --text: #1E1C19; --text-2: #5C574F; --text-3: #6E685F; --surface: #ECE9E2; --surface-2: #FFFFFF; --press: rgb(30 28 25 / .07);
+  --accent: var(--text); --on-accent: var(--bg); --link: var(--text); --link-line: rgb(30 28 25 / .35);
+  --live: #2F8A4C; --scrim: rgb(20 18 16 / .32); --pane: #EEEBE5;
+  --c-whatsapp: #3E8C5A; --c-slack: #8A5689; --c-chrome: #4A73A3; --c-swiggy: #B8662F; --c-gmail: #B04D45; --c-spotify: #3B8752;
+  --c-kindle: #57788B; --c-claude: #BC5C3B; --c-uber: var(--text-2); --c-place: var(--text-2); --c-docs: #4A73A3; --c-meet: #3E8C5A;
+  --av-amma: #E6D3C0; --av-amma-ink: #6E4A2C; --av-group: #DCE3D9; --av-group-ink: #3E5A44;
+  background: var(--bg); color: var(--text); font-family: var(--sans);
+}
+html.dark .phone {
+  --bg: #1C1B19; --text: #ECE9E3; --text-2: #ABA59B; --text-3: #9C968C; --surface: #292724; --surface-2: #2E2C29; --press: rgb(236 233 227 / .08);
+  --link-line: rgb(236 233 227 / .4); --live: #6BC287; --scrim: rgb(0 0 0 / .5); --pane: #242320;
+  --c-whatsapp: #7CC296; --c-slack: #C99BC8; --c-chrome: #93B5DD; --c-swiggy: #E3A175; --c-gmail: #E59088; --c-spotify: #7CC296;
+  --c-kindle: #9DBBCB; --c-claude: #E59A7C; --c-docs: #93B5DD; --c-meet: #7CC296;
+  --av-amma: #4A3B2E; --av-amma-ink: #EBCDB0; --av-group: #33402F; --av-group-ink: #C3D8BC;
+}
+.phone.v-B {
+  --bg: #F2F3F4; --text: #1A1C1F; --text-2: #565B62; --text-3: #60666D; --surface: #E6E8EB; --surface-2: #FFFFFF; --press: rgb(26 28 31 / .07);
+  --accent: #34558A; --on-accent: #FFFFFF; --link: #34558A; --link-line: rgb(52 85 138 / .45); --pane: #E9EBEE;
+}
+html.dark .phone.v-B {
+  --bg: #17191C; --text: #E7E9EC; --text-2: #A3A8AF; --text-3: #8F959C; --surface: #23262A; --surface-2: #2A2D32; --press: rgb(231 233 236 / .08);
+  --accent: #A9C1EA; --on-accent: #13243F; --link: #A9C1EA; --link-line: rgb(169 193 234 / .5); --pane: #1F2226;
+}
+
+:where(.phone button) { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: inherit; }
+.phone a { color: inherit; }
+.phone :focus-visible { outline: 2px solid var(--text); outline-offset: -2px; border-radius: 10px; }
+
+.status { flex: none; height: 36px; display: flex; align-items: center; justify-content: space-between; padding: 0 26px 0 28px; font: 500 14px var(--sans); font-variant-numeric: tabular-nums; }
+.status .ph { font-size: 15px; margin-left: 4px; }
+.gesture { flex: none; height: 20px; display: grid; place-items: center; }
+.gesture::after { content: ''; width: 108px; height: 4px; border-radius: 2px; background: var(--text); opacity: .4; }
+
+.live { flex: none; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 20px; height: 32px; font-size: 13px; color: var(--text-2); }
+.live .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--live); flex: none; }
+.live .what { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.live button { font-weight: 600; color: var(--text); padding: 0 12px; height: 32px; border-radius: 16px; }
+.live button:hover { background: var(--press); }
+
+.body { flex: 1; min-height: 0; display: flex; }
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.scroll { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.pane { min-width: 0; display: flex; flex-direction: column; }
+
+/* Bottom nav and rail */
+.nav { flex: none; display: flex; justify-content: space-around; padding: 6px 0 2px; }
+.nav button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 56px; justify-content: center; color: var(--text-3); font-size: 12px; font-weight: 500; }
+.nav .ph { font-size: 24px; }
+.nav button[aria-current=page] { color: var(--text); font-weight: 650; }
+.v-B .nav button[aria-current=page] { color: var(--accent); }
+.nav button:hover .ph { opacity: .8; }
+.rail { flex: none; width: 88px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 12px; }
+.rail button { width: 72px; min-height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--text-3); font-size: 12px; font-weight: 500; border-radius: 16px; }
+.rail .ph { font-size: 24px; }
+.rail button[aria-current=page] { color: var(--text); font-weight: 650; }
+.v-B .rail button[aria-current=page] { color: var(--accent); }
+.rail button:hover { background: var(--press); }
+
+/* Headers */
+.head { flex: none; display: flex; align-items: center; gap: 4px; padding: 4px 8px 4px 20px; min-height: 56px; }
+.head.back { padding-left: 4px; }
+.head .grow { flex: 1; min-width: 0; }
+.head h1 { font: 600 20px/1.3 var(--sans); margin: 0; }
+.ib { width: 48px; height: 48px; border-radius: 24px; display: grid; place-items: center; color: var(--text-2); flex: none; }
+.ib .ph { font-size: 22px; }
+.ib:hover { background: var(--press); color: var(--text); }
+
+.week { display: flex; gap: 0; margin-left: -8px; }
+.week button { width: 38px; height: 48px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; color: var(--text-3); }
+.week button small { font-size: 11px; line-height: 14px; font-weight: 500; }
+.week button b { font-size: 15px; line-height: 20px; font-weight: 500; }
+.week button:hover { background: var(--press); }
+.week button[aria-current=date] { color: var(--text); }
+.week button[aria-current=date] b { font-weight: 700; text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 2px; }
+
+.datebtn { display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 10px; margin-left: -10px; border-radius: 20px; font-weight: 600; font-size: 16px; }
+.datebtn .ph { font-size: 16px; color: var(--text-2); }
+.datebtn:hover { background: var(--press); }
+
+/* Day page */
+.day { padding: 8px 20px 32px; }
+.dateline { font-size: 13px; color: var(--text-3); margin: 8px 0 6px; font-variant-numeric: tabular-nums; }
+.daytitle { font: 400 32px/1.15 var(--serif); letter-spacing: -.01em; margin: 0 0 10px; text-wrap: balance; }
+.summary { font: 400 18px/1.5 var(--serif); color: var(--text-2); margin: 0 0 8px; text-wrap: pretty; max-width: 34em; }
+.summary a { color: var(--link); text-decoration: underline; text-decoration-color: var(--link-line); text-decoration-thickness: 1px; text-underline-offset: 4px; border-radius: 4px; }
+.v-B .summary a { color: var(--link); }
+.summary a:hover { text-decoration-color: currentColor; }
+.label { font-size: 13px; font-weight: 500; color: var(--text-3); margin: 22px 0 2px; display: flex; justify-content: space-between; gap: 12px; font-variant-numeric: tabular-nums; }
+.label .span { font-weight: 400; }
+
+.row { display: flex; align-items: flex-start; gap: 14px; width: calc(100% + 24px); margin: 0 -12px; padding: 10px 12px; border-radius: 14px; min-height: 60px; }
+.row:hover, .row[aria-current=true] { background: var(--press); }
+.row .lead { width: 36px; height: 40px; flex: none; display: grid; place-items: center; }
+.row .lead .ph { font-size: 24px; }
+.row .txt { flex: 1; min-width: 0; }
+.row .t { display: block; font-size: 16px; line-height: 22px; font-weight: 500; }
+.row .p { display: block; font-size: 14px; line-height: 20px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .time { flex: none; font-size: 13px; line-height: 22px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.row.muted .t { color: var(--text-2); }
+.row.single { align-items: center; min-height: 56px; }
+.row.single .lead { height: 36px; }
+.av { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; display: grid; place-items: center; font-size: 15px; font-weight: 600; }
+.av.amma { background: var(--av-amma); color: var(--av-amma-ink); }
+.av.group { background: var(--av-group); color: var(--av-group-ink); }
+.av.group .ph { font-size: 18px; }
+.av.sm { width: 28px; height: 28px; font-size: 12px; }
+
+/* B: place rows */
+.place { display: flex; align-items: center; gap: 14px; margin: 24px 0 2px; min-height: 40px; }
+.place .lead { width: 36px; display: grid; place-items: center; color: var(--text-2); }
+.place .lead .ph { font-size: 20px; }
+.place .t { flex: 1; font-size: 15px; font-weight: 600; }
+.place .time { font-size: 13px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.v-B .row.inplace { padding-left: 12px; }
+
+/* C: day index */
+.idx { padding: 8px 20px 32px; }
+.dayrow { display: flex; gap: 14px; align-items: baseline; width: calc(100% + 24px); margin: 0 -12px; padding: 12px; border-radius: 14px; }
+.dayrow:hover { background: var(--press); }
+.dayrow .d { width: 36px; flex: none; text-align: center; font-variant-numeric: tabular-nums; color: var(--text-3); }
+.dayrow .d small { display: block; font-size: 11px; font-weight: 500; line-height: 14px; }
+.dayrow .d b { display: block; font-size: 17px; font-weight: 500; line-height: 22px; color: var(--text-2); }
+.dayrow .txt { flex: 1; min-width: 0; }
+.dayrow .t { display: block; font: 400 19px/1.3 var(--serif); }
+.dayrow .p { display: block; font-size: 14px; line-height: 20px; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
+.dayrow[aria-current=true] { background: var(--press); }
+.todayblock .titlebtn { display: flex; align-items: center; gap: 6px; text-align: left; border-radius: 8px; }
+.todayblock .titlebtn .ph { font-size: 20px; color: var(--text-3); }
+.todayblock .titlebtn:hover .daytitle { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 5px; }
+
+/* Moment pages */
+.meta { font-size: 13px; color: var(--text-3); margin: 0 0 14px; font-variant-numeric: tabular-nums; }
+.read { padding: 4px 20px 32px; }
+.read h2 { font: 600 22px/1.3 var(--sans); margin: 0 0 4px; text-wrap: balance; }
+.read .src { font-size: 13px; color: var(--text-3); margin: 0 0 20px; }
+.read p.body { font-size: 16px; line-height: 1.6; margin: 0 0 14px; max-width: 36em; }
+.read .gap { font-size: 13px; color: var(--text-3); margin: 18px 0; }
+.msg { display: flex; gap: 12px; padding: 8px 0; }
+.msg .who { font-size: 14px; font-weight: 600; }
+.msg .who span { font-weight: 400; color: var(--text-3); font-size: 13px; margin-left: 6px; font-variant-numeric: tabular-nums; }
+.msg .m { font-size: 15px; line-height: 1.5; margin-top: 1px; }
+.steps { list-style: none; padding: 0; margin: 0; }
+.steps li { display: flex; gap: 12px; padding: 8px 0; font-size: 15px; line-height: 1.45; }
+.steps li .ph { color: var(--text-3); font-size: 18px; margin-top: 2px; }
+.steps time { color: var(--text-3); font-size: 13px; min-width: 64px; font-variant-numeric: tabular-nums; margin-top: 1px; }
+.textbtn { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; margin-left: -14px; border-radius: 20px; font-weight: 600; font-size: 14px; }
+.textbtn:hover { background: var(--press); }
+.textbtn .ph { font-size: 18px; }
+.empty { margin: 120px auto 0; text-align: center; color: var(--text-3); font-size: 14px; max-width: 24ch; }
+
+/* Composer */
+.composer { flex: none; padding: 8px 12px 10px; }
+.field { display: flex; align-items: center; gap: 4px; background: var(--surface); border-radius: 26px; min-height: 52px; padding: 0 6px 0 18px; }
+.field input { flex: 1; min-width: 0; border: 0; background: none; font: 16px var(--sans); color: var(--text); outline: none; }
+.field input::placeholder { color: var(--text-3); }
+.inner .right .field { background: var(--bg); }
+.field:focus-within { outline: 2px solid var(--text-3); outline-offset: 0; }
+.send { width: 40px; height: 40px; border-radius: 20px; display: grid; place-items: center; background: var(--accent); color: var(--on-accent); flex: none; }
+.send .ph { font-size: 18px; }
+.field .ib { width: 40px; height: 40px; }
+
+/* Chat */
+.chat { padding: 4px 20px 16px; display: flex; flex-direction: column; gap: 6px; }
+.you { align-self: flex-end; max-width: 80%; background: var(--surface); padding: 10px 14px; border-radius: 20px; font-size: 16px; line-height: 1.45; margin-top: 14px; }
+.bot { font-size: 16px; line-height: 1.55; max-width: 36em; margin-top: 10px; }
+.bot p { margin: 0 0 8px; }
+.cite { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-2); height: 36px; padding: 0 10px; margin-left: -10px; border-radius: 18px; }
+.cite:hover { background: var(--press); }
+.cite .ph { font-size: 15px; }
+.draft { background: var(--surface); border-radius: 16px; padding: 12px 14px; margin: 6px 0 8px; }
+.draft small { display: block; font-size: 13px; color: var(--text-3); margin-bottom: 4px; }
+.btns { display: flex; gap: 8px; align-items: center; }
+.btn { height: 40px; padding: 0 18px; border-radius: 20px; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; }
+.btn.primary { background: var(--accent); color: var(--on-accent); }
+.btn.plain:hover { background: var(--press); }
+.picker { display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 12px; margin-left: -12px; border-radius: 20px; font-weight: 600; font-size: 16px; }
+.picker .ph { font-size: 16px; color: var(--text-2); }
+.picker:hover { background: var(--press); }
+.greet { font: 400 30px/1.2 var(--serif); margin: 0; }
+
+/* Search */
+.sfield { flex: 1; display: flex; align-items: center; background: var(--surface); border-radius: 24px; height: 48px; padding: 0 4px 0 16px; }
+.sfield input { flex: 1; min-width: 0; border: 0; background: none; font: 16px var(--sans); color: var(--text); outline: none; }
+.sfield .ib { width: 40px; height: 40px; }
+mark { background: none; color: inherit; font-weight: 700; }
+
+/* Sheet */
+.scrim { position: absolute; inset: 0; background: var(--scrim); z-index: 5; display: flex; align-items: flex-end; justify-content: center; }
+.inner .scrim { align-items: center; }
+.sheet { background: var(--surface-2); width: 100%; border-radius: 28px 28px 0 0; padding: 8px 20px 28px; max-height: 88%; overflow-y: auto; animation: up var(--slow) var(--ease); }
+html.dark .sheet { background: var(--surface-2); }
+.inner .sheet { width: 520px; border-radius: 28px; padding-top: 20px; animation: fade var(--fast) var(--ease); }
+.sheet .handle { width: 32px; height: 4px; border-radius: 2px; background: var(--text-3); opacity: .5; margin: 6px auto 18px; }
+.inner .sheet .handle { display: none; }
+.sheet h2 { font: 600 20px/1.3 var(--sans); margin: 0 0 6px; }
+.sheet > p { font-size: 14px; line-height: 1.5; color: var(--text-2); margin: 0 0 12px; }
+.sheet .row .ph-check { font-size: 20px; color: var(--text); }
+.v-B .sheet .row .ph-check { color: var(--accent); }
+@keyframes up { from { transform: translateY(100%); } }
+@keyframes fade { from { opacity: 0; transform: scale(.98); } }
+@media (prefers-reduced-motion: reduce) { .sheet { animation: none !important; } }
+
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; margin-top: 8px; }
+.cal small { font-size: 12px; color: var(--text-3); padding: 6px 0; font-weight: 500; }
+.cal button { height: 44px; border-radius: 22px; font-size: 15px; font-variant-numeric: tabular-nums; }
+.cal button:hover { background: var(--press); }
+.cal button:disabled { color: var(--text-3); opacity: .55; cursor: default; }
+.cal button:disabled:hover { background: none; }
+.cal button[aria-current=date] { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+.cal button.today:not([aria-current]) { font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+
+.toast { position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--text); color: var(--bg); font-size: 14px; padding: 10px 16px; border-radius: 12px; z-index: 9; max-width: 80%; text-align: center; }
+
+.inner .split { display: flex; flex: 1; min-height: 0; }
+.inner .split > .left { width: 380px; flex: none; }
+.inner .split > .right { flex: 1; min-width: 0; background: var(--pane); border-radius: 24px 24px 0 0; margin: 0 12px 0 8px; }
+.inner .colwrap { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.vis { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top">
+    <div>
+      <h1>Handset, design round two</h1>
+      <p>Clickable mocks of the Android app, in three close variations of one quiet look. Every phone works: tap the tabs, rows, underlined phrases, dates, search and the gear. My pick is at the end.</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Theme"><span>Theme</span>
+        <button data-theme="auto">Auto</button><button data-theme="light">Light</button><button data-theme="dark">Dark</button></div>
+      <div class="seg" role="group" aria-label="Screen"><span>Screen</span>
+        <button data-w="cover">Cover</button><button data-w="inner">Inner</button></div>
+      <div class="seg" role="group" aria-label="Agent acting"><span>Agent acting</span>
+        <button data-live="1">On</button><button data-live="0">Off</button></div>
+    </div>
+  </div>
+  <div id="variations"></div>
+  <section class="pick" id="pick">
+    <h2>My pick: A, with B's place rows on the inner screen only</h2>
+    <p>A is the closest to Juno. One warm neutral, colour only in app icons and photos, and the day reads like a page: title, three sentences, then rows. The tiny week row makes yesterday one tap or one swipe away without a sheet, and it shows at a glance which days you can go back to. B's accent is useful for links and Send but pulls the eye off the content, and its place rows add a second kind of row to learn. C's index is calm, but today's moments sit one tap away, and the day page is the point of the app.</p>
+  </section>
+</div>
+
+<script>
+// ---------- Content ----------
+const P = n => `assets/people/${n}.jpg`;
+const APPS = {
+  whatsapp: ['whatsapp-logo', 'WhatsApp'], slack: ['slack-logo', 'Slack'], chrome: ['google-chrome-logo', 'Chrome'],
+  swiggy: ['bowl-food', 'Swiggy'], uber: ['car', 'Uber'], gmail: ['envelope-simple', 'Gmail'], spotify: ['spotify-logo', 'Spotify'],
+  kindle: ['book-open', 'Kindle'], claude: ['asterisk', 'Claude'], docs: ['file-text', 'Google Docs'], meet: ['video-camera', 'Google Meet'],
+  instamart: ['shopping-cart', 'Swiggy Instamart'], place: ['map-pin', ''],
+};
+const appColor = a => ({ instamart: 'swiggy', place: 'place' }[a] || a);
+
+const M = {
+  // Tue 27
+  o1: { app: 'whatsapp', person: 'meera', t: 'Draft to Meera', p: 'Can we move Thursday’s investor call to 4?', time: '6:12 pm', toast: 'Opens WhatsApp with the draft' },
+  o2: { app: 'instamart', t: 'Swiggy Instamart', p: 'Cart at checkout: milk, eggs, bread and 3 more', time: '8:55 pm', toast: 'Opens Swiggy Instamart at checkout' },
+  spotify1: { app: 'spotify', t: 'Spotify', p: 'Lo-fi Beats while you got ready', time: '8:05 am' },
+  gmail1: { app: 'gmail', t: 'Gmail', p: 'Read the Surge update, archived 14 newsletters', time: '8:42 am', read: ['Surge cohort 12: demo day moves to 19 November.', 'Office hours with Rajan are open on Thursdays from 4 pm. Book through the portal.', 'Archived 14 newsletters, including Lenny’s Newsletter and The Ken.'] },
+  uber1: { app: 'uber', t: 'Uber', p: 'Ride to Indiranagar, 34 min, ₹212', time: '9:25 am' },
+  slack1: { app: 'slack', t: 'Slack', p: '#release-0-9: ship Thursday, onboarding waits for 0.10', time: '11:42 am', open: 'thread' },
+  wa1: { app: 'whatsapp', group: true, t: 'Founders BLR', p: 'Priya: Drinks at Toit on Friday?', time: '12:30 pm', read: ['Priya: Drinks at Toit on Friday? 8ish', 'Arjun: In', 'You: In, I’ll book a table'] },
+  chrome1: { app: 'chrome', t: 'Chrome', p: 'How ESOPs are taxed when you exercise them', time: '1:05 pm', open: 'article' },
+  arjun1: { person: 'arjun', app: 'place', t: 'Arjun', p: 'Coffee at Third Wave, 1 h 20 min', time: '3:20 pm', read: ['You were at Third Wave Coffee, 100 Feet Road, from 3:20 to 4:40 pm.', 'Arjun’s messages before and after: “Here” at 3:18 pm, “Thanks for the ESOP notes” at 4:52 pm.'] },
+  claude1: { app: 'claude', t: 'Claude', p: 'Added Toit, Friday 8 pm to Calendar', time: '4:10 pm', open: 'steps' },
+  swiggy1: { app: 'swiggy', t: 'Swiggy', p: 'Chicken biryani from Meghana Foods, ₹389', time: '8:10 pm' },
+  amma1: { person: 'amma', app: 'whatsapp', t: 'Amma', p: 'WhatsApp call, 24 min', time: '8:40 pm' },
+  rahul1: { person: 'rahul', app: 'slack', t: 'Rahul', p: 'Build is green. Tagging 0.9 in the morning.', time: '9:12 pm', open: 'thread' },
+  kindle1: { app: 'kindle', t: 'Kindle', p: 'The Mom Test, chapter 4, 22 pages', time: '9:30 pm', read: ['“Rule of thumb: Opinions are worthless.”', '“Anything involving the future is an over-optimistic lie.”'] },
+  // Mon 26
+  docs2: { app: 'docs', t: 'Google Docs', p: 'Surge deck notes with Meera, 2 h 10 min', time: '10:20 am' },
+  meera2: { person: 'meera', app: 'whatsapp', t: 'Meera', p: 'Slide 7 still says 40 lakh, should be 55', time: '1:40 pm' },
+  meet2: { app: 'meet', t: 'Google Meet', p: 'Practice pitch with Meera, 45 min', time: '5:00 pm' },
+  uber2: { app: 'uber', t: 'Uber', p: 'Ride home to HSR Layout, ₹238', time: '9:04 pm' },
+  // Sun 25 (quiet)
+  spotify3: { app: 'spotify', t: 'Spotify', p: 'Sunday Morning Jazz', time: '9:30 am' },
+  amma3: { person: 'amma', app: 'whatsapp', t: 'Amma', p: 'Are you coming home for Diwali?', time: '10:15 am' },
+  kindle3: { app: 'kindle', t: 'Kindle', p: 'The Mom Test, chapters 1 to 3', time: '2:10 pm', read: ['“The measure of usefulness of an early customer conversation is whether it gives us concrete facts about our customers’ lives and world views.”'] },
+  lake3: { app: 'place', t: 'Agara Lake', p: 'Walk, 40 min', time: '6:05 pm' },
+  swiggy3: { app: 'swiggy', t: 'Swiggy', p: 'Masala dosa from Rameshwaram Cafe, ₹156', time: '8:20 pm' },
+  // Sat 24
+  park4: { app: 'place', t: 'Cubbon Park', p: 'Run, 5.2 km', time: '7:10 am' },
+  priya4: { person: 'priya', app: 'whatsapp', t: 'Priya', p: 'Lunch at Toit at 1?', time: '11:05 am' },
+  chrome4: { app: 'chrome', t: 'Chrome', p: 'Toit Brewpub, Indiranagar: menu', time: '12:40 pm' },
+  // Fri 23
+  gmail5: { app: 'gmail', t: 'Gmail', p: 'Three Android candidates for the panel', time: '9:50 am' },
+  meet5: { app: 'meet', t: 'Google Meet', p: 'Interview loop, 3 h 40 min', time: '11:00 am' },
+  slack5: { app: 'slack', t: 'Slack', p: '#hiring: offer to Kavya approved', time: '6:30 pm' },
+};
+
+const DAYS = [
+  { k: 21, w: 'W', wd: 'Wed', long: 'Wednesday, 21 October', title: 'Mostly Slack, and a late dinner', summary: ['You spent most of the day in Slack threads about the 0.9 scope. Dinner with Priya ran past eleven.'], groups: [] },
+  { k: 22, w: 'T', wd: 'Thu', long: 'Thursday, 22 October', title: 'Board call prep', summary: ['A morning on the board update, then the call at 4. You walked home along 27th Main.'], groups: [] },
+  { k: 23, w: 'F', wd: 'Fri', long: 'Friday, 23 October', title: 'Hiring loop for the Android role', summary: ['Three interviews back to back at the office. By evening the team agreed on an offer to Kavya.'],
+    groups: [{ label: 'Office', icon: 'briefcase', span: '9:40 am – 7:05 pm', items: ['gmail5', 'meet5', 'slack5'] }] },
+  { k: 24, w: 'S', wd: 'Sat', long: 'Saturday, 24 October', title: 'Cubbon Park and a long lunch', summary: ['An early run in Cubbon Park, then lunch at Toit with Priya that took most of the afternoon.'],
+    groups: [{ label: 'Cubbon Park', icon: 'tree', span: '6:50 – 7:50 am', items: ['park4'] }, { label: 'Home', icon: 'house', span: '8:30 am – 12:30 pm', items: ['priya4', 'chrome4'] }] },
+  { k: 25, w: 'S', wd: 'Sun', long: 'Sunday, 25 October', title: 'A slow Sunday at home', summary: ['You stayed in all day. ', { t: 'The afternoon went to Kindle', m: 'kindle3' }, ', and you ', { t: 'walked to Agara Lake', m: 'lake3' }, ' before dinner.'],
+    groups: [{ label: 'Morning', items: ['spotify3', 'amma3'] }, { label: 'Afternoon', items: ['kindle3'] }, { label: 'Evening', items: ['lake3', 'swiggy3'] }] },
+  { k: 26, w: 'M', wd: 'Mon', long: 'Monday, 26 October', title: 'Investor prep with Meera', summary: ['Most of the day went to ', { t: 'the Surge deck with Meera', m: 'docs2' }, ', in Google Docs and a practice call. You took an Uber home at nine.'],
+    groups: [{ label: 'Office', icon: 'briefcase', span: '9:55 am – 8:50 pm', items: ['docs2', 'meera2', 'meet2'] }, { label: 'Home', icon: 'house', span: 'from 9:40 pm', items: ['uber2'] }] },
+  { k: 27, w: 'T', wd: 'Tue', long: 'Tuesday, 27 October', today: true, title: 'Release day with Rahul',
+    summary: ['You and Rahul ', { t: 'agreed to ship 0.9 on Thursday', m: 'slack1' }, ' and keep the new onboarding for 0.10. ', { t: 'Coffee with Arjun', m: 'arjun1' }, ' at Third Wave ran long, and ', { t: 'Claude put Toit on your calendar', m: 'claude1' }, ' for Friday at 8.'],
+    open: ['o1', 'o2'],
+    groups: [
+      { label: 'Home', icon: 'house', span: '7:40 – 9:25 am', items: ['spotify1', 'gmail1', 'uber1'] },
+      { label: 'Office', icon: 'briefcase', span: '10:05 am – 3:10 pm', items: ['slack1', 'wa1', 'chrome1'] },
+      { label: 'Third Wave Coffee', icon: 'coffee', span: '3:20 – 4:40 pm', items: ['arjun1', 'claude1'] },
+      { label: 'Home', icon: 'house', span: 'from 7:40 pm', items: ['swiggy1', 'amma1', 'rahul1', 'kindle1'] },
+    ] },
+];
+const dayOf = k => DAYS.find(d => d.k === k);
+const dayOfMoment = id => DAYS.find(d => (d.open || []).concat(...d.groups.map(g => g.items)).includes(id));
+const placeOfMoment = id => { const d = dayOfMoment(id); const g = d && d.groups.find(g => g.items.includes(id)); return g && g.icon ? g.label : null; };
+
+const SEARCH = [
+  { label: 'Today', items: [{ m: 'claude1', p: 'Added <mark>Toit</mark>, Friday 8 pm to Calendar' }, { m: 'wa1', p: 'Priya: Drinks at <mark>Toit</mark> on Friday?' }] },
+  { label: 'Saturday, 24 October', items: [{ m: 'priya4', p: 'Lunch at <mark>Toit</mark> at 1?' }, { m: 'chrome4', p: '<mark>Toit</mark> Brewpub, Indiranagar: menu' }] },
+  { label: 'Saturday, 3 October', items: [{ x: { app: 'uber', t: 'Uber', time: '7:48 pm' }, p: 'Ride to <mark>Toit</mark>, Indiranagar, ₹186' }] },
+];
+
+// ---------- Rendering helpers ----------
+const ic = (n, extra = '') => `<i class="ph ph-${n}" aria-hidden="true"${extra}></i>`;
+function lead(m) {
+  if (m.person === 'amma') return `<span class="av amma" aria-hidden="true">A</span>`;
+  if (m.person) return `<img class="av" src="${P(m.person)}" alt="">`;
+  if (m.group) return `<span class="av group" aria-hidden="true">${ic('users')}</span>`;
+  const [icon] = APPS[m.app];
+  return ic(icon, ` style="color:var(--c-${appColor(m.app)})"`);
+}
+function row(id, ph, cur, opts = {}) {
+  const m = typeof id === 'string' ? M[id] : id;
+  const act = typeof id === 'string' ? `data-a="moment" data-id="${id}"` : `data-a="toast" data-msg="Opens the ride in Uber"`;
+  return `<button class="row${opts.cls ? ' ' + opts.cls : ''}" ${act}${cur ? ' aria-current="true"' : ''}>
+    <span class="lead">${lead(m)}</span>
+    <span class="txt"><span class="t">${m.t}</span><span class="p">${ph || m.p}</span></span>
+    <span class="time">${m.time}</span></button>`;
+}
+const summaryHTML = (segs) => segs.map(s => typeof s === 'string' ? s : `<a href="#" data-a="moment" data-id="${s.m}">${s.t}</a>`).join('');
+
+// ---------- Phone ----------
+const FRAMES = {
+  A: [['today', 'Today'], ['past', 'A past day: a quiet Sunday'], ['moment', 'A moment opened: what you read in Chrome'], ['person', 'A person’s messages'], ['search', 'Search'], ['chat', 'Chat'], ['agents', 'Agents'], ['addagent', 'Add agent']],
+  B: [['today', 'Today'], ['calendar', 'Changing the day: the calendar sheet'], ['past', 'A past day: a quiet Sunday'], ['moment', 'A moment opened: what you read in Chrome'], ['search', 'Search'], ['chat', 'Chat, with the model picker open'], ['agents', 'Agents'], ['addagent', 'Add agent']],
+  C: [['index', 'Days tab: today on top, earlier days below'], ['today', 'Today’s page'], ['past', 'A past day: a quiet Sunday'], ['moment', 'A moment opened: what you read in Chrome'], ['search', 'Search'], ['chat', 'Chat'], ['agents', 'Agents'], ['addagent', 'Add agent']],
+};
+const G = { w: 'cover', live: true };
+
+function initState(v, frame) {
+  const base = v === 'C' ? [{ s: 'index' }] : [];
+  const day = k => v === 'C' ? [{ s: 'index' }, { s: 'day', k }] : [{ s: 'day', k }];
+  const st = { v, tab: 'days', stack: day(27), sheet: null, toast: null };
+  if (v === 'C') st.stack = [{ s: 'index' }];
+  switch (frame) {
+    case 'today': st.stack = v === 'C' ? day(27) : day(27); if (G.w === 'inner' && v !== 'C') st.stack.push({ s: 'moment', id: 'slack1' }); break;
+    case 'index': st.stack = [{ s: 'index' }]; break;
+    case 'past': st.stack = day(25); if (G.w === 'inner' && v !== 'C') st.stack.push({ s: 'moment', id: 'kindle3' }); break;
+    case 'moment': st.stack = day(27).concat({ s: 'moment', id: 'chrome1' }); break;
+    case 'person': st.stack = day(27).concat({ s: 'moment', id: 'rahul1' }); break;
+    case 'search': st.stack = (v === 'C' ? [{ s: 'index' }] : day(27)).concat({ s: 'search', q: 'Toit' }); if (G.w === 'inner') st.stack.push({ s: 'moment', id: 'claude1' }); break;
+    case 'calendar': st.sheet = 'calendar'; break;
+    case 'chat': st.tab = 'chat'; if (v === 'B') st.sheet = 'model'; break;
+    case 'agents': st.tab = 'agents'; break;
+    case 'addagent': st.tab = 'agents'; st.sheet = 'addagent'; break;
+  }
+  return st;
+}
+
+const topOf = st => st.stack[st.stack.length - 1];
+
+function statusBar() {
+  return `<div class="status" aria-hidden="true"><span>9:42</span><span>${ic('wifi-high')}${ic('cell-signal-full')}${ic('battery-high')}</span></div>`;
+}
+function liveLine(st) {
+  if (!G.live) return '';
+  return `<div class="live" role="status"><span class="dot"></span><span class="what">Claude is using Slack</span><button data-a="stop">Stop</button></div>`;
+}
+function navItems(st) {
+  return [['days', 'calendar-blank', 'Days'], ['chat', 'chat-circle', 'Chat'], ['agents', 'robot', 'Agents']]
+    .map(([k, i, l]) => `<button data-a="tab" data-tab="${k}"${st.tab === k ? ' aria-current="page"' : ''}>${ic(i)}<span>${l}</span></button>`).join('');
+}
+
+function dayHeader(st, d, inner) {
+  const icons = `<button class="ib" data-a="search" aria-label="Search">${ic('magnifying-glass')}</button><button class="ib" data-a="settings" aria-label="Settings">${ic('gear-six')}</button>`;
+  if (st.v === 'A') {
+    const wk = DAYS.map(x => `<button data-a="day" data-k="${x.k}" aria-label="${x.long}"${x.k === d.k ? ' aria-current="date"' : ''}><small>${x.w}</small><b>${x.k}</b></button>`).join('');
+    return `<div class="head"><nav class="week grow" aria-label="Days this week">${wk}</nav>${icons}</div>`;
+  }
+  if (st.v === 'B') {
+    return `<div class="head"><div class="grow"><button class="datebtn" data-a="sheet" data-sheet="calendar" aria-label="Change day, ${d.today ? 'today' : d.long}">${d.today ? 'Today' : d.wd + ' ' + d.k + ' Oct'} ${ic('caret-down')}</button></div>${icons}</div>`;
+  }
+  // C: back to the index on the cover
+  if (inner) return '';
+  return `<div class="head back"><button class="ib" data-a="back" aria-label="All days">${ic('arrow-left')}</button><div class="grow"></div>${icons}</div>`;
+}
+
+function dayBody(st, d, selId) {
+  let h = `<div class="day" data-swipe="${st.v === 'A' ? 1 : ''}">`;
+  h += `<p class="dateline">${d.long}</p>`;
+  h += `<h2 class="daytitle">${d.title}</h2>`;
+  h += `<p class="summary">${summaryHTML(d.summary)}</p>`;
+  if (d.open && d.open.length) {
+    h += `<div class="label">Left open</div>` + d.open.map(id => row(id, null, false)).join('');
+  }
+  for (const g of d.groups) {
+    if (st.v === 'B' && g.icon) {
+      h += `<div class="place"><span class="lead">${ic(g.icon)}</span><span class="t">${g.label}</span><span class="time">${g.span}</span></div>`;
+    } else if (st.v === 'C' && g.span) {
+      h += `<div class="label"><span>${g.label}</span><span class="span">${g.span}</span></div>`;
+    } else {
+      h += `<div class="label">${g.label}</div>`;
+    }
+    h += g.items.map(id => row(id, null, id === selId)).join('');
+  }
+  return h + `</div>`;
+}
+
+function indexBody(st, selK) {
+  const t = dayOf(27);
+  if (G.w === 'inner') return indexRows(selK);
+  let h = `<div class="idx"><div class="todayblock"><p class="dateline">Today, 27 October</p>
+    <button class="titlebtn" data-a="day" data-k="27"><h2 class="daytitle" style="margin:0">${t.title}</h2>${ic('caret-right')}</button>
+    <p class="summary" style="margin-top:10px">${summaryHTML(t.summary)}</p></div>`;
+  h += `<div class="label">Left open</div>` + t.open.map(id => row(id)).join('');
+  return h + indexRows(selK, true).replace('<div class="idx">', '');
+}
+function indexRows(selK, skipToday) {
+  let h = skipToday ? '' : '<div class="idx">';
+  h += `<div class="label"${skipToday ? '' : ' style="margin-top:4px"'}>This week</div>`;
+  for (const d of DAYS.slice(skipToday ? 0 : 0, skipToday ? 6 : 7).reverse()) {
+    const first = d.summary.map(s => typeof s === 'string' ? s : s.t).join('').split('. ')[0].replace(/\.$/, '') + '.';
+    h += `<button class="dayrow" data-a="day" data-k="${d.k}"${d.k === selK ? ' aria-current="true"' : ''}><span class="d"><small>${d.wd}</small><b>${d.k}</b></span><span class="txt"><span class="t">${d.title}</span><span class="p">${first}</span></span></button>`;
+  }
+  h += `<div class="label">Last week</div>`;
+  for (const [wd, k, t, p] of [['Tue', 20, 'Demo for the Surge partners', 'A short demo at 11, then lunch with the partners on Lavelle Road.'], ['Mon', 19, 'Laptop died, a day on the phone', 'Most of the day ran from the phone while the MacBook was at the service centre.']]) {
+    h += `<button class="dayrow" data-a="toast" data-msg="This mock has 21 to 27 October"><span class="d"><small>${wd}</small><b>${k}</b></span><span class="txt"><span class="t">${t}</span><span class="p">${p}</span></span></button>`;
+  }
+  return h + `</div>`;
+}
+
+function headerTitle(title, back = true, right = '') {
+  return `<div class="head back">${back ? `<button class="ib" data-a="back" aria-label="Back">${ic('arrow-left')}</button>` : ''}<h1 class="grow">${title}</h1>${right}</div>`;
+}
+
+function momentView(st, id, inner) {
+  const m = M[id];
+  const d = dayOfMoment(id);
+  const place = placeOfMoment(id);
+  const when = `${d.today ? 'Today' : d.wd + ' ' + d.k + ' Oct'}, ${m.time}${place ? ' · ' + place : ''}`;
+  const right = m.app && m.app !== 'place' && m.app !== 'claude' ? `<button class="ib" data-a="toast" data-msg="Opens ${APPS[m.app][1]}" aria-label="Open in ${APPS[m.app][1]}">${ic('arrow-square-out')}</button>` : '';
+  const closeBtn = inner ? `<div class="head back"><button class="ib" data-a="back" aria-label="Close">${ic('x')}</button><div class="grow"></div>${right}</div>` : '';
+  let h = inner ? closeBtn : `<div class="head back"><button class="ib" data-a="back" aria-label="Back">${ic('arrow-left')}</button><div class="grow"></div>${right}</div>`;
+  h += `<div class="scroll"><div class="read">`;
+  if (m.open === 'article') {
+    h += `<p class="meta">Chrome · ${when} · 17 min</p><h2>How ESOPs are taxed when you exercise them</h2><p class="src">zerodha.com/varsity</p>
+      <p class="body">When you exercise your options, the difference between the fair market value on that day and your exercise price is taxed as a perquisite, as part of your salary. Your employer deducts TDS on it.</p>
+      <p class="body">When you later sell the shares, the gain over the fair market value at exercise is a capital gain. Unlisted shares held for more than 24 months count as long term.</p>
+      <p class="gap">You scrolled past two sections</p>
+      <p class="body">Employees of eligible startups can defer the tax on exercise for up to five years, or until they leave the company or sell the shares, whichever comes first.</p>`;
+  } else if (m.open === 'thread') {
+    h += `<p class="meta">Slack · #release-0-9 · ${d.today ? 'Today' : d.long}</p>
+      <div class="msg"><img class="av" src="${P('rahul')}" alt=""><div><div class="who">Rahul<span>11:38 am</span></div><div class="m">Onboarding isn’t ready. I’d rather ship 0.9 on Thursday without it.</div></div></div>
+      <div class="msg"><span class="av amma" style="background:var(--surface);color:var(--text-2)" aria-hidden="true">T</span><div><div class="who">You<span>11:42 am</span></div><div class="m">Agreed. Onboarding goes in 0.10. Can you get CI green tonight?</div></div></div>
+      <div class="msg"><img class="av" src="${P('rahul')}" alt=""><div><div class="who">Rahul<span>11:44 am</span></div><div class="m">Yes. Two flaky tests left.</div></div></div>
+      <p class="gap">Later</p>
+      <div class="msg"><img class="av" src="${P('rahul')}" alt=""><div><div class="who">Rahul<span>9:12 pm</span></div><div class="m">Build is green. Tagging 0.9 in the morning.</div></div></div>`;
+  } else if (m.open === 'steps') {
+    h += `<p class="meta">${when}</p><h2>Claude added Toit, Friday 8 pm to Calendar</h2><p class="src">You asked from claude.ai: “book drinks with Founders BLR at Toit on Friday”</p>
+      <ol class="steps">
+        <li><time>4:09 pm</time><span>Read “Drinks at Toit on Friday?” in Founders BLR on WhatsApp</span></li>
+        <li><time>4:10 pm</time><span>Opened Calendar and made “Toit with Founders BLR”, Friday 30 October, 8 to 10 pm</span></li>
+        <li><time>4:10 pm</time><span>Added Toit, 100 Feet Road, Indiranagar as the place</span></li>
+        <li><time>4:11 pm</time><span>Asked before sending in Founders BLR. You tapped Allow.</span></li>
+      </ol>`;
+  } else {
+    const app = m.app && m.app !== 'place' ? APPS[m.app][1] + ' · ' : '';
+    h += `<p class="meta">${app}${when}</p><h2>${m.t}</h2><p class="src">${m.p}</p>`;
+    for (const r of (m.read || ['Nothing else from this moment was kept.'])) h += `<p class="body">${r}</p>`;
+  }
+  h += `</div></div>`;
+  h += `<div class="composer"><label class="field"><span class="vis">Ask about this</span><input placeholder="Ask about this"><button class="send" data-a="toast" data-msg="Gemini Nano answers here" aria-label="Send">${ic('arrow-up')}</button></label></div>`;
+  return h;
+}
+
+function searchView(st, q, selId) {
+  let h = `<div class="head back"><button class="ib" data-a="back" aria-label="Back">${ic('arrow-left')}</button><label class="sfield"><span class="vis">Search your days</span><input value="${q}" placeholder="Search your days"><button class="ib" data-a="toast" data-msg="Clears the search" aria-label="Clear search">${ic('x')}</button></label></div>`;
+  h += `<div class="scroll"><div class="day" style="padding-top:0">`;
+  for (const g of SEARCH) {
+    h += `<div class="label" style="margin-top:20px">${g.label}</div>`;
+    h += g.items.map(it => row(it.m || it.x, it.p, !!it.m && it.m === selId)).join('');
+  }
+  return h + `</div></div>`;
+}
+
+function settingsView() {
+  const r = (t, p, right = '') => `<button class="row" data-a="toast" data-msg="Opens ${t}"><span class="txt"><span class="t">${t}</span><span class="p" style="white-space:normal">${p}</span></span>${right ? `<span class="time">${right}</span>` : ''}</button>`;
+  return headerTitle('Settings') + `<div class="scroll"><div class="day" style="padding-top:0">
+    <div class="label" style="margin-top:8px">Your days</div>
+    ${r('Screen memory', 'Keeps the text of screens you open, on this phone.', 'On')}
+    ${r('Day summaries', 'Gemini Nano writes each day’s title and summary on this phone. Nothing is uploaded.', 'On')}
+    ${r('Apps never read', 'Banking, password managers, keyboards and 9 more.')}
+    <div class="label">Agents</div>
+    ${r('Ask me before Send or Pay', 'A tap on Send, Pay, Buy or Order waits for you to tap Allow.', 'On')}
+    ${r('Phone access', 'Accessibility, notifications and battery.', 'All on')}
+    <div class="label">Look</div>
+    ${r('Theme', 'Follows the system.', 'Auto')}
+  </div></div>`;
+}
+
+function chatView(st) {
+  const model = st.model || 'Gemini Nano';
+  return `<div class="head"><div class="grow"><button class="picker" data-a="sheet" data-sheet="model" aria-label="Model: ${model}. Change">${model} ${ic('caret-down')}</button></div><button class="ib" data-a="toast" data-msg="Starts a new chat" aria-label="New chat">${ic('note-pencil')}</button></div>
+  <div class="scroll"><div class="chat">
+    <div class="you">What did Rahul and I decide about 0.9?</div>
+    <div class="bot"><p>You agreed to ship 0.9 on Thursday and leave the new onboarding for 0.10. Rahul said he’d get CI green tonight, and at 9:12 pm he wrote that the build is green.</p>
+      <button class="cite" data-a="moment" data-id="slack1">${ic('slack-logo', ' style="color:var(--c-slack)"')}Slack, #release-0-9, 11:42 am</button></div>
+    <div class="you">Tell Amma I’ll call her tomorrow morning, I’m sleeping early</div>
+    <div class="bot"><p>Here’s the message. I’ll send it on WhatsApp when you say so.</p>
+      <div class="draft"><small>To Amma on WhatsApp</small>Sleeping early today, Amma. I’ll call you tomorrow morning.</div>
+      <div class="btns"><button class="btn primary" data-a="toast" data-msg="Sent to Amma">${ic('paper-plane-right')}Send</button><button class="btn plain" data-a="toast" data-msg="Opens the draft to edit">Edit</button></div></div>
+  </div></div>
+  <div class="composer"><label class="field"><span class="vis">Ask about your days, or give a task</span><input placeholder="Ask about your days, or give a task"><button class="ib" aria-label="Speak" data-a="toast" data-msg="Listens">${ic('microphone')}</button><button class="send" aria-label="Send" data-a="toast" data-msg="Sends">${ic('arrow-up')}</button></label></div>`;
+}
+
+function agentsView(st) {
+  const live = G.live;
+  const a = (icon, color, t, p, right, act) => `<button class="row" ${act}><span class="lead">${ic(icon, ` style="color:${color}"`)}</span><span class="txt"><span class="t">${t}</span><span class="p">${p}</span></span><span class="time">${right}</span></button>`;
+  const r = (icon, t, p, paused) => `<button class="row${paused ? ' muted' : ''}" data-a="toast" data-msg="Opens the routine"><span class="lead">${ic(icon, ' style="color:var(--text-2)"')}</span><span class="txt"><span class="t">${t}</span><span class="p">${p}</span></span>${paused ? '<span class="time">Paused</span>' : ''}</button>`;
+  return `<div class="head"><h1 class="grow">Agents</h1></div><div class="scroll"><div class="day" style="padding-top:0">
+    <div class="label" style="margin-top:4px">Connected</div>
+    ${a('asterisk', 'var(--c-claude)', 'Claude', live ? 'Using Slack now' : 'claude.ai and the Claude app', live ? 'Now' : '4:10 pm', 'data-a="moment" data-id="claude1"')}
+    ${a('terminal-window', 'var(--text-2)', 'Claude Code', 'MacBook Air, over Tailscale', 'Yesterday', 'data-a="toast" data-msg="Opens Claude Code"')}
+    ${a('open-ai-logo', 'var(--text-2)', 'ChatGPT', 'chatgpt.com and the ChatGPT app', '3 Oct', 'data-a="toast" data-msg="Opens ChatGPT"')}
+    <button class="row single" data-a="sheet" data-sheet="addagent"><span class="lead">${ic('plus', ' style="color:var(--text-2)"')}</span><span class="txt"><span class="t">Add agent</span></span></button>
+    <div class="label">Routines</div>
+    ${r('map-pin', 'When I get to Office', 'Do Not Disturb until 1 pm, open Slack')}
+    ${r('battery-low', 'When battery is below 15%', 'Battery saver on, mute Slack until it charges')}
+    ${r('chat-circle', 'When Rahul messages after 10 pm', 'Claude drafts a reply for the morning')}
+    ${r('clock', 'Weekdays at 8:30 am', 'Claude sends my day’s plan on WhatsApp', true)}
+    <button class="row single" data-a="toast" data-msg="Opens a new routine"><span class="lead">${ic('plus', ' style="color:var(--text-2)"')}</span><span class="txt"><span class="t">New routine</span></span></button>
+  </div></div>`;
+}
+
+function sheetHTML(st) {
+  if (!st.sheet) return '';
+  let h = '';
+  if (st.sheet === 'addagent') {
+    const r = (icon, color, t, p) => `<button class="row" data-a="toast" data-msg="Shows how to connect ${t}"><span class="lead">${ic(icon, ` style="color:${color}"`)}</span><span class="txt"><span class="t">${t}</span><span class="p" style="white-space:normal">${p}</span></span></button>`;
+    h = `<h2 id="sh">Add agent</h2><p>An agent you add can read your screen and use your apps. Send and Pay wait for you, and Stop is always in the pill at the top of the screen.</p>
+      ${r('asterisk', 'var(--c-claude)', 'Claude', 'claude.ai and the Claude app')}
+      ${r('terminal-window', 'var(--text-2)', 'Claude Code', 'On your computer, over Wi-Fi or Tailscale')}
+      ${r('open-ai-logo', 'var(--text-2)', 'ChatGPT', 'chatgpt.com and the ChatGPT app')}
+      ${r('code', 'var(--text-2)', 'Codex', 'On your computer, over Wi-Fi or Tailscale')}
+      ${r('plugs', 'var(--text-2)', 'Another MCP client', 'Copy the address and key into it')}`;
+  } else if (st.sheet === 'model') {
+    const cur = st.model || 'Gemini Nano';
+    const r = (t, p) => `<button class="row" data-a="model" data-model="${t}"><span class="txt"><span class="t">${t}</span><span class="p" style="white-space:normal">${p}</span></span><span class="lead">${t === cur ? ic('check') : ''}</span></button>`;
+    h = `<h2 id="sh">Model</h2><p>Chat reads your days to answer. On-phone models keep everything here.</p>
+      ${r('Gemini Nano', 'On this phone. Fast, good for questions about your days.')}
+      ${r('Gemma 4 E4B', 'On this phone. Slower, better at long answers. A 3 GB download.')}
+      ${r('Claude, your API key', 'Sends your question and the moments it needs to Anthropic.')}`;
+  } else if (st.sheet === 'calendar') {
+    const sel = st.stack.find(x => x.s === 'day')?.k || 27;
+    let cells = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(x => `<small aria-hidden="true">${x}</small>`).join('');
+    cells += '<span></span>'.repeat(4);
+    for (let n = 1; n <= 31; n++) {
+      const has = !!dayOf(n);
+      const future = n > 27;
+      cells += `<button ${future ? 'disabled' : `data-a="${has ? 'day' : 'toast'}" data-k="${n}" data-msg="This mock has 21 to 27 October"`} class="${n === 27 ? 'today' : ''}"${n === sel ? ' aria-current="date"' : ''} aria-label="${n} October">${n}</button>`;
+    }
+    h = `<h2 id="sh">October 2026</h2><div class="cal">${cells}</div>`;
+  }
+  return `<div class="scrim" data-a="closesheet"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh" data-stop><div class="handle"></div>${h}</div></div>`;
+}
+
+function render(ph) {
+  const st = ph.st; const inner = G.w === 'inner';
+  const t = topOf(st);
+  let main = '';
+  let showNav = true;
+  if (st.tab === 'chat') main = inner ? `<div class="colwrap">${chatView(st)}</div>` : chatView(st);
+  else if (st.tab === 'agents') main = inner ? `<div class="colwrap">${agentsView(st)}</div>` : agentsView(st);
+  else if (t.s === 'settings') { main = inner ? `<div class="colwrap">${settingsView()}</div>` : settingsView(); showNav = !!inner; }
+  else if (!inner) {
+    if (t.s === 'moment') { main = momentView(st, t.id); showNav = false; }
+    else if (t.s === 'search') { main = searchView(st, t.q); showNav = false; }
+    else if (t.s === 'index') main = `<div class="head"><h1 class="grow">Days</h1><button class="ib" data-a="search" aria-label="Search">${ic('magnifying-glass')}</button><button class="ib" data-a="settings" aria-label="Settings">${ic('gear-six')}</button></div><div class="scroll">${indexBody(st)}</div>`;
+    else { const d = dayOf(t.k); main = dayHeader(st, d) + `<div class="scroll">${dayBody(st, d)}</div>`; }
+  } else {
+    // Inner: list on the left, detail on the right
+    const below = st.stack.slice(0, -1);
+    const momentTop = t.s === 'moment';
+    const leftV = [...(momentTop ? below : st.stack)].reverse().find(x => x.s === 'day' || x.s === 'search') || { s: 'day', k: 27 };
+    const selId = momentTop ? t.id : null;
+    let left = '', right = '';
+    if (st.v === 'C') {
+      const dayV = [...st.stack].reverse().find(x => x.s === 'day');
+      const searchV = st.stack.some(x => x.s === 'search') ? st.stack.find(x => x.s === 'search') : null;
+      if (searchV) left = searchView(st, searchV.q, selId);
+      else left = `<div class="head"><h1 class="grow">Days</h1><button class="ib" data-a="search" aria-label="Search">${ic('magnifying-glass')}</button><button class="ib" data-a="settings" aria-label="Settings">${ic('gear-six')}</button></div><div class="scroll">${indexBody(st, dayV?.k ?? 27)}</div>`;
+      if (momentTop) right = momentView(st, t.id, true);
+      else if (dayV) right = `<div class="scroll">${dayBody(st, dayOf(dayV.k))}</div>`;
+      else right = `<div class="scroll">${dayBody(st, dayOf(27))}</div>`;
+    } else {
+      if (leftV.s === 'search') left = searchView(st, leftV.q, selId);
+      else { const d = dayOf(leftV.k); left = dayHeader(st, d, true) + `<div class="scroll">${dayBody(st, d, selId)}</div>`; }
+      right = momentTop ? momentView(st, t.id, true) : `<p class="empty">Tap a moment to read it here.</p>`;
+    }
+    main = `<div class="split"><div class="pane left">${left}</div><div class="pane right">${right}</div></div>`;
+  }
+  const nav = inner ? `<nav class="rail" aria-label="Sections">${navItems(st)}</nav>` : '';
+  ph.el.innerHTML = statusBar() + liveLine(st) +
+    `<div class="body">${nav}<div class="main">${main}</div></div>` +
+    (!inner && showNav ? `<nav class="nav" aria-label="Sections">${navItems(st)}</nav>` : '') +
+    `<div class="gesture" aria-hidden="true"></div>` + sheetHTML(st) +
+    (st.toast ? `<div class="toast" role="status">${st.toast}</div>` : '');
+}
+
+function act(ph, el, e) {
+  const st = ph.st; const a = el.dataset.a; const inner = G.w === 'inner';
+  if (a === 'closesheet' && e.target.closest('[data-stop]')) return;
+  st.toast = null;
+  switch (a) {
+    case 'tab': st.tab = el.dataset.tab; st.sheet = null; if (st.tab === 'days') st.stack = st.v === 'C' ? [{ s: 'index' }] : [{ s: 'day', k: 27 }]; break;
+    case 'moment': {
+      st.sheet = null; st.tab = 'days';
+      const id = el.dataset.id;
+      if (topOf(st).s === 'moment') { if (inner) st.stack[st.stack.length - 1] = { s: 'moment', id }; else st.stack.push({ s: 'moment', id }); }
+      else st.stack.push({ s: 'moment', id });
+      break;
+    }
+    case 'day': {
+      const k = +el.dataset.k; st.sheet = null;
+      if (st.v === 'C') st.stack = [{ s: 'index' }, { s: 'day', k }];
+      else st.stack = [{ s: 'day', k }];
+      break;
+    }
+    case 'back': if (st.stack.length > 1) st.stack.pop(); break;
+    case 'search': st.stack.push({ s: 'search', q: 'Toit' }); break;
+    case 'settings': st.stack.push({ s: 'settings' }); break;
+    case 'sheet': st.sheet = el.dataset.sheet; break;
+    case 'closesheet': st.sheet = null; break;
+    case 'model': st.model = el.dataset.model; st.sheet = null; break;
+    case 'stop': G.live = false; syncControls(); renderAll(); return;
+    case 'toast': st.toast = el.dataset.msg; clearTimeout(ph.tt); ph.tt = setTimeout(() => { st.toast = null; render(ph); }, 1800); break;
+  }
+  render(ph);
+}
+
+// ---------- Page ----------
+const VARS = [
+  ['A', 'A. Week row and swipe', 'Warm off-white or warm charcoal with no accent; a row of this week’s dates in the header and a swipe to change day; places only label each group; the full summary always shows.'],
+  ['B', 'B. Calendar sheet and place rows', 'A slightly cool neutral with one ink-blue accent for links, Send and the selected tab; “Today” opens a month sheet; each place is its own row with its time span.'],
+  ['C', 'C. Day index', 'Warm and accent-free like A, but the Days tab is a list of days, Juno-style, with today’s summary on top; places label groups with their time span; the inner screen becomes list and page side by side.'],
+];
+const phones = [];
+function build() {
+  const root = document.getElementById('variations');
+  root.innerHTML = VARS.map(([v, title, line]) => `<section class="variation" id="var-${v}"><h2>${title}</h2><p class="note">${line}</p><div class="grid" id="grid-${v}"></div></section>`).join('');
+  phones.length = 0;
+  for (const [v] of VARS) {
+    const grid = document.getElementById('grid-' + v);
+    for (const [frame, cap] of FRAMES[v]) {
+      if (G.w === 'inner' && frame === 'person' ) continue;
+      const fig = document.createElement('figure');
+      fig.innerHTML = `<figcaption>${cap}</figcaption><div class="device ${G.w}"><div class="phone v-${v}"></div></div>`;
+      grid.appendChild(fig);
+      const ph = { el: fig.querySelector('.phone'), st: initState(v, frame) };
+      ph.el.addEventListener('click', e => { const el = e.target.closest('[data-a]'); if (el && ph.el.contains(el)) { if (el.tagName === 'A') e.preventDefault(); act(ph, el, e); } });
+      let x0 = null;
+      ph.el.addEventListener('pointerdown', e => { x0 = e.target.closest('[data-swipe="1"]') ? e.clientX : null; });
+      ph.el.addEventListener('pointerup', e => {
+        if (x0 == null) return; const dx = e.clientX - x0; x0 = null;
+        if (Math.abs(dx) < 60) return;
+        const dv = [...ph.st.stack].reverse().find(s => s.s === 'day'); if (!dv) return;
+        const k = dv.k + (dx < 0 ? 1 : -1); if (!dayOf(k)) return;
+        ph.st.stack = [{ s: 'day', k }]; render(ph);
+      });
+      ph.el.addEventListener('keydown', e => { if (e.key === 'Escape' && ph.st.sheet) { ph.st.sheet = null; render(ph); } });
+      phones.push(ph);
+    }
+  }
+  renderAll();
+}
+const renderAll = () => phones.forEach(render);
+
+const q = new URLSearchParams(location.search);
+let theme = q.get('theme') || 'auto';
+G.w = q.get('w') || 'cover';
+if (q.get('live') === '0') G.live = false;
+const mq = matchMedia('(prefers-color-scheme: dark)');
+function applyTheme() { document.documentElement.classList.toggle('dark', theme === 'dark' || (theme === 'auto' && mq.matches)); }
+mq.addEventListener('change', applyTheme);
+function syncControls() {
+  document.querySelectorAll('[data-theme]').forEach(b => b.setAttribute('aria-pressed', b.dataset.theme === theme));
+  document.querySelectorAll('[data-w]').forEach(b => b.setAttribute('aria-pressed', b.dataset.w === G.w));
+  document.querySelectorAll('[data-live]').forEach(b => b.setAttribute('aria-pressed', (b.dataset.live === '1') === G.live));
+}
+document.querySelector('.controls').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.theme) { theme = b.dataset.theme; applyTheme(); }
+  if (b.dataset.w) { G.w = b.dataset.w; build(); }
+  if (b.dataset.live) { G.live = b.dataset.live === '1'; renderAll(); }
+  syncControls();
+});
+applyTheme(); syncControls(); build();
+</script>
+</body>
+</html>

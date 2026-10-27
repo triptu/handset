@@ -1,0 +1,30 @@
+{
+  "name": "@handset/relay",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun scripts/dev.ts",
+    "deploy": "alchemy deploy",
+    "check": "tsc --noEmit",
+    "test": "bun test",
+    "phone": "bun scripts/fake-phone.ts"
+  },
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "1.2.4",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@alchemy.run/cloudflare": "2.0.0-beta.84",
+    "@cloudflare/workers-types": "5.20261027.1",
+    "@effect/platform-bun": "4.0.6",
+    "@effect/platform-node": "4.0.6",
+    "@modelcontextprotocol/inspector": "2.12.0",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "@types/bun": "1.4.4",
+    "alchemy": "2.0.0-beta.84",
+    "effect": "4.0.6",
+    "esbuild": "0.28.2",
+    "miniflare": "4.20260730.0",
+    "typescript": "7.0.2"
+  }
+}

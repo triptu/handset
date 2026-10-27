@@ -1,0 +1,859 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobile use, first look</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/phosphor-regular.css">
+<link rel="stylesheet" href="assets/phosphor-fill.css">
+<style>
+/* ---------- page ---------- */
+:root{
+  --page-bg:oklch(0.955 0.004 90); --page-ink:oklch(0.22 0.01 90); --page-ink2:oklch(0.43 0.01 90);
+  --page-line:oklch(0.87 0.006 90); --page-surf:oklch(0.985 0.002 90); --page-accent:oklch(0.48 0.08 168);
+  color-scheme:light;
+}
+html[data-theme=dark]{
+  --page-bg:oklch(0.15 0.004 90); --page-ink:oklch(0.93 0.006 90); --page-ink2:oklch(0.74 0.008 90);
+  --page-line:oklch(0.29 0.006 90); --page-surf:oklch(0.19 0.004 90); --page-accent:oklch(0.76 0.08 168);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page-bg);color:var(--page-ink);font:15px/1.5 'Google Sans Flex',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+::selection{background:color-mix(in oklch,var(--page-accent) 30%,transparent)}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 28px 24px}
+h1{font-size:34px;line-height:1.15;margin:0 0 10px;font-weight:600;letter-spacing:-0.01em}
+h2{font-size:24px;margin:0 0 8px;font-weight:600}
+h3{font-size:17px;margin:0 0 6px;font-weight:600}
+h2.sub{font-size:17px;margin:0 0 6px}
+p{margin:0 0 10px;max-width:72ch}
+.lede{color:var(--page-ink2);font-size:16px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:28px}
+.borrow{margin:0;padding:0;list-style:none}
+.borrow li{padding:7px 0;border-top:1px solid var(--page-line);color:var(--page-ink2)}
+.borrow b{color:var(--page-ink);font-weight:600}
+.struct{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0}
+.struct dt{font-weight:600;white-space:nowrap}
+.struct dd{margin:0;color:var(--page-ink2)}
+
+/* toolbar */
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in oklch,var(--page-bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--page-line)}
+.bar .in{max-width:1180px;margin:0 auto;padding:10px 28px;display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center}
+.ctl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--page-ink2)}
+.seg{display:inline-flex;border:1px solid var(--page-line);border-radius:999px;padding:2px;background:var(--page-surf)}
+.seg button{border:0;background:none;color:var(--page-ink2);font:inherit;font-size:13px;padding:5px 11px;border-radius:999px;cursor:pointer}
+.seg button:hover{color:var(--page-ink);background:color-mix(in oklch,var(--page-ink) 6%,transparent)}
+.seg button[aria-pressed=true]{background:var(--page-ink);color:var(--page-bg)}
+.sw{width:22px;height:22px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;outline-offset:2px}
+.sw[aria-pressed=true]{border-color:var(--page-ink)}
+.sw.def{background:conic-gradient(oklch(0.55 0.09 168) 0 33%,oklch(0.5 0.12 262) 0 66%,oklch(0.6 0.12 35) 0)}
+
+/* direction sections */
+.dir{padding:36px 0 10px;border-top:1px solid var(--page-line)}
+.dir .head{max-width:1180px;margin:0 auto;padding:0 28px 18px;display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.dir .head .tag{display:inline-block;font-size:13px;color:var(--page-ink2);margin-bottom:4px}
+.row{display:flex;gap:28px;overflow-x:auto;padding:6px 28px 26px;scroll-padding:28px}
+.row::-webkit-scrollbar{height:10px}.row::-webkit-scrollbar-thumb{background:var(--page-line);border-radius:10px}
+.fwrap{flex:none;display:flex;flex-direction:column;gap:10px}
+.flabel{font-size:13px;color:var(--page-ink2);padding-left:4px}
+.verdict{max-width:1180px;margin:0 auto;padding:0 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.verdict p{color:var(--page-ink2)}
+.verdict b{color:var(--page-ink)}
+.rec{border-top:1px solid var(--page-line);padding-top:30px}
+.rec ol{padding-left:20px;margin:0}.rec li{margin:0 0 8px;color:var(--page-ink2);max-width:80ch}.rec li b{color:var(--page-ink)}
+.note{font-size:13px;color:var(--page-ink2)}
+
+/* ---------- phone frame ---------- */
+.phone{--w:412px;--h:916px;width:var(--w);height:var(--h);border-radius:34px;padding:9px;background:oklch(0.16 0.004 90);box-shadow:0 18px 40px -18px rgb(0 0 0/.35),0 2px 6px rgb(0 0 0/.12);flex:none}
+html[data-theme=dark] .phone{background:oklch(0.32 0.004 90);box-shadow:none}
+html[data-screen=inner] .phone{--w:860px;--h:930px;border-radius:26px}
+html[data-screen=inner] .fwrap[data-role=detail]{display:none}
+.scr{width:100%;height:100%;border-radius:26px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);container-type:inline-size}
+html[data-screen=inner] .scr{border-radius:18px}
+.status{flex:none;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 22px 0 24px;font-size:13px;font-weight:500;color:var(--ink)}
+.status .r{display:flex;gap:5px;font-size:15px}
+.gest{flex:none;height:22px;display:grid;place-items:center}
+.gest::after{content:"";width:110px;height:4px;border-radius:4px;background:var(--ink);opacity:.55}
+.body{flex:1;min-height:0;display:flex;flex-direction:column}
+.scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+
+/* ---------- shared theme tokens per direction ---------- */
+.dA{--fs:15px;font-family:'Google Sans Flex',system-ui,sans-serif;
+  --bg:oklch(0.975 0.005 165);--surf:oklch(0.995 0.002 165);--surf2:oklch(0.945 0.008 165);--ink:oklch(0.22 0.02 170);--ink2:oklch(0.42 0.016 170);--ink3:oklch(0.5 0.012 170);--line:oklch(0.9 0.008 165);
+  --accent:oklch(0.5 0.09 168);--on-accent:#fff;}
+.dB{--fs:15px;font-family:'Figtree',system-ui,sans-serif;
+  --bg:oklch(0.962 0.011 240);--surf:oklch(0.99 0.004 240);--surf2:oklch(0.932 0.015 240);--ink:oklch(0.24 0.045 262);--ink2:oklch(0.42 0.035 258);--ink3:oklch(0.5 0.03 255);--line:oklch(0.885 0.016 245);
+  --accent:oklch(0.45 0.12 262);--on-accent:#fff;}
+.dC{--fs:15px;font-family:'Rubik',system-ui,sans-serif;
+  --bg:oklch(0.978 0.005 60);--surf:oklch(0.997 0.002 60);--surf2:oklch(0.945 0.01 60);--ink:oklch(0.23 0.015 50);--ink2:oklch(0.43 0.015 50);--ink3:oklch(0.51 0.012 50);--line:oklch(0.9 0.01 60);
+  --accent:oklch(0.56 0.12 35);--on-accent:#fff;}
+html[data-theme=dark] .dA{--bg:oklch(0.17 0.01 170);--surf:oklch(0.215 0.012 170);--surf2:oklch(0.255 0.013 170);--ink:oklch(0.94 0.01 170);--ink2:oklch(0.79 0.012 170);--ink3:oklch(0.7 0.01 170);--line:oklch(0.3 0.01 170);--accent:oklch(0.76 0.09 168);--on-accent:oklch(0.17 0.02 170)}
+html[data-theme=dark] .dB{--bg:oklch(0.195 0.03 262);--surf:oklch(0.235 0.033 262);--surf2:oklch(0.275 0.035 262);--ink:oklch(0.94 0.012 250);--ink2:oklch(0.81 0.02 250);--ink3:oklch(0.72 0.02 250);--line:oklch(0.33 0.03 258);--accent:oklch(0.79 0.09 255);--on-accent:oklch(0.2 0.03 262)}
+html[data-theme=dark] .dC{--bg:oklch(0.195 0.008 60);--surf:oklch(0.235 0.009 60);--surf2:oklch(0.275 0.01 60);--ink:oklch(0.94 0.008 70);--ink2:oklch(0.8 0.01 70);--ink3:oklch(0.71 0.01 70);--line:oklch(0.32 0.01 60);--accent:oklch(0.76 0.1 35);--on-accent:oklch(0.2 0.02 40)}
+/* accent override */
+html[data-accent=teal] .scr{--accent:oklch(0.5 0.09 168)} html[data-theme=dark][data-accent=teal] .scr{--accent:oklch(0.76 0.09 168)}
+html[data-accent=ink] .scr{--accent:oklch(0.45 0.12 262)} html[data-theme=dark][data-accent=ink] .scr{--accent:oklch(0.79 0.09 255)}
+html[data-accent=clay] .scr{--accent:oklch(0.56 0.12 35)} html[data-theme=dark][data-accent=clay] .scr{--accent:oklch(0.76 0.1 35)}
+html[data-accent=moss] .scr{--accent:oklch(0.49 0.09 135)} html[data-theme=dark][data-accent=moss] .scr{--accent:oklch(0.77 0.09 135)}
+.scr{--accent-soft:color-mix(in oklch,var(--accent) 14%,var(--surf));--accent-ink:color-mix(in oklch,var(--accent) 80%,var(--ink));
+  --c-work:oklch(0.6 0.08 255);--c-chats:oklch(0.66 0.1 150);--c-browse:oklch(0.67 0.07 205);--c-watch:oklch(0.65 0.11 12);--c-read:oklch(0.72 0.1 80);--c-errands:oklch(0.62 0.09 50);
+  --p-home:oklch(0.86 0.045 80);--p-office:oklch(0.85 0.035 255);--p-cafe:oklch(0.86 0.05 150);--p-park:oklch(0.85 0.06 135);
+  --row:12px;--gap:16px;font-size:var(--fs)}
+html[data-theme=dark] .scr{--c-work:oklch(0.7 0.08 255);--c-chats:oklch(0.74 0.1 150);--c-browse:oklch(0.75 0.07 205);--c-watch:oklch(0.72 0.1 12);--c-read:oklch(0.8 0.09 80);--c-errands:oklch(0.71 0.08 50);
+  --p-home:oklch(0.4 0.04 80);--p-office:oklch(0.4 0.045 255);--p-cafe:oklch(0.42 0.05 150);--p-park:oklch(0.42 0.06 135)}
+html[data-density=compact] .scr{--row:7px;--gap:11px;--fs:14px}
+
+/* ---------- shared atoms ---------- */
+.scr button{font:inherit;color:inherit}
+.ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;border:0;background:none;cursor:pointer;font-size:22px;color:var(--ink2);flex:none}
+.ib:hover{background:color-mix(in oklch,var(--ink) 8%,transparent)}
+.ib:active{background:color-mix(in oklch,var(--ink) 14%,transparent)}
+.ib.sm{width:32px;height:32px;font-size:18px}
+.tap{cursor:pointer}
+.tap:hover{background:color-mix(in oklch,var(--ink) 5%,transparent)}
+.tap:active{background:color-mix(in oklch,var(--ink) 10%,transparent)}
+.muted{color:var(--ink2)} .faint{color:var(--ink3)}
+.num{font-variant-numeric:tabular-nums}
+.av{width:36px;height:36px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:19px;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover}
+.av.sm{width:28px;height:28px;font-size:15px}
+.av.xs{width:22px;height:22px;font-size:13px}
+.av.app{background:color-mix(in oklch,var(--cat) 20%,var(--surf));color:color-mix(in oklch,var(--cat) 62%,var(--ink))}
+.av.person{background:color-mix(in oklch,var(--accent) 16%,var(--surf));color:var(--accent-ink);font-weight:600;font-size:15px}
+.av.group{background:var(--surf2);color:var(--ink2)}
+.av.sys{background:var(--surf2);color:var(--ink2)}
+.btn{border:0;border-radius:999px;padding:10px 18px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:14px}
+.btn.pri{background:var(--accent);color:var(--on-accent)}
+.btn.pri:hover{background:color-mix(in oklch,var(--accent) 88%,var(--ink))}
+.btn.ton{background:var(--accent-soft);color:var(--accent-ink)}
+.btn.ton:hover{background:color-mix(in oklch,var(--accent) 22%,var(--surf))}
+.btn.out{background:none;border:1px solid var(--line);color:var(--ink)}
+.btn.out:hover{background:color-mix(in oklch,var(--ink) 5%,transparent)}
+.btn.stop{background:oklch(0.55 0.15 25);color:#fff}
+.btn.stop:hover{background:oklch(0.5 0.15 25)}
+.switch{width:46px;height:28px;border-radius:999px;background:var(--surf2);border:2px solid var(--ink3);position:relative;flex:none;cursor:pointer;padding:0}
+.switch::after{content:"";position:absolute;top:4px;left:4px;width:16px;height:16px;border-radius:50%;background:var(--ink3);transition:all .15s cubic-bezier(.2,.8,.2,1)}
+.switch[aria-checked=true]{background:var(--accent);border-color:var(--accent)}
+.switch[aria-checked=true]::after{left:21px;top:2px;width:20px;height:20px;background:var(--on-accent)}
+.bar-track{height:6px;background:var(--surf2);position:relative}
+.bar-fill{position:absolute;inset:0 auto 0 0;background:var(--cat,var(--accent))}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--ink2)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i.k{width:10px;height:10px;background:var(--cat);display:inline-block}
+.legend i.k.hatch{background:repeating-linear-gradient(135deg,var(--ink3) 0 1.5px,transparent 1.5px 4px)}
+.live{flex:none;display:flex;align-items:center;gap:10px;margin:0 12px 6px;padding:7px 8px 7px 14px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:13px}
+.live .dot{width:8px;height:8px;border-radius:50%;background:oklch(0.72 0.17 145);box-shadow:0 0 0 3px color-mix(in oklch,oklch(0.72 0.17 145) 30%,transparent)}
+.live .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.live button{border:0;border-radius:999px;background:color-mix(in oklch,var(--bg) 18%,transparent);color:var(--bg);padding:5px 12px;font-weight:600;font-size:12.5px;cursor:pointer;display:flex;gap:5px;align-items:center}
+.live button:hover{background:color-mix(in oklch,var(--bg) 28%,transparent)}
+mark{background:color-mix(in oklch,var(--accent) 26%,transparent);color:inherit;padding:0 1px}
+.sec{padding:var(--gap) 20px 4px}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 8px}
+.sec-h h4{margin:0;font-size:16px;font-weight:600}
+.sec-h .a{font-size:13px;color:var(--accent-ink);font-weight:600;cursor:pointer}
+.lrow{display:flex;align-items:center;gap:12px;padding:var(--row) 20px}
+.lrow .main{flex:1;min-width:0}
+.lrow .t1{font-weight:500;line-height:1.3}
+.lrow .t2{font-size:13px;color:var(--ink2);line-height:1.35;margin-top:2px}
+.lrow .end{font-size:13.5px;color:var(--ink2);font-variant-numeric:tabular-nums;text-align:right;flex:none}
+.clamp1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.input{flex:1;min-width:0;border:0;background:none;outline:none;font:inherit;color:var(--ink)}
+.input::placeholder{color:var(--ink3)}
+.composer{flex:none;display:flex;align-items:center;gap:8px;margin:8px 12px 6px;padding:6px 6px 6px 16px;border-radius:999px;background:var(--surf);border:1px solid var(--line)}
+.send{width:40px;height:40px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-size:19px;cursor:pointer;flex:none}
+.split{flex:1;min-height:0;display:grid;grid-template-columns:430px 1fr}
+.split>.pane{min-height:0;display:flex;flex-direction:column;border-right:1px solid var(--line)}
+.split>.pane:last-child{border-right:0}
+.rail{flex:none;width:84px;display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:14px;border-right:1px solid var(--line)}
+.with-rail{flex:1;min-height:0;display:flex}
+.with-rail>.content{flex:1;min-width:0;display:flex;flex-direction:column}
+.navbar{flex:none;display:flex;justify-content:space-around;padding:8px 6px 4px;border-top:1px solid var(--line);background:var(--bg)}
+.nav{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;cursor:pointer;font-size:12px;font-weight:500;color:var(--ink2);min-width:64px}
+.nav .pill{width:56px;height:30px;border-radius:999px;display:grid;place-items:center;font-size:21px;position:relative}
+.nav:hover .pill{background:color-mix(in oklch,var(--ink) 7%,transparent)}
+.nav[aria-current=true]{color:var(--ink)}
+.nav[aria-current=true] .pill{background:var(--accent-soft);color:var(--accent-ink)}
+.nav .badge{position:absolute;top:3px;right:12px;width:8px;height:8px;border-radius:50%;background:oklch(0.65 0.17 145);border:1.5px solid var(--bg)}
+.toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:13px;pointer-events:none}
+.empty-later{background:repeating-linear-gradient(90deg,var(--line) 0 2px,transparent 2px 6px)}
+
+/* ---------- A: ribbon ---------- */
+.dA .top{display:flex;align-items:center;gap:4px;padding:6px 10px 0 20px}
+.dA .top .ttl{flex:1;min-width:0}
+.dA .top h2{font-size:30px;line-height:1.1;font-weight:600;margin:0;letter-spacing:-0.01em}
+.dA .datesw{display:flex;align-items:center;gap:2px;margin:2px 0 0 -8px;font-size:14px;color:var(--ink2)}
+.dA .sum{padding:12px 20px 4px;font-size:16px;line-height:1.5}
+.dA .by{font-size:12.5px;color:var(--ink3);display:flex;align-items:center;gap:6px;margin-top:6px}
+.dA .by button{border:0;background:none;color:var(--accent-ink);font-weight:600;font-size:12.5px;cursor:pointer;padding:0}
+.ribwrap{padding:14px 20px 4px}
+.rib{position:relative;height:96px;touch-action:none;cursor:ew-resize;user-select:none}
+.rib .gl{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+.rib .gl.m{background:color-mix(in oklch,var(--ink3) 45%,transparent)}
+.rib .lane{position:absolute;left:0;right:0}
+.rib .lane.pl{top:0;height:24px}
+.rib .lane.sc{top:30px;height:40px;background:var(--surf2)}
+.rib .lane.nt{top:76px;height:20px}
+.rib .blk{position:absolute;top:0;bottom:0}
+.rib .pl .blk{display:flex;align-items:center;padding-left:5px;font-size:11px;font-weight:600;color:color-mix(in oklch,var(--ink) 80%,transparent);overflow:hidden;white-space:nowrap}
+.rib .pl .blk.travel{background:repeating-linear-gradient(135deg,var(--ink3) 0 1.5px,transparent 1.5px 4px);opacity:.7}
+.rib .sc .blk{background:var(--cat)}
+.rib .nt .d{position:absolute;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:var(--ink2)}
+.rib .later{position:absolute;top:0;bottom:0;right:0}
+.rib .scrub{position:absolute;top:-6px;bottom:-4px;width:2px;margin-left:-1px;background:var(--ink);pointer-events:none}
+.rib .scrub::before{content:"";position:absolute;top:-6px;left:-6px;width:14px;height:14px;border-radius:50%;background:var(--ink);border:3px solid var(--bg)}
+.axis{position:relative;height:18px;font-size:11.5px;color:var(--ink3);margin-top:4px}
+.axis span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.axis span:first-child{transform:none}
+.readout{margin:10px 12px 0;padding:12px 8px 12px 14px;background:var(--surf);border:1px solid var(--line);display:flex;gap:12px;align-items:center}
+.readout .main{flex:1;min-width:0}
+.readout .t1{font-weight:600}
+.readout .t2{font-size:13px;color:var(--ink2);margin-top:2px}
+.readout .rq{font-size:13.5px;margin-top:6px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+html[data-shot] .bar{display:none}
+.dA .tot{padding:14px 20px 0;font-size:14px;color:var(--ink2)}
+.dA .tot b{color:var(--ink);font-weight:600}
+.dA .approw .bar-track{margin-top:7px}
+.hh{padding:4px 20px 12px}
+.hh h3{font-size:24px;margin:0;font-weight:600}
+.minirib{position:relative;height:30px;background:var(--surf2);margin:10px 0 4px}
+.minirib .blk{position:absolute;top:0;bottom:0;background:var(--cat)}
+.minirib .hl{position:absolute;top:-4px;bottom:-4px;border:2px solid var(--ink)}
+.quote{margin:0 20px 10px;padding:12px 14px;background:var(--surf);border:1px solid var(--line)}
+.quote .src{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink2);margin-bottom:6px}
+.quote .q{font-size:14.5px;line-height:1.45}
+
+/* agents (shared shapes) */
+.livecard{margin:6px 16px 6px;padding:14px 16px;background:var(--surf);border:1px solid var(--line)}
+.livecard .hd{display:flex;align-items:center;gap:10px}
+.livecard .hd .main{flex:1}
+.steps{list-style:none;margin:12px 0 12px;padding:0;font-size:14px}
+.steps li{display:flex;gap:10px;align-items:center;padding:4px 0;color:var(--ink2)}
+.steps li i{font-size:17px}
+.steps li.now{color:var(--ink);font-weight:500}
+.steps li.done i{color:oklch(0.6 0.13 150)}
+.spin{animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.addr{display:flex;align-items:center;gap:12px;padding:var(--row) 20px}
+.addr .main{flex:1;min-width:0}
+.addr code{font-family:inherit;font-size:13px;color:var(--ink2);word-break:break-all}
+.pillst{font-size:12.5px;color:var(--ink2);display:inline-flex;align-items:center;gap:5px}
+.pillst .g{width:7px;height:7px;border-radius:50%;background:oklch(0.65 0.16 145)}
+.pillst .o{width:7px;height:7px;border-radius:50%;background:var(--ink3)}
+
+/* chat (shared shapes) */
+.msgs{padding:10px 14px 14px;display:flex;flex-direction:column;gap:12px}
+.bub{max-width:84%;padding:10px 14px;border-radius:20px;line-height:1.45}
+.bub.me{align-self:flex-end;background:var(--accent);color:var(--on-accent);border-bottom-right-radius:6px}
+.bub.ai{align-self:flex-start;background:var(--surf);border:1px solid var(--line);border-bottom-left-radius:6px}
+.srcs{display:flex;flex-direction:column;gap:2px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink2)}
+.srcs div{display:flex;align-items:center;gap:7px}
+.meta{font-size:12px;color:var(--ink3);margin-top:-6px;padding:0 4px}
+.meta.r{text-align:right}
+.action{align-self:flex-start;width:88%;background:var(--surf);border:1px solid var(--line);padding:12px 14px}
+.action .hd{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--ink2);margin-bottom:8px}
+.action .bodyq{padding:10px 12px;background:var(--surf2);font-size:14.5px;margin-bottom:10px}
+.action .btns{display:flex;gap:8px}
+.chat-top{display:flex;align-items:center;gap:6px;padding:4px 10px 6px 12px;border-bottom:1px solid var(--line)}
+.modelbtn{display:flex;align-items:center;gap:8px;border:0;background:none;cursor:pointer;padding:6px 10px;border-radius:999px;text-align:left}
+.modelbtn:hover{background:color-mix(in oklch,var(--ink) 6%,transparent)}
+.modelbtn .t1{font-weight:600;font-size:15px;line-height:1.2}
+.modelbtn .t2{font-size:12px;color:var(--ink2)}
+.tries{display:flex;flex-direction:column;gap:6px;padding:0 14px 16px}
+.tries button{align-self:flex-start;border:1px dashed var(--ink3);background:none;border-radius:999px;padding:6px 12px;font-size:13px;color:var(--ink2);cursor:pointer}
+.tries button:hover{color:var(--ink);border-style:solid}
+
+/* ---------- B: journal ---------- */
+.dB .serif{font-family:'Literata',Georgia,serif}
+.dB .btop{display:flex;align-items:center;gap:2px;padding:4px 8px 0 14px}
+.dB .btop .sp{flex:1}
+.dB .bday{padding:4px 22px 0}
+.dB .bday h2{font-family:'Literata',serif;font-size:38px;line-height:1.1;font-weight:500;margin:0;letter-spacing:-0.01em}
+.dB .bday .d{font-size:14px;color:var(--ink2);margin-top:4px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:12px 14px 4px}
+.week button{border:0;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 7px;border-radius:14px;color:var(--ink2);font-size:12px}
+.week button b{font-size:16px;font-weight:600;color:var(--ink)}
+.week button .dt{width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.7}
+.week button .dt.no{background:none}
+.week button:hover{background:color-mix(in oklch,var(--ink) 6%,transparent)}
+.week button[aria-current=true]{background:var(--accent);color:var(--on-accent)}
+.week button[aria-current=true] b{color:var(--on-accent)}
+.week button[aria-current=true] .dt{background:var(--on-accent)}
+.week button.fut{opacity:.45;cursor:default}
+.dB .bsum{padding:16px 22px 6px;font-family:'Literata',serif;font-size:19px;line-height:1.55}
+.dB .by{font-size:12.5px;color:var(--ink3);padding:0 22px;display:flex;gap:6px;align-items:center}
+.dB .hl{list-style:none;margin:14px 0 0;padding:0 22px}
+.dB .hl li{display:flex;gap:12px;padding:8px 0;border-top:1px solid var(--line);font-size:14.5px;align-items:flex-start}
+.dB .hl li i{font-size:19px;color:var(--accent-ink);margin-top:1px}
+.dB .stack{display:flex;height:12px;margin:8px 0 8px}
+.dB .stack div{background:var(--cat)}
+.mom{display:grid;grid-template-columns:62px 1fr;gap:0 10px;padding:0 20px 0 14px}
+.mom .tm{font-size:12.5px;color:var(--ink2);text-align:right;padding-top:12px;font-variant-numeric:tabular-nums}
+.mom .bd{padding:10px 0 12px;border-top:1px solid var(--line)}
+.mom .bd .t1{font-weight:600;display:flex;gap:8px;align-items:center}
+.mom .bd .t2{font-size:13.5px;color:var(--ink2);margin-top:3px}
+.mom .bd .qq{font-family:'Literata',serif;font-size:15px;line-height:1.5;margin-top:6px;padding-left:12px;border-left:2px solid var(--line)}
+.dB .ask{flex:none;display:flex;align-items:center;gap:10px;margin:6px 12px 6px;padding:6px 6px 6px 16px;border-radius:999px;background:var(--surf);border:1px solid var(--line);cursor:text}
+.dB .ask .askph{color:var(--ink3);flex:1}
+.dB .ans{font-family:'Literata',serif;font-size:16.5px;line-height:1.55;padding:2px 4px}
+.dB .q{font-weight:600;font-size:15px;padding:0 4px;color:var(--ink)}
+.dB .qa{display:flex;flex-direction:column;gap:8px;padding:14px 18px;border-top:1px solid var(--line)}
+.dB .seg2{display:flex;gap:6px;padding:6px 16px 8px}
+.dB .seg2 button{border:1px solid var(--line);background:none;border-radius:999px;padding:6px 14px;font-size:13.5px;cursor:pointer;color:var(--ink2)}
+.dB .seg2 button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* ---------- C: places ---------- */
+.dC .ctop{display:flex;align-items:center;padding:8px 10px 0 20px}
+.dC .ctop .sp{flex:1}
+.dC .greet{font-size:30px;font-weight:600;line-height:1.15;margin:0;padding:0 20px;letter-spacing:-0.01em}
+.dC .dsw{display:flex;align-items:center;gap:0;padding:2px 12px 0;color:var(--ink2);font-size:14px}
+.dC .csum{padding:10px 20px 6px;font-size:15.5px;line-height:1.5;color:var(--ink)}
+.dC .by{font-size:12.5px;color:var(--ink3);padding:0 20px 8px;display:flex;align-items:center;gap:6px}
+.spine{position:relative;padding:8px 0 20px}
+.visit{display:grid;grid-template-columns:56px 1fr;padding:0 16px 0 10px;position:relative}
+.visit .rail2{position:relative;display:flex;justify-content:center}
+.visit .rail2::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;background:var(--line)}
+.visit:first-child .rail2::before{top:22px}
+.visit:last-child .rail2::before{bottom:calc(100% - 22px)}
+.visit .node{position:relative;z-index:1;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:20px;margin-top:4px;background:var(--pc,var(--surf2));color:var(--ink)}
+.visit.travel .rail2::before{background:repeating-linear-gradient(180deg,var(--ink3) 0 4px,transparent 4px 8px);opacity:.8}
+.visit.travel .node{width:28px;height:28px;font-size:15px;background:var(--bg);border:1.5px solid var(--ink3);color:var(--ink2);margin-top:8px}
+.visit .vb{padding:6px 6px 16px 6px;min-width:0}
+.visit .vb .t1{display:flex;align-items:baseline;gap:8px}
+.visit .vb .t1 b{font-size:16.5px;font-weight:600;flex:1;min-width:0}
+.visit .vb .t1 span{font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums;flex:none}
+.visit .vb .t2{font-size:13px;color:var(--ink2);margin-top:1px}
+.visit .vb .use{display:flex;height:8px;margin:9px 0 7px;background:var(--surf2)}
+.visit .vb .use div{background:var(--cat)}
+.visit .vb .ic{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2)}
+.visit.travel .vb{padding-top:10px;padding-bottom:14px}
+.visit.travel .vb .t1 b{font-size:14px;font-weight:500;color:var(--ink2)}
+.visit.tap{border-radius:0}
+.visit.sel{background:var(--accent-soft)}
+.dC .vh{padding:2px 20px 10px;display:flex;gap:14px;align-items:center}
+.dC .vh .node{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:26px;background:var(--pc)}
+.dC .vh h3{font-size:22px;margin:0;font-weight:600}
+.searchbox{display:flex;align-items:center;gap:10px;margin:6px 14px 6px;padding:10px 14px;border-radius:999px;background:var(--surf);border:1px solid var(--line)}
+.searchbox i{font-size:19px;color:var(--ink2)}
+.res{padding:10px 20px;display:flex;gap:12px}
+.res .main{flex:1;min-width:0}
+.res .t2{font-size:12.5px;color:var(--ink2);margin-bottom:3px}
+.res .t1{font-size:14.5px;line-height:1.45}
+.dayhd{padding:14px 20px 4px;font-size:13px;font-weight:600;color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="bar"><div class="in">
+  <div class="ctl">Theme <span class="seg" data-ctl="theme"><button data-v="system">System</button><button data-v="light">Light</button><button data-v="dark">Dark</button></span></div>
+  <div class="ctl">Screen <span class="seg" data-ctl="screen"><button data-v="cover">Cover (folded)</button><button data-v="inner">Inner (open)</button></span></div>
+  <div class="ctl">Accent <span style="display:flex;gap:6px" data-ctl="accent">
+    <button class="sw def" data-v="default" title="Each direction's own"></button>
+    <button class="sw" data-v="teal" style="background:oklch(0.55 0.09 168)" title="Teal"></button>
+    <button class="sw" data-v="ink" style="background:oklch(0.47 0.12 262)" title="Ink blue"></button>
+    <button class="sw" data-v="clay" style="background:oklch(0.6 0.12 35)" title="Clay"></button>
+    <button class="sw" data-v="moss" style="background:oklch(0.52 0.09 135)" title="Moss"></button></span></div>
+  <div class="ctl">Density <span class="seg" data-ctl="density"><button data-v="comfortable">Comfortable</button><button data-v="compact">Compact</button></span></div>
+  <div class="ctl">Agent at work <span class="seg" data-ctl="acting"><button data-v="on">On</button><button data-v="off">Off</button></span></div>
+</div></div>
+
+<div class="wrap" id="intro">
+  <h1>Mobile use, first look</h1>
+  <p class="lede">Three directions for the Android app, as clickable mocks at the Galaxy Z Fold 7's real sizes. Nothing here is built yet. All content is made-up sample data. Tap rows, hours, days, tabs and switches; on direction A, drag across the coloured strip. Use the bar above to switch theme, folded or open screen, accent and density.</p>
+  <p class="lede">What to do: pick a direction (or parts of two) and answer the open questions at the bottom.</p>
+  <div class="cols">
+    <div>
+      <h2 class="sub">What we borrowed, and from whom</h2>
+      <ul class="borrow">
+        <li><b>Google Maps Timeline.</b> Places as visits with a start and end time ("Home, 12:00 to 9:05 am"), travel between them as its own row, and a day switcher with arrows.</li>
+        <li><b>Apple Screen Time and Digital Wellbeing.</b> Screen time split by hour and coloured by category, a most-used apps list with time on the right, and notifications counted per sender.</li>
+        <li><b>Rewind and Limitless.</b> One search box over everything you saw on screen, results show the matched words with app and time, and a strip you drag across the day.</li>
+        <li><b>Day One and Apple Journal.</b> The day as a written entry first, a week strip with dots on days that have entries, and moments with a time, a place and a quote.</li>
+        <li><b>Daylio.</b> A few highlights instead of a dashboard, so the day reads at a glance.</li>
+      </ul>
+    </div>
+    <div>
+      <h2 class="sub">Proposed structure</h2>
+      <dl class="struct">
+        <dt>Days</dt><dd>Home screen. Today opens first; arrows, the week strip or the calendar move to other days. Search across days sits at the top.</dd>
+        <dt>Chat</dt><dd>Ask about a day or tell the phone to do something. Uses Gemini Nano by default; Gemma 4 E4B or your own API key are one tap away.</dd>
+        <dt>Agents</dt><dd>Which agents are connected, how to connect a new one, what an agent is doing right now, and triggers. Triggers live here because they start agent routines.</dd>
+        <dt>Settings</dt><dd>Behind the shield button: permissions, what is collected, excluded apps, how long to keep data, delete a day. Per-app switches also show on each app's page.</dd>
+        <dt>Open screen</dt><dd>On the inner screen each tab becomes list and detail side by side (the Material 3 list-detail layout), with a navigation rail.</dd>
+      </dl>
+      <p class="note" style="margin-top:10px">When an agent is acting, a dark bar with Stop sits at the top of every screen, matching the pill the phone already shows.</p>
+    </div>
+  </div>
+</div>
+
+<section class="dir" id="dirA">
+  <div class="head">
+    <div><span class="tag">Direction A</span><h2>Day strip</h2><p class="muted" style="color:var(--page-ink2)">The day is one coloured strip from 6 am to midnight: where you were on top, what was on screen in the middle, notifications as dots. Drag across it to see any moment, tap to open that hour. Font is Google Sans Flex, bundled under the OFL; it is the Material 3 font, so it feels native on the Fold.</p></div>
+    <div></div>
+  </div>
+  <div class="row" data-dir="A"></div>
+  <div class="verdict">
+    <p><b>Optimises for</b> scanning a whole day in one look and jumping to an exact time. It shows that the app knows when and where, which is the core of what's collected.</p>
+    <p><b>Weak spot</b> is a dense strip on the cover screen: thin sessions under 5 minutes disappear, and the legend has to be learned once. The written summary is small next to the strip.</p>
+  </div>
+</section>
+
+<section class="dir" id="dirB">
+  <div class="head">
+    <div><span class="tag">Direction B</span><h2>Journal</h2><p style="color:var(--page-ink2)">The day reads like a journal page. Nano's summary is the headline in a reading serif, then highlights and moments with real quotes from your screen. There are no tabs: you ask about the day from the box at the bottom, and agents sit behind the plug button. Fonts are Literata for reading and Figtree for the interface, both OFL.</p></div>
+    <div></div>
+  </div>
+  <div class="row" data-dir="B"></div>
+  <div class="verdict">
+    <p><b>Optimises for</b> the evening read on the open screen and for people who aren't tech nerds. It is the warmest and fewest concepts: one page per day, one box to ask.</p>
+    <p><b>Weak spot</b> is that it leans on the summary being good, and Gemini Nano writes short and sometimes flat. Agents and triggers are one level deeper, so the "drive my phone" half of the app is less visible.</p>
+  </div>
+</section>
+
+<section class="dir" id="dirC">
+  <div class="head">
+    <div><span class="tag">Direction C</span><h2>Places</h2><p style="color:var(--page-ink2)">The day is a list of places like Google Maps Timeline, and everything else hangs off them: what you used at the office, who messaged you at the cafe, what you watched in the Uber. A greeting on top borrows Juno's warmth. Font is Rubik (OFL), slightly round and friendly.</p></div>
+    <div></div>
+  </div>
+  <div class="row" data-dir="C"></div>
+  <div class="verdict">
+    <p><b>Optimises for</b> memory. People remember "the coffee with Arjun", not "2 pm", so places are the easiest way in. Four tabs make search, chat and agents equally visible.</p>
+    <p><b>Weak spot</b> is days spent at home: one long visit holds everything and the timeline turns into a single block. It also depends on location being on.</p>
+  </div>
+</section>
+
+<div class="wrap rec">
+  <h2>Recommendation</h2>
+  <p>Build <b>A, the day strip</b>, with B's reading layer on top of it. The strip is the one thing no other app shows, and it works in a quiet home day as well as a busy office one, where C's place list falls apart. On the cover screen it gives the day in one glance. From B, take the serif summary and the quoted moments for the inner screen's right pane. From C, take the greeting and the place names inside the strip (already there).</p>
+  <h2 class="sub" style="margin-top:22px">Taste calls I made</h2>
+  <ol>
+    <li><b>Tabs.</b> Three: Days, Chat, Agents. Triggers live inside Agents. Settings and privacy sit behind a shield button, not a tab.</li>
+    <li><b>Colour.</b> Each direction has its own muted accent (teal, ink blue, clay). None reuses Nano Chat's coral on peach, so the apps feel related but not the same. App categories use six low-chroma hues with a legend.</li>
+    <li><b>Shapes.</b> Bars and strips are straight with square ends on square-cornered panels. Buttons, the live bar and the composer stay round, like Nano Chat.</li>
+    <li><b>App icons.</b> Phosphor glyphs on soft round tints, not the real app logos (licensing, and they would make the screen loud). People get photos, groups get a people glyph.</li>
+    <li><b>Summary voice.</b> Second person, past tense, two or three sentences, names people and places. Always labelled as written on this phone by Gemini Nano.</li>
+    <li><b>Agent control.</b> Sending messages and buying things always asks first by default. Stop is on every screen while an agent acts.</li>
+    <li><b>Numbers.</b> Totals are a sentence ("6h 12m on screen, 79 notifications"), not big stat tiles.</li>
+  </ol>
+  <h2 class="sub" style="margin-top:22px">What I'd like you to decide</h2>
+  <ol>
+    <li><b>Direction.</b> A (strip), B (journal), C (places), or A with B's reading layer as I recommend.</li>
+    <li><b>Accent.</b> Teal, ink blue, clay or moss. Try them with the swatches above.</li>
+    <li><b>Where chat lives.</b> Its own tab (A and C) or a box at the bottom of each day (B). The box makes chat feel like part of the day; the tab makes "tell the phone to do something" easier to find.</li>
+    <li><b>Screen text.</b> Show quoted text from your screens on the day page (B does), or only inside an hour or app and in search (A does). Quotes are more useful and more exposing if someone looks at your phone.</li>
+  </ol>
+  <p class="note" style="margin-top:20px">Fonts: Google Sans Flex, Figtree, Literata and Rubik, all from Google Fonts under the SIL Open Font License, so the app can bundle them. Icons: Phosphor (MIT). Portraits: randomuser.me sample photos.</p>
+</div>
+
+<script>
+/* ================= data ================= */
+const CATS={work:'Work',chats:'Chats and calls',browse:'Browsing',watch:'Watching and music',read:'Reading',errands:'Food and rides'};
+const APPS={
+  whatsapp:{n:'WhatsApp',i:'whatsapp-logo',c:'chats'}, phone:{n:'Phone',i:'phone',c:'chats'},
+  slack:{n:'Slack',i:'slack-logo',c:'work'}, gmail:{n:'Gmail',i:'envelope-simple',c:'work'}, meet:{n:'Google Meet',i:'video-camera',c:'work'}, claude:{n:'Claude',i:'asterisk-simple',c:'work'},
+  chrome:{n:'Chrome',i:'google-chrome-logo',c:'browse'},
+  youtube:{n:'YouTube',i:'youtube-logo',c:'watch'}, spotify:{n:'Spotify',i:'spotify-logo',c:'watch'},
+  kindle:{n:'Kindle',i:'book-open-text',c:'read'},
+  swiggy:{n:'Swiggy',i:'bowl-food',c:'errands'}, uber:{n:'Uber',i:'car-profile',c:'errands'}, maps:{n:'Maps',i:'map-trifold',c:'errands'},
+  calendar:{n:'Calendar',i:'calendar-check',c:'work'}, hdfc:{n:'HDFC Bank',i:'bank',c:'errands'}
+};
+const PEOPLE={
+  rahul:{n:'Rahul',img:'assets/people/rahul.jpg'}, arjun:{n:'Arjun',img:'assets/people/arjun.jpg'},
+  priya:{n:'Priya',img:'assets/people/priya.jpg'}, meera:{n:'Meera',img:'assets/people/meera.jpg'},
+  amma:{n:'Amma',init:'A'}, fblr:{n:'Founders BLR',group:true}
+};
+const PLACEKIND={home:{i:'house',v:'--p-home'},office:{i:'briefcase',v:'--p-office'},cafe:{i:'coffee',v:'--p-cafe'},park:{i:'tree',v:'--p-park'}};
+const h=(H,M=0)=>H*60+M;
+const DAYS=[
+ {key:'mon',title:'Yesterday',long:'Monday',date:'Mon, 26 Oct',longDate:'26 October',greet:'Monday, 26 Oct',now:h(24),
+  summary:'A slow Monday at home. Most of the morning went into the October investor update in Docs, then a long lunch with YouTube. You took an Uber to Cubbon Park around 5:30 and were back by 7:15, with Kindle before bed again.',
+  highlights:[{i:'hourglass',t:'Your longest stretch was 1h 45m in Chrome, on the investor update.'},{i:'tree',t:'1h 15m at Cubbon Park, your first walk there this month.'},{i:'chats-circle',t:'Founders BLR sent the most messages, 21 of them.'}],
+  places:[{k:'home',n:'Home',sub:'HSR Layout',s:0,e:h(17,15)},{travel:true,n:'Uber',app:'uber',s:h(17,15),e:h(17,35)},{k:'park',n:'Cubbon Park',sub:'Kasturba Road',s:h(17,35),e:h(18,50)},{travel:true,n:'Uber',app:'uber',s:h(18,50),e:h(19,15)},{k:'home',n:'Home',sub:'HSR Layout',s:h(19,15),e:h(24)}],
+  sessions:[[h(8,30),h(8,50),'whatsapp'],[h(9),h(9,40),'gmail'],[h(9,45),h(11,30),'chrome'],[h(11,40),h(12,10),'slack'],[h(12,30),h(13,30),'youtube'],[h(13,40),h(13,55),'swiggy'],[h(14,30),h(15,20),'chrome'],[h(15,30),h(16,10),'slack'],[h(16,20),h(16,40),'whatsapp'],[h(17,12),h(17,16),'uber'],[h(18,48),h(18,52),'uber'],[h(19,30),h(20,10),'youtube'],[h(21),h(21,45),'kindle'],[h(22),h(22,30),'whatsapp'],[h(22,40),h(23,10),'chrome']],
+  hourly:[0,0,1,4,3,2,4,5,3,2,6,4,2,3,5,4,3,1],
+  senders:[['fblr','whatsapp',21,'Who is going to Toit on Friday?'],['meera','slack',9,'Onboarding drop-off is 38% on step 3'],['amma','whatsapp',6,'Did you eat?'],['rahul','slack',5,'Will look at CI tomorrow morning'],[null,'uber',6,'Trip to Home, 25 min'],[null,'swiggy',5,'Delivered. Enjoy your meal']],
+  events:[],
+  texts:[[h(9,12),'gmail','Draft','October investor update. Revenue grew 18% month on month, burn is flat.'],[h(11,52),'slack','#product, Meera','Onboarding drop-off is 38% on step 3. I think the permissions screen scares people.'],[h(21,10),'kindle','The Mom Test','Talk about their life instead of your idea.']]
+ },
+ {key:'tue',title:'Today',long:'Tuesday',date:'Tue, 27 Oct',longDate:'27 October',greet:'Evening, Tushar.',now:h(21,42),
+  summary:'A long office day. The morning went to the 0.9 release thread with Rahul, and you two agreed to ship Thursday without the new onboarding. Coffee with Arjun at Third Wave ran almost an hour and a half. Home by 8, biryani from Meghana\u2019s, a call with Amma, and half an hour of The Mom Test.',
+  highlights:[{i:'hourglass',t:'Your longest stretch was 1h 20m of Chrome, reading about Gemini Nano from 10:05 am.'},{i:'chats-circle',t:'Founders BLR sent the most messages, 38 of them.'},{i:'sun-horizon',t:'First unlock at 7:12 am, 25 minutes earlier than usual.'}],
+  places:[{k:'home',n:'Home',sub:'HSR Layout',s:0,e:h(9,5)},{travel:true,n:'Uber',app:'uber',s:h(9,5),e:h(9,48)},{k:'office',n:'Office',sub:'100 Feet Road, Indiranagar',s:h(9,48),e:h(12,58)},{travel:true,n:'Walk',walk:true,s:h(12,58),e:h(13,10)},{k:'cafe',n:'Third Wave Coffee',sub:'12th Main, Indiranagar',s:h(13,10),e:h(14,35)},{travel:true,n:'Walk',walk:true,s:h(14,35),e:h(14,45)},{k:'office',n:'Office',sub:'100 Feet Road, Indiranagar',s:h(14,45),e:h(19,18)},{travel:true,n:'Uber',app:'uber',s:h(19,18),e:h(20,4)},{k:'home',n:'Home',sub:'HSR Layout',s:h(20,4),e:h(21,42)}],
+  sessions:[[h(7,12),h(7,20),'whatsapp'],[h(7,20),h(7,34),'chrome'],[h(8,10),h(8,25),'gmail'],[h(8,40),h(8,52),'slack'],[h(9,3),h(9,7),'uber'],[h(9,10),h(9,35),'slack'],[h(9,36),h(9,46),'whatsapp'],[h(10,5),h(11,25),'chrome'],[h(11,30),h(12,5),'slack'],[h(12,10),h(12,30),'gmail'],[h(13,2),h(13,8),'maps'],[h(13,38),h(13,48),'whatsapp'],[h(14,18),h(14,28),'chrome'],[h(14,45),h(15,40),'meet'],[h(15,45),h(16,30),'slack'],[h(16,30),h(17,10),'chrome'],[h(17,15),h(17,30),'whatsapp'],[h(17,40),h(18,20),'claude'],[h(18,30),h(19,5),'slack'],[h(19,16),h(19,19),'uber'],[h(19,25),h(19,55),'youtube'],[h(20,15),h(20,24),'swiggy'],[h(20,30),h(20,48),'phone'],[h(21),h(21,32),'kindle'],[h(21,35),h(21,42),'whatsapp']],
+  hourly:[0,4,5,6,3,8,7,5,4,6,5,9,4,3,6,4,0,0],
+  senders:[['fblr','whatsapp',38,'Drinks at Toit on Friday?'],['rahul','slack',14,'Build is green. Pushing 0.9 tonight.'],[null,'uber',7,'Trip to Home, 46 min'],[null,'swiggy',6,'Delivered. Enjoy your meal'],['amma','whatsapp',5,'Call when free'],['arjun','whatsapp',4,'Here, corner table upstairs'],['priya','gmail',3,'Redlines on the term sheet'],['meera','slack',2,'Can you review the pricing page copy?']],
+  events:[[h(7,12),'amma','whatsapp','Good morning. Eat before you leave.'],[h(8,41),'rahul','slack','CI is red on 0.9, looking'],[h(9,4),null,'uber','Manjunath is arriving in 3 min'],[h(10,30),'fblr','whatsapp','Anyone using Gemini Nano in prod?'],[h(11,40),'rahul','slack','Let\u2019s cut onboarding from 0.9 and ship Thursday'],[h(12,5),'priya','gmail','Redlines on the term sheet'],[h(12,48),'arjun','whatsapp','Third Wave at 1?'],[h(13,38),'arjun','whatsapp','Here, corner table upstairs'],[h(14,12),'rahul','slack','Pushed a fix, CI running'],[h(14,30),null,'calendar','Board update with Priya in 15 min'],[h(14,51),'fblr','whatsapp','Sharing the AICore thread here'],[h(16,15),'rahul','slack','Thursday it is. Writing the changelog.'],[h(17,20),'fblr','whatsapp','Drinks at Toit on Friday?'],[h(18,40),'meera','slack','Can you review the pricing page copy?'],[h(19,17),null,'uber','Trip to Home, 46 min'],[h(20,16),null,'hdfc','\u20b9486 spent at Swiggy'],[h(20,18),null,'swiggy','Meghana Foods accepted your order'],[h(20,29),'amma','whatsapp','Call when free'],[h(20,52),null,'swiggy','Delivered. Enjoy your meal'],[h(21,12),'rahul','slack','Build is green. Pushing 0.9 tonight.']],
+  texts:[[h(7,24),'chrome','The Ken','Why Bengaluru\u2019s quick-commerce war moved to pharmacies'],[h(10,12),'chrome','developer.android.com','Gemini Nano runs inside AICore, so prompts and results stay on the device.'],[h(11,42),'slack','#release-0-9, Rahul','Let\u2019s cut onboarding from 0.9 and ship Thursday. I\u2019ll get CI green tonight.'],[h(12,14),'gmail','Priya','Two small changes on the pro-rata clause. The rest looks fine to us.'],[h(13,41),'whatsapp','Arjun','Here, corner table upstairs'],[h(14,22),'chrome','Zerodha Varsity','How ESOPs are taxed when you exercise them'],[h(17,48),'claude','Claude','PRD draft: Mobile use, day browser v1'],[h(19,31),'youtube','Fireship','Kotlin in 100 seconds'],[h(21,6),'kindle','The Mom Test','Compliments are the fool\u2019s gold of customer learning.']]
+ }];
+const AGENTS=[
+ {id:'claude',n:'Claude',i:'asterisk-simple',how:'Claude app and claude.ai, through Tailscale',last:'Using your phone now'},
+ {id:'cc',n:'Claude Code',i:'terminal-window',how:'On Tushar\u2019s MacBook, through Tailscale',last:'Last used at 6:02 pm'},
+ {id:'gpt',n:'ChatGPT',i:'open-ai-logo',how:'Needs a public address. Coming with the relay.',off:true}
+];
+const LOG=[
+ ['9:31 pm','claude','Read today\u2019s summary'],
+ ['6:02 pm','cc','Read 14 Slack notifications from Rahul'],
+ ['2:15 pm','cc','Searched your screens for \u201cpro-rata\u201d'],
+ ['Yesterday','claude','Opened Swiggy and reordered from Meghana Foods, after you said yes'],
+ ['Yesterday','gpt','Tried to connect. Blocked, not set up yet']
+];
+const TRIGGERS=[
+ {id:'t1',i:'map-pin',when:'I arrive at the office',then:'Post \u201cin\u201d to #standup',to:'n8n',ran:'Ran at 9:48 am'},
+ {id:'t2',i:'chats-circle',when:'Amma sends a message',then:'Ping me on my Mac',to:'Claude Code',ran:'Ran at 8:29 pm'},
+ {id:'t3',i:'battery-low',when:'battery drops below 15%',then:'Pause backups and tell me',to:'n8n',ran:'Not run today'}
+];
+const MODELS=[['Gemini Nano','On this phone'],['Gemma 4 E4B','On this phone, slower'],['Claude Sonnet','Your API key, leaves the phone']];
+
+/* ================= global state ================= */
+const G={acting:true,perms:{claude_apps:true,claude_ask:true,cc_apps:false,cc_ask:true},trig:{t1:true,t2:true,t3:false},sent:false,model:0,extra:[],toast:null,query:'onboarding',collect:{slack:true}};
+const frames=[];
+
+/* ================= helpers ================= */
+const ic=(n,cls='')=>`<i class="ph ph-${n} ${cls}"></i>`;
+const icf=(n)=>`<i class="ph-fill ph-${n}"></i>`;
+function t12(m,ampm=true){m=Math.round(m);let H=Math.floor(m/60)%24,M=m%60;const ap=H<12?'am':'pm';let hh=H%12;if(hh===0)hh=12;return `${hh}:${String(M).padStart(2,'0')}${ampm?' '+ap:''}`}
+function tr(s,e){const a=t12(s),b=t12(e);return (a.slice(-2)===b.slice(-2)?a.slice(0,-3):a)+' to '+b}
+function dur(m){m=Math.round(m);const H=Math.floor(m/60),M=m%60;return H?`${H}h${M?' '+M+'m':''}`:`${M}m`}
+function appAv(id,cls=''){const a=APPS[id];return `<span class="av app ${cls}" style="--cat:var(--c-${a.c})">${ic(a.i)}</span>`}
+function personAv(pid,app,cls=''){if(!pid)return appAv(app,cls);const p=PEOPLE[pid];if(p.img)return `<span class="av ${cls}"><img src="${p.img}" alt=""></span>`;if(p.group)return `<span class="av group ${cls}">${ic('users-three')}</span>`;return `<span class="av person ${cls}">${p.init}</span>`}
+function who(pid,app){return pid?PEOPLE[pid].n:APPS[app].n}
+function appTotals(d){const t={};d.sessions.forEach(([s,e,a])=>t[a]=(t[a]||0)+e-s);return Object.entries(t).sort((a,b)=>b[1]-a[1])}
+function catTotals(d){const t={};d.sessions.forEach(([s,e,a])=>{const c=APPS[a].c;t[c]=(t[c]||0)+e-s});return Object.entries(t).sort((a,b)=>b[1]-a[1])}
+function screenTotal(d){return d.sessions.reduce((x,[s,e])=>x+e-s,0)}
+function notifTotal(d){return d.senders.reduce((x,s)=>x+s[2],0)}
+function placeAt(d,m){return d.places.find(p=>m>=p.s&&m<p.e)}
+function sessionAt(d,m){return d.sessions.find(([s,e])=>m>=s&&m<e)}
+function inRange(list,s,e,idx=0){return list.filter(x=>x[idx]>=s&&x[idx]<e)}
+function clip(s,e,a,b){return [Math.max(s,a),Math.min(e,b)]}
+function placeLabel(p){return p.travel?(p.walk?'Walking':p.n):p.n}
+function joinPlaces(pl){const n=pl.map(p=>p.travel?(p.walk?'a walk':'an Uber ride'):p.n);return n.length<2?n.join(''):n.slice(0,-1).join(', ')+' and then '+n[n.length-1]}
+function near(list,m,idx,win=20){let best=null;list.forEach(x=>{const dt=m-x[idx];if(dt>=-3&&dt<=win&&(!best||Math.abs(m-x[idx])<Math.abs(m-best[idx])))best=x});return best}
+function visitCount(d){return d.places.filter(p=>!p.travel).length}
+const R0=h(6),R1=h(24),pct=m=>((Math.min(Math.max(m,R0),R1)-R0)/(R1-R0)*100);
+function sw(key,label){const on=(key in G.trig)?G.trig[key]:(key in G.perms)?G.perms[key]:(G.collect[key]??true);return `<button class="switch" role="switch" aria-checked="${!!on}" aria-label="${label}" data-toggle="${key}"></button>`}
+function status(){return `<div class="status"><span class="num">9:42</span><span class="r">${ic('wifi-high')}${ic('cell-signal-full')}${ic('battery-high')}</span></div>`}
+function liveBar(f){if(!G.acting||f.state.screen==='agents')return '';return `<div class="live"><span class="dot"></span><span class="t">Claude is adding the Toit plan to Calendar</span><button data-act="stop">${ic('stop')} Stop</button></div>`}
+function getDay(f){return DAYS[f.state.day]}
+function daySwitch(f,cls=''){const i=f.state.day;return `<button class="ib sm" aria-label="Previous day" data-day="-1" ${i===0?'disabled style="opacity:.35"':''}>${ic('caret-left')}</button><span class="${cls}">${getDay(f).date}</span><button class="ib sm" aria-label="Next day" data-day="1" ${i===DAYS.length-1?'disabled style="opacity:.35"':''}>${ic('caret-right')}</button>`}
+function legend(d){return `<div class="legend">${catTotals(d).map(([c])=>`<span><i class="k" style="--cat:var(--c-${c})"></i>${CATS[c]}</span>`).join('')}</div>`}
+
+/* shared content pieces, styled per direction */
+function senderRows(d,limit=5){return d.senders.slice(0,limit).map(([p,a,n,last])=>`<div class="lrow">${personAv(p,a)}<div class="main"><div class="t1">${who(p,a)}</div><div class="t2 clamp1">${p?APPS[a].n+' \u00b7 ':''}${last}</div></div><div class="end">${n}</div></div>`).join('')}
+function quotes(list){return list.map(([t,a,src,q])=>`<div class="quote"><div class="src">${appAv(a,'xs')}<span>${APPS[a].n} \u00b7 ${src} \u00b7 ${t12(t)}</span></div><div class="q">${q}</div></div>`).join('')}
+function eventRows(list){return list.map(([t,p,a,txt])=>`<div class="lrow">${personAv(p,a,'sm')}<div class="main"><div class="t1">${who(p,a)}</div><div class="t2">${txt}</div></div><div class="end">${t12(t)}</div></div>`).join('')}
+function sessRows(list){return list.map(([s,e,a])=>`<div class="lrow">${appAv(a,'sm')}<div class="main"><div class="t1">${APPS[a].n}</div><div class="t2 num">${tr(s,e)}</div></div><div class="end">${dur(e-s)}</div></div>`).join('')}
+
+/* agents content (shared, wrapped by direction) */
+function liveCard(){
+  if(!G.acting) return `<div class="livecard"><div class="hd"><span class="av sys">${ic('hand-tap')}</span><div class="main"><div class="t1" style="font-weight:600">No agent is using your phone</div><div class="t2 muted" style="font-size:13px">Claude stopped at 9:42 pm. It can act again next time you ask it to.</div></div></div></div>`;
+  return `<div class="livecard"><div class="hd"><span class="av app" style="--cat:var(--c-work)">${ic('asterisk-simple')}</span><div class="main"><div style="font-weight:600">Claude is using your phone</div><div class="muted" style="font-size:13px">Started 40 seconds ago, through Tailscale</div></div></div>
+  <ol class="steps"><li class="done">${ic('check')}Opened WhatsApp</li><li class="done">${ic('check')}Read \u201cDrinks at Toit on Friday?\u201d in Founders BLR</li><li class="now">${ic('circle-notch','spin')}Adding \u201cToit, Friday 8 pm\u201d in Calendar</li></ol>
+  <button class="btn stop" data-act="stop">${ic('stop')} Stop Claude</button></div>`}
+function agentRows(){return AGENTS.map(a=>`<div class="lrow">${`<span class="av app" style="--cat:${a.off?'var(--ink3)':'var(--c-work)'}">${ic(a.i)}</span>`}<div class="main"><div class="t1">${a.n}</div><div class="t2">${a.how}</div></div>${a.off?`<button class="btn out" style="padding:7px 14px">Set up</button>`:`<span class="pillst"><span class="g"></span>${a.id==='claude'&&G.acting?'Acting':'Connected'}</span>`}</div>`).join('')}
+function permRows(){return `<div class="lrow"><div class="main"><div class="t1">Claude can use apps</div><div class="t2">Tap, type and open apps for you. Reading your days is always allowed for connected agents.</div></div>${sw('claude_apps','Claude can use apps')}</div>
+<div class="lrow"><div class="main"><div class="t1">Ask me before sending or paying</div><div class="t2">Messages, emails, orders and payments wait for your yes on the phone.</div></div>${sw('claude_ask','Ask before sending')}</div>`}
+function addrRows(){return `<div class="addr"><span class="av sys">${ic('device-mobile')}</span><div class="main"><div class="t1">On this phone</div><code>http://127.0.0.1:7313/mcp</code></div><button class="ib sm" data-act="copy" aria-label="Copy address">${ic('copy')}</button></div>
+<div class="addr"><span class="av sys">${ic('laptop')}</span><div class="main"><div class="t1">From your other devices, with Tailscale</div><code>http://fold7.tail3b2c.ts.net:7313/mcp</code></div><button class="ib sm" data-act="copy" aria-label="Copy address">${ic('copy')}</button></div>
+<div class="addr"><span class="av sys">${ic('globe-simple')}</span><div class="main"><div class="t1 faint">From anywhere, for ChatGPT and claude.ai</div><div class="t2">Relay link. Coming later.</div></div></div>`}
+function trigRows(){return TRIGGERS.map(t=>`<div class="lrow"><span class="av sys">${ic(t.i)}</span><div class="main"><div class="t1">When ${t.when}</div><div class="t2">${t.then}, via ${t.to}. ${G.trig[t.id]?t.ran:'Off'}</div></div>${sw(t.id,t.when)}</div>`).join('')}
+function logRows(){return LOG.map(([t,a,txt])=>{const ag=AGENTS.find(x=>x.id===a);return `<div class="lrow"><span class="av sm app" style="--cat:${ag.off?'var(--ink3)':'var(--c-work)'}">${ic(ag.i)}</span><div class="main"><div class="t1" style="font-weight:400">${txt}</div><div class="t2">${ag.n}</div></div><div class="end">${t}</div></div>`}).join('')}
+
+/* chat content */
+function chatMsgs(dirB){
+  const m=MODELS[G.model];
+  const ans1=`You agreed to ship 0.9 on Thursday and leave the new onboarding for 0.10. Rahul said he\u2019d get CI green tonight, and at 9:12 pm he wrote that the build is green.`;
+  const srcs=`<div class="srcs"><div>${appAv('slack','xs')}Slack, #release-0-9, 11:42 am</div><div>${appAv('slack','xs')}Slack, Rahul, 9:12 pm</div></div>`;
+  const act= G.sent?`<div class="action"><div class="hd">${appAv('whatsapp','xs')}Sent to Amma on WhatsApp at 9:43 pm</div><div class="bodyq">Sleeping early today. Will call you tomorrow morning.</div></div>`
+   :`<div class="action"><div class="hd">${appAv('whatsapp','xs')}Send on WhatsApp to Amma?</div><div class="bodyq">Sleeping early today. Will call you tomorrow morning.</div><div class="btns"><button class="btn pri" data-act="sendwa">${ic('paper-plane-right')} Send</button><button class="btn out">${ic('pencil-simple')} Change</button></div></div>`;
+  const extra=G.extra.map(([w,t])=>w==='me'?`<div class="bub me">${t}</div>`:`<div class="bub ai">${t}</div>`).join('');
+  if(dirB){
+    const ex=G.extra.map(([w,t])=>w==='me'?`<div class="q">${t}</div>`:`<div class="ans">${t}</div>`).join('');
+    return `<div class="qa"><div class="q">What did Rahul and I decide about 0.9?</div><div class="ans">${ans1}</div>${srcs}</div>
+    <div class="qa"><div class="q">Tell Amma I\u2019ll call tomorrow morning, I\u2019m sleeping early</div><div class="ans">Here\u2019s the message. I\u2019ll send it once you say yes.</div>${act.replace('align-self:flex-start;','')}</div>${ex?`<div class="qa">${ex}</div>`:''}`;
+  }
+  return `<div class="msgs"><div class="bub me">What did Rahul and I decide about 0.9?</div><div class="bub ai">${ans1}${srcs}</div><div class="meta">${m[0]} \u00b7 ${m[1].toLowerCase()} \u00b7 2.1 s</div>
+  <div class="bub me">Tell Amma I\u2019ll call tomorrow morning, I\u2019m sleeping early</div><div class="bub ai">Here\u2019s the message. I\u2019ll send it once you say yes.</div>${act}${extra}</div>`}
+function modelBtn(){const m=MODELS[G.model];return `<button class="modelbtn" data-act="model" aria-label="Change model"><span class="av sm app" style="--cat:var(--accent)">${ic(G.model===2?'cloud-arrow-up':'cpu')}</span><span><span class="t1" style="display:flex;align-items:center;gap:4px">${m[0]} ${ic('caret-down')}</span><span class="t2">${m[1]}</span></span></button>`}
+function composer(ph){return `<div class="composer"><input class="input" placeholder="${ph}" data-input aria-label="${ph}"><button class="ib sm" aria-label="Voice">${ic('microphone')}</button><button class="send" data-act="send" aria-label="Send">${ic('arrow-up')}</button></div>`}
+function pastChats(){return [['Today','What did Rahul and I decide about 0.9?'],['Yesterday','How long was I on YouTube this week?'],['Sat, 24 Oct','Find the Airbnb link Meera sent'],['Thu, 22 Oct','Order my usual from Meghana\u2019s']].map(([d,q],i)=>`<div class="lrow tap" style="${i===0?'background:var(--accent-soft)':''}"><div class="main"><div class="t1 clamp1">${q}</div><div class="t2">${d}</div></div></div>`).join('')}
+
+/* search */
+function searchScreen(f,back){
+  const q=G.query.trim().toLowerCase();
+  const groups=DAYS.slice().reverse().map(d=>({d,hits:d.texts.filter(x=>!q||x[3].toLowerCase().includes(q)||x[2].toLowerCase().includes(q))})).filter(g=>g.hits.length);
+  const hl=s=>q?s.replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig'),'<mark>$1</mark>'):s;
+  return `<div class="top" style="display:flex;align-items:center;padding:4px 8px 0 6px">${back?`<button class="ib" data-go="day" aria-label="Back">${ic('arrow-left')}</button>`:''}<h4 style="margin:0 0 0 ${back?4:14}px;font-size:20px;font-weight:600">Search your days</h4></div>
+  <div class="searchbox">${ic('magnifying-glass')}<input class="input" value="${G.query}" data-search aria-label="Search screen text"></div>
+  <div class="scroll">${groups.length?groups.map(g=>`<div class="dayhd">${g.d.title}, ${g.d.date.split(', ')[1]}</div>`+g.hits.map(([t,a,src,txt])=>`<div class="res tap" data-pickday="${DAYS.indexOf(g.d)}">${appAv(a,'sm')}<div class="main"><div class="t2">${APPS[a].n} \u00b7 ${src} \u00b7 ${t12(t)}</div><div class="t1">${hl(txt)}</div></div></div>`).join('')).join(''):`<div class="res"><div class="main"><div class="t1">Nothing on your screens matched \u201c${G.query}\u201d.</div><div class="t2">Search covers the last 30 days of screen text, notifications and places.</div></div></div>`}
+  <p class="faint" style="font-size:12.5px;padding:10px 20px">Searches the text of screens you read, notifications and places. Excluded apps are never recorded.</p></div>`}
+
+/* ================= Direction A: Day strip ================= */
+function ribbon(d,scrub){
+  const grid=[];for(let H=6;H<=24;H++)grid.push(`<div class="gl ${H%3===0?'m':''}" style="left:${pct(h(H))}%"></div>`);
+  const pl=d.places.map(p=>{const [s,e]=clip(p.s,p.e,R0,R1);if(e<=s)return '';const w=pct(e)-pct(s);return `<div class="blk ${p.travel?'travel':''}" style="left:${pct(s)}%;width:${w}%;${p.travel?'':`background:var(${PLACEKIND[p.k].v})`}" title="${placeLabel(p)}">${!p.travel&&w>9?p.n.replace('Third Wave Coffee','Cafe'):''}</div>`}).join('');
+  const sc=d.sessions.map(([s,e,a])=>`<div class="blk" style="left:${pct(s)}%;width:${Math.max(pct(e)-pct(s),0.45)}%;--cat:var(--c-${APPS[a].c})"></div>`).join('');
+  const nt=d.hourly.map((n,i)=>n?`<div class="d" style="left:${pct(h(6+i,30))}%;width:${4+n*1.1}px;height:${4+n*1.1}px"></div>`:'').join('');
+  const later=d.now<R1?`<div class="later empty-later" style="left:${pct(d.now)}%;opacity:.5"></div>`:'';
+  return `<div class="rib" data-rib>${grid.join('')}<div class="lane pl">${pl}</div><div class="lane sc">${sc}</div><div class="lane nt">${nt}</div>${later}<div class="scrub" style="left:${pct(scrub)}%"></div></div>
+  <div class="axis">${['6 am','9','12 pm','3','6','9','12 am'].map((l,i)=>`<span style="left:${i===6?'auto':pct(h(6+i*3))+'%'};${i===6?'right:0;transform:none':''}">${l}</span>`).join('')}</div>`}
+function readout(d,m){
+  const p=placeAt(d,m),s=sessionAt(d,m),H=Math.floor(m/60);
+  const n=d.hourly[H-6]||0;
+  if(m>d.now) return `<div class="readout"><div class="main"><div class="t1">${t12(m)}</div><div class="t2">Later today. Nothing yet.</div></div></div>`;
+  return `<div class="readout tap" data-sel="hour:${H}"><span class="av ${s?'app':'sys'}" style="${s?`--cat:var(--c-${APPS[s[2]].c})`:''}">${ic(s?APPS[s[2]].i:'device-mobile')}</span><div class="main"><div class="t1">${t12(m)} \u00b7 ${p?placeLabel(p):'Home'}</div><div class="t2">${s?APPS[s[2]].n+' on screen':'Screen off'}${n?` \u00b7 ${n} notifications this hour`:''}</div>${(()=>{const tx=near(d.texts,m,0),ev=near(d.events,m,0);if(tx)return `<div class="rq">\u201c${tx[3]}\u201d <span class="faint">${tx[2]}</span></div>`;if(ev)return `<div class="rq">${who(ev[1],ev[2])}: ${ev[3]}</div>`;return ''})()}</div>${ic('caret-right','faint')}</div>`}
+function A_day(f,wide){
+  const d=getDay(f);const scrub=f.state.scrub??(d.key==='tue'?h(14,22):h(18));
+  return `<div class="top"><div class="ttl"><h2>${d.title}</h2><div class="datesw">${daySwitch(f)}</div></div><button class="ib" data-go="search" aria-label="Search">${ic('magnifying-glass')}</button><button class="ib" aria-label="Calendar">${ic('calendar-blank')}</button><button class="ib" aria-label="Privacy and settings">${ic('shield-check')}</button></div>
+  <div class="scroll">
+  <div class="sum">${d.summary}<div class="by">${ic('sparkle')}Written on this phone by Gemini Nano \u00b7 <button>Rewrite</button></div></div>
+  <div class="ribwrap">${ribbon(d,scrub)}<div style="margin-top:10px">${legend(d)}</div><div class="legend" style="margin-top:6px"><span><i class="k" style="--cat:var(--p-office)"></i>Places</span><span><i class="k hatch"></i>On the move</span><span><i class="k" style="--cat:var(--ink2);border-radius:50%"></i>Notifications</span></div></div>
+  <div data-readout>${readout(d,scrub)}</div>
+  <div class="tot"><b>${dur(screenTotal(d))}</b> on screen, <b>${notifTotal(d)}</b> notifications, <b>${visitCount(d)}</b> places</div>
+  <div class="sec"><div class="sec-h"><h4>Apps</h4><span class="a">All ${Object.keys(appTotals(d)).length}</span></div></div>
+  ${appTotals(d).slice(0,5).map(([a,m],i,arr)=>`<div class="lrow tap approw" data-sel="app:${a}">${appAv(a)}<div class="main"><div class="t1">${APPS[a].n}</div><div class="bar-track"><div class="bar-fill" style="width:${m/arr[0][1]*100}%;--cat:var(--c-${APPS[a].c})"></div></div></div><div class="end" style="min-width:52px">${dur(m)}</div></div>`).join('')}
+  <div class="sec"><div class="sec-h"><h4>Who reached you</h4><span class="a">All</span></div></div>
+  ${senderRows(d,4)}
+  <div style="height:16px"></div></div>`}
+function A_detailHour(f,H){
+  const d=getDay(f);const s=h(H),e=h(H+1);
+  const ss=d.sessions.filter(([a,b])=>b>s&&a<e).map(([a,b,x])=>[Math.max(a,s),Math.min(b,e),x]);
+  const pl=d.places.filter(p=>p.e>s&&p.s<e);
+  const ev=inRange(d.events,s,e),tx=inRange(d.texts,s,e);
+  const used=ss.reduce((x,[a,b])=>x+b-a,0);
+  return `<div class="hh"><h3>${t12(s).replace(':00','')} to ${t12(e).replace(':00','')}</h3><div class="muted" style="font-size:14px">${d.long}, ${d.longDate} \u00b7 ${joinPlaces(pl)}</div>
+  <div class="minirib">${ss.map(([a,b,x])=>`<div class="blk" style="left:${(a-s)/60*100}%;width:${(b-a)/60*100}%;--cat:var(--c-${APPS[x].c})"></div>`).join('')}</div>
+  <div class="axis" style="margin-top:2px"><span style="left:0">${t12(s)}</span><span style="left:50%">:30</span><span style="right:0;transform:none">${t12(e)}</span></div>
+  <div class="muted" style="font-size:14px;margin-top:4px">${dur(used)} on screen this hour</div></div>
+  <div class="sec"><div class="sec-h"><h4>Places</h4></div></div>
+  ${pl.map(p=>`<div class="lrow"><span class="av sys" style="${p.travel?'':`background:var(${PLACEKIND[p.k].v});color:var(--ink)`}">${ic(p.travel?(p.walk?'person-simple-walk':'car-profile'):PLACEKIND[p.k].i)}</span><div class="main"><div class="t1">${placeLabel(p)}</div><div class="t2 num">${tr(p.s,p.e)}</div></div><div class="end">${dur(p.e-p.s)}</div></div>`).join('')}
+  <div class="sec"><div class="sec-h"><h4>On screen</h4></div></div>${sessRows(ss)}
+  ${ev.length?`<div class="sec"><div class="sec-h"><h4>Notifications</h4><span class="faint" style="font-size:13px">${d.hourly[H-6]} this hour</span></div></div>${eventRows(ev)}`:''}
+  ${tx.length?`<div class="sec"><div class="sec-h"><h4>What you read</h4></div></div>${quotes(tx)}`:''}<div style="height:12px"></div>`}
+function A_detail(f,wide){
+  const sel=f.state.sel||'hour:14';const [k,v]=sel.split(':');
+  const head=wide?'':`<div class="top" style="padding-left:6px"><button class="ib" data-go="day" aria-label="Back">${ic('arrow-left')}</button><div class="ttl" style="font-size:15px;color:var(--ink2)">${getDay(f).title}</div><button class="ib" aria-label="Previous hour" data-hour="-1">${ic('caret-left')}</button><button class="ib" aria-label="Next hour" data-hour="1">${ic('caret-right')}</button></div>`;
+  if(k==='app') return head+`<div class="scroll">${appDetail(f,v)}</div>`;
+  return head+`<div class="scroll">${A_detailHour(f,+v)}</div>`}
+function appDetail(f,a){
+  const d=getDay(f);const ss=d.sessions.filter(x=>x[2]===a);const tot=ss.reduce((x,[s,e])=>x+e-s,0);
+  const ev=d.events.filter(x=>x[2]===a),tx=d.texts.filter(x=>x[1]===a);
+  return `<div class="hh" style="padding-top:6px"><div style="display:flex;gap:14px;align-items:center"><span class="av app" style="width:52px;height:52px;font-size:28px;--cat:var(--c-${APPS[a].c})">${ic(APPS[a].i)}</span><div><h3>${APPS[a].n}</h3><div class="muted" style="font-size:14px">${dur(tot)} across ${ss.length} sessions, ${d.title.toLowerCase()}</div></div></div>
+  <div class="minirib">${ss.map(([s,e])=>`<div class="blk" style="left:${pct(s)}%;width:${Math.max(pct(e)-pct(s),.5)}%;--cat:var(--c-${APPS[a].c})"></div>`).join('')}</div>
+  <div class="axis"><span style="left:0">6 am</span><span style="left:33.3%">12 pm</span><span style="left:66.6%">6 pm</span><span style="right:0;transform:none">12 am</span></div></div>
+  <div class="sec"><div class="sec-h"><h4>Sessions</h4></div></div>${sessRows(ss)}
+  ${ev.length?`<div class="sec"><div class="sec-h"><h4>Notifications</h4></div></div>${eventRows(ev)}`:''}
+  ${tx.length?`<div class="sec"><div class="sec-h"><h4>What you read</h4></div></div>${quotes(tx)}`:''}
+  <div class="sec"><div class="sec-h"><h4>Privacy</h4></div></div>
+  <div class="lrow"><div class="main"><div class="t1">Record ${APPS[a].n}</div><div class="t2">Time, notifications and screen text. Turn off to stop collecting and delete what\u2019s stored.</div></div>${sw(a,'Record '+APPS[a].n)}</div><div style="height:12px"></div>`}
+function A_agents(f,wide){
+  const L=`<div class="top"><div class="ttl"><h2>Agents</h2></div><button class="ib" aria-label="Privacy and settings">${ic('shield-check')}</button></div>
+  <div class="scroll">${liveCard()}
+  <div class="sec"><div class="sec-h"><h4>Connected</h4><span class="a">Add agent</span></div></div>${agentRows()}
+  <div class="sec"><div class="sec-h"><h4>What Claude can do</h4></div></div>${permRows()}
+  ${wide?'':`<div class="sec"><div class="sec-h"><h4>Connect an agent</h4></div><p class="muted" style="font-size:13.5px;margin:0">Paste one of these into your agent\u2019s MCP settings. Only devices you allow can reach it.</p></div>${addrRows()}
+  <div class="sec"><div class="sec-h"><h4>Triggers</h4><span class="a">New</span></div><p class="muted" style="font-size:13.5px;margin:0">Phone events that start your agent routines through a webhook.</p></div>${trigRows()}
+  <div class="sec"><div class="sec-h"><h4>Recently</h4><span class="a">Full log</span></div></div>${logRows()}`}<div style="height:12px"></div></div>`;
+  if(!wide) return L;
+  const R=`<div class="scroll"><div class="sec" style="padding-top:18px"><div class="sec-h"><h4>Connect an agent</h4></div><p class="muted" style="font-size:13.5px;margin:0">Paste one of these into your agent\u2019s MCP settings. Only devices you allow can reach it.</p></div>${addrRows()}
+  <div class="sec"><div class="sec-h"><h4>Triggers</h4><span class="a">New</span></div><p class="muted" style="font-size:13.5px;margin:0">Phone events that start your agent routines through a webhook.</p></div>${trigRows()}
+  <div class="sec"><div class="sec-h"><h4>Recently</h4><span class="a">Full log</span></div></div>${logRows()}</div>`;
+  return `<div class="split"><div class="pane">${L}</div><div class="pane">${R}</div></div>`}
+function A_chat(f,wide){
+  const conv=`<div class="chat-top">${modelBtn()}<span style="flex:1"></span><button class="ib sm" aria-label="New chat">${ic('plus')}</button></div><div class="scroll">${chatMsgs(false)}</div>${composer('Ask or give a task')}`;
+  if(!wide) return conv;
+  return `<div class="split"><div class="pane"><div class="top"><div class="ttl"><h2>Chat</h2></div><button class="ib" aria-label="New chat">${ic('plus')}</button></div><div class="scroll" style="padding-top:8px">${pastChats()}</div></div><div class="pane">${conv}</div></div>`}
+function A_nav(f,wide){const cur=f.state.screen==='detail'||f.state.screen==='search'?'day':f.state.screen;const items=[['day','Days','calendar-dots'],['chat','Chat','chat-circle-text'],['agents','Agents','plugs-connected']];
+  const b=items.map(([k,l,i])=>`<button class="nav" data-go="${k}" aria-current="${cur===k}"><span class="pill">${cur===k?icf(i):ic(i)}${k==='agents'&&G.acting?'<span class="badge"></span>':''}</span>${l}</button>`).join('');
+  return wide?`<nav class="rail">${b}</nav>`:`<nav class="navbar">${b}</nav>`}
+function A_render(f,wide){
+  const s=f.state.screen;let content;
+  if(s==='search') content=searchScreen(f,true);
+  else if(s==='day'||(s==='detail'&&wide)) content=wide?`<div class="split"><div class="pane">${A_day(f,true)}</div><div class="pane"><div style="height:8px"></div>${A_detail(f,true)}</div></div>`:A_day(f);
+  else if(s==='detail') content=A_detail(f);
+  else if(s==='agents') content=A_agents(f,wide);
+  else content=A_chat(f,wide);
+  if(wide) return `${liveBar(f)}<div class="with-rail">${A_nav(f,true)}<div class="content">${content}</div></div>`;
+  return `${liveBar(f)}<div class="body">${content}</div>${A_nav(f)}`}
+
+/* ================= Direction B: Journal ================= */
+function B_week(f){const days=[['M',26,0],['T',27,1],['W',28],['T',29],['F',30],['S',31],['S',1]];return `<div class="week">${days.map(([l,n,i])=>i===undefined?`<button class="fut" disabled>${l}<b>${n}</b><span class="dt no"></span></button>`:`<button data-pickday="${i}" aria-current="${f.state.day===i}">${l}<b>${n}</b><span class="dt"></span></button>`).join('')}</div>`}
+function B_moments(f,d){
+  const items=[];
+  d.places.forEach((p,i)=>{if(p.travel)return;const first=p.s===0;const isNow=p.e===d.now&&d.key==='tue';items.push({t:first?d.sessions[0][0]:p.s,html:`<div class="t1">${ic(PLACEKIND[p.k].i)}${p.n}</div><div class="t2">${p.sub}, ${first?'until '+t12(p.e):isNow?'since '+t12(p.s):p.e>=h(24)?'from '+t12(p.s):tr(p.s,p.e)}</div>`})});
+  d.texts.forEach(([t,a,src,q])=>items.push({t,html:`<div class="t1" style="font-weight:500;font-size:14px">${appAv(a,'xs')}${APPS[a].n} \u00b7 ${src}</div><div class="qq">${q}</div>`,sel:'app:'+a}));
+  items.sort((a,b)=>a.t-b.t);
+  return items.map(x=>`<div class="mom ${x.sel?'tap':''}" ${x.sel?`data-sel="${x.sel}"`:''}><div class="tm">${t12(x.t)}</div><div class="bd">${x.html}</div></div>`).join('')}
+function B_day(f,wide,part){
+  const d=getDay(f);
+  const head=`<div class="btop"><button class="ib" aria-label="Calendar">${ic('calendar-blank')}</button><span class="sp"></span><button class="ib" data-go="search" aria-label="Search">${ic('magnifying-glass')}</button><button class="ib" data-go="agents" aria-label="Agents" style="position:relative">${ic('plugs-connected')}${G.acting?'<span style="position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:oklch(0.65 0.17 145)"></span>':''}</button><button class="ib" aria-label="Privacy and settings">${ic('shield-check')}</button></div>`;
+  const top=`<div class="bday"><h2>${d.long}</h2><div class="d">${d.longDate}${d.key==='tue'?', today':''}</div></div>${B_week(f)}
+  <div class="bsum">${d.summary}</div><div class="by">${ic('sparkle')}Written on this phone by Gemini Nano</div>
+  <ul class="hl">${d.highlights.map(x=>`<li>${ic(x.i)}<span>${x.t}</span></li>`).join('')}</ul>
+  <div style="padding:16px 22px 0"><div style="display:flex;justify-content:space-between;font-size:14px"><b style="font-weight:600">${dur(screenTotal(d))} on screen</b><span class="muted">${notifTotal(d)} notifications</span></div><div class="stack">${catTotals(d).map(([c,m])=>`<div style="flex:${m};--cat:var(--c-${c})"></div>`).join('')}</div>${legend(d)}</div>
+  <div style="padding:10px 8px 0">${appTotals(d).slice(0,3).map(([a,m])=>`<div class="lrow tap" style="padding-left:14px;padding-right:14px" data-sel="app:${a}">${appAv(a,'sm')}<div class="main"><div class="t1">${APPS[a].n}</div></div><div class="end">${dur(m)}</div></div>`).join('')}</div>`;
+  const moments=`<div class="sec" style="padding-left:22px"><div class="sec-h"><h4 style="font-family:Literata,serif;font-size:20px;font-weight:500">Moments</h4></div></div>${B_moments(f,d)}<div style="height:12px"></div>`;
+  const ask=`<div class="ask" data-go="chat"><span class="av sm app" style="--cat:var(--accent)">${ic('sparkle')}</span><span class="askph">Ask about ${d.long}</span><button class="send" aria-label="Ask">${ic('arrow-up')}</button></div>`;
+  if(wide) return {head,top,moments,ask};
+  return `${head}<div class="scroll">${top}${moments}</div>${ask}`}
+function B_detail(f,wide){
+  const sel=f.state.sel||'app:slack';const a=sel.split(':')[1];
+  return `${wide?'':`<div class="btop"><button class="ib" data-go="day" aria-label="Back">${ic('arrow-left')}</button><span class="muted" style="font-size:15px">${getDay(f).long}</span><span class="sp"></span></div>`}<div class="scroll">${appDetail(f,a).replace('<h3>',`<h3 style="font-family:Literata,serif;font-weight:500;font-size:26px">`)}</div>`}
+function B_agents(f,wide){
+  const tab=f.state.btab||'agents';
+  const tabs=`<div class="seg2">${[['agents','Agents'],['activity','Activity'],['triggers','Triggers']].map(([k,l])=>`<button data-btab="${k}" aria-pressed="${tab===k}">${l}</button>`).join('')}</div>`;
+  let body='';
+  if(tab==='agents') body=`${liveCard()}<div class="sec"><div class="sec-h"><h4>Connected</h4></div></div>${agentRows()}<div class="sec"><div class="sec-h"><h4>What Claude can do</h4></div></div>${permRows()}<div class="sec"><div class="sec-h"><h4>Connect an agent</h4></div><p class="muted" style="font-size:13.5px;margin:0">Paste one of these into your agent\u2019s MCP settings.</p></div>${addrRows()}`;
+  if(tab==='activity') body=`${liveCard()}<div class="sec"><div class="sec-h"><h4>Recently</h4></div></div>${logRows()}`;
+  if(tab==='triggers') body=`<div class="sec"><p class="muted" style="font-size:13.5px;margin:0">Phone events that start your agent routines through a webhook.</p></div>${trigRows()}<div style="padding:12px 20px"><button class="btn ton">${ic('plus')} New trigger</button></div>`;
+  const L=`<div class="btop"><button class="ib" data-go="day" aria-label="Back">${ic('arrow-left')}</button><span class="sp"></span></div><div class="bday" style="padding-bottom:6px"><h2 style="font-size:30px">Agents</h2></div>${wide?'':tabs}<div class="scroll">${wide?`${liveCard()}<div class="sec"><div class="sec-h"><h4>Connected</h4></div></div>${agentRows()}<div class="sec"><div class="sec-h"><h4>What Claude can do</h4></div></div>${permRows()}`:body}<div style="height:12px"></div></div>`;
+  if(!wide) return L;
+  const R=`<div class="scroll" style="padding-top:20px"><div class="sec"><div class="sec-h"><h4>Connect an agent</h4></div><p class="muted" style="font-size:13.5px;margin:0">Paste one of these into your agent\u2019s MCP settings.</p></div>${addrRows()}<div class="sec"><div class="sec-h"><h4>Triggers</h4></div></div>${trigRows()}<div class="sec"><div class="sec-h"><h4>Recently</h4></div></div>${logRows()}</div>`;
+  return `<div class="split" style="grid-template-columns:1fr 1fr"><div class="pane">${L}</div><div class="pane">${R}</div></div>`}
+function B_chat(f,wide){
+  const d=getDay(f);
+  const conv=`<div class="btop">${wide?'':`<button class="ib" data-go="day" aria-label="Back">${ic('arrow-left')}</button>`}${modelBtn()}<span class="sp"></span></div><div class="scroll">${chatMsgs(true)}</div>${composer('Ask about '+d.long+' or give a task')}`;
+  return conv}
+function B_render(f,wide){
+  const s=f.state.screen;let c;
+  if(s==='search') c=searchScreen(f,true);
+  else if(s==='agents') c=B_agents(f,wide);
+  else if(s==='chat'&&!wide) c=B_chat(f,false);
+  else if(s==='detail'&&!wide) c=B_detail(f,false);
+  else if(wide){
+    const p=B_day(f,true);
+    const right = s==='chat'?B_chat(f,true): s==='detail'?`<div class="btop"><button class="ib" data-go="day" aria-label="Close">${ic('x')}</button></div>`+B_detail(f,true):`<div style="height:12px"></div><div class="scroll">${p.moments}</div>${p.ask}`;
+    c=`${p.head}<div class="split" style="grid-template-columns:1fr 1fr"><div class="pane"><div class="scroll">${p.top}<div style="height:16px"></div></div></div><div class="pane">${right}</div></div>`;
+  } else c=B_day(f,false);
+  return `${liveBar(f)}<div class="body">${c}</div>`}
+
+/* ================= Direction C: Places ================= */
+function C_visit(d,p,i,sel){
+  if(p.travel){const ss=d.sessions.filter(([s,e])=>s<p.e&&e>p.s);const top=ss.sort((a,b)=>(b[1]-b[0])-(a[1]-a[0]))[0];
+    return `<div class="visit travel"><div class="rail2"><span class="node">${ic(p.walk?'person-simple-walk':'car-profile')}</span></div><div class="vb"><div class="t1"><b>${p.walk?'Walked':'Uber'}, ${dur(p.e-p.s)}</b></div>${top&&!p.walk?`<div class="t2">${APPS[top[2]].n} for ${dur(Math.min(top[1],p.e)-Math.max(top[0],p.s))} on the way</div>`:''}</div></div>`}
+  const ss=d.sessions.filter(([s,e])=>s<p.e&&e>p.s).map(([s,e,a])=>[Math.max(s,p.s),Math.min(e,p.e),a]);
+  const tot=ss.reduce((x,[s,e])=>x+e-s,0);const span=p.e-p.s;
+  const byApp={};ss.forEach(([s,e,a])=>byApp[a]=(byApp[a]||0)+e-s);const top=Object.entries(byApp).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const byCat={};ss.forEach(([s,e,a])=>{const c=APPS[a].c;byCat[c]=(byCat[c]||0)+e-s});
+  const ev=d.events.filter(([t])=>t>=p.s&&t<p.e);const ppl=[...new Set(ev.map(x=>x[1]).filter(Boolean))].slice(0,3);
+  const isNow=p.e===d.now&&d.key==='tue';
+  return `<div class="visit tap ${sel?'sel':''}" data-sel="visit:${i}"><div class="rail2"><span class="node" style="--pc:var(${PLACEKIND[p.k].v})">${ic(PLACEKIND[p.k].i)}</span></div><div class="vb">
+   <div class="t1"><b>${p.n}</b><span>${isNow?t12(p.s)+' to now':p.s===0?'Until '+t12(p.e):p.e>=h(24)?'From '+t12(p.s):tr(p.s,p.e)}</span></div><div class="t2">${p.sub} \u00b7 ${dur(span)}</div>
+   ${tot?`<div class="use" title="${dur(tot)} on screen">${Object.entries(byCat).map(([c,m])=>`<div style="width:${m/span*100}%;--cat:var(--c-${c})"></div>`).join('')}</div>
+   <div class="ic">${top.map(([a])=>appAv(a,'xs')).join('')}<span>${dur(tot)} on screen${ppl.length?`, messages from ${ppl.map(x=>PEOPLE[x].n).join(', ')}`:''}</span></div>`:`<div class="ic" style="margin-top:6px">Phone mostly idle</div>`}
+  </div></div>`}
+function C_day(f,wide){
+  const d=getDay(f);const selI=wide?+(f.state.sel||'visit:4').split(':')[1]:-1;
+  return `<div class="ctop"><span class="sp"></span><button class="ib" aria-label="Calendar">${ic('calendar-blank')}</button><button class="ib" aria-label="Privacy and settings">${ic('shield-check')}</button></div>
+  <div class="scroll"><h2 class="greet">${d.greet}</h2><div class="dsw">${daySwitch(f)}</div>
+  <div class="csum">${d.summary}</div><div class="by">${ic('sparkle')}Written on this phone by Gemini Nano</div>
+  <div style="padding:4px 20px 6px">${legend(d)}</div>
+  <div class="spine">${d.places.map((p,i)=>C_visit(d,p,i,i===selI)).join('')}</div>
+  <p class="faint" style="font-size:12.5px;padding:0 20px 16px">${dur(screenTotal(d))} on screen and ${notifTotal(d)} notifications in total.</p></div>`}
+function C_detail(f,wide){
+  const d=getDay(f);const i=+(f.state.sel||'visit:4').split(':')[1];const p=d.places[i]&&!d.places[i].travel?d.places[i]:d.places.find(x=>!x.travel);
+  const ss=d.sessions.filter(([s,e])=>s<p.e&&e>p.s).map(([s,e,a])=>[Math.max(s,p.s),Math.min(e,p.e),a]);
+  const ev=d.events.filter(([t])=>t>=p.s&&t<p.e),tx=d.texts.filter(([t])=>t>=p.s&&t<p.e);
+  return `${wide?'<div style="height:14px"></div>':`<div class="ctop" style="padding-left:6px"><button class="ib" data-go="day" aria-label="Back">${ic('arrow-left')}</button><span class="muted" style="font-size:15px">${d.title}</span><span class="sp"></span><button class="ib" aria-label="More">${ic('dots-three-vertical')}</button></div>`}
+  <div class="scroll"><div class="vh"><span class="node" style="--pc:var(${PLACEKIND[p.k].v})">${ic(PLACEKIND[p.k].i)}</span><div><h3>${p.n}</h3><div class="muted" style="font-size:14px">${tr(p.s,p.e)} \u00b7 ${dur(p.e-p.s)}</div></div></div>
+  <div style="padding:0 20px"><div class="minirib" style="height:22px">${ss.map(([s,e,a])=>`<div class="blk" style="left:${(s-p.s)/(p.e-p.s)*100}%;width:${(e-s)/(p.e-p.s)*100}%;--cat:var(--c-${APPS[a].c})"></div>`).join('')}</div>
+  <div class="axis"><span style="left:0">${t12(p.s)}</span><span style="right:0;transform:none">${t12(p.e)}</span></div></div>
+  <div class="sec"><div class="sec-h"><h4>On screen</h4></div></div>${sessRows(ss)}
+  ${ev.length?`<div class="sec"><div class="sec-h"><h4>Messages and alerts</h4></div></div>${eventRows(ev)}`:''}
+  ${tx.length?`<div class="sec"><div class="sec-h"><h4>What you read here</h4></div></div>${quotes(tx)}`:''}
+  <div style="display:flex;gap:8px;padding:10px 20px 18px"><button class="btn out">${ic('pencil-simple')} Rename place</button><button class="btn out">${ic('eye-slash')} Don\u2019t record here</button></div></div>`}
+function C_agents(f,wide){
+  const L=`<div class="ctop"><h2 class="greet" style="padding:0;flex:1">Agents</h2><button class="ib" aria-label="Privacy and settings">${ic('shield-check')}</button></div><div class="scroll" style="padding-top:8px">${liveCard()}
+  <div class="sec"><div class="sec-h"><h4>Your agents</h4><span class="a">Add</span></div></div>${agentRows()}${permRows()}
+  ${wide?'':`<div class="sec"><div class="sec-h"><h4>Addresses</h4></div></div>${addrRows()}<div class="sec"><div class="sec-h"><h4>When something happens</h4><span class="a">New</span></div></div>${trigRows()}<div class="sec"><div class="sec-h"><h4>Recently</h4></div></div>${logRows()}`}<div style="height:12px"></div></div>`;
+  if(!wide)return L;
+  return `<div class="split"><div class="pane">${L}</div><div class="pane"><div class="scroll" style="padding-top:18px"><div class="sec"><div class="sec-h"><h4>Addresses</h4></div></div>${addrRows()}<div class="sec"><div class="sec-h"><h4>When something happens</h4><span class="a">New</span></div></div>${trigRows()}<div class="sec"><div class="sec-h"><h4>Recently</h4></div></div>${logRows()}</div></div></div>`}
+function C_chat(f,wide){
+  const conv=`<div class="chat-top">${modelBtn()}<span style="flex:1"></span><button class="ib sm" aria-label="New chat">${ic('plus')}</button></div><div class="scroll">${chatMsgs(false)}<div class="tries"><span class="faint" style="font-size:12.5px">Try</span><button data-try="How long was I in Slack this week?">How long was I in Slack this week?</button><button data-try="Turn on Do Not Disturb until 7 am">Turn on Do Not Disturb until 7 am</button></div></div>${composer('Message your phone')}`;
+  if(!wide)return conv;
+  return `<div class="split"><div class="pane"><div class="ctop"><h2 class="greet" style="padding:0;flex:1">Chat</h2><button class="ib" aria-label="New chat">${ic('plus')}</button></div><div class="scroll" style="padding-top:8px">${pastChats()}</div></div><div class="pane">${conv}</div></div>`}
+function C_nav(f,wide){const cur=f.state.screen==='detail'?'day':f.state.screen;const items=[['day','Timeline','path'],['search','Search','magnifying-glass'],['chat','Chat','chat-circle-text'],['agents','Agents','plugs-connected']];
+  const b=items.map(([k,l,i])=>`<button class="nav" data-go="${k}" aria-current="${cur===k}"><span class="pill">${cur===k&&k!=='search'?icf(i):ic(i)}${k==='agents'&&G.acting?'<span class="badge"></span>':''}</span>${l}</button>`).join('');
+  return wide?`<nav class="rail">${b}</nav>`:`<nav class="navbar">${b}</nav>`}
+function C_render(f,wide){
+  const s=f.state.screen;let c;
+  if(s==='search') c=searchScreen(f,false);
+  else if(s==='agents') c=C_agents(f,wide);
+  else if(s==='chat') c=C_chat(f,wide);
+  else if(wide) c=`<div class="split"><div class="pane">${C_day(f,true)}</div><div class="pane">${C_detail(f,true)}</div></div>`;
+  else c= s==='detail'?C_detail(f):C_day(f);
+  if(wide) return `${liveBar(f)}<div class="with-rail">${C_nav(f,true)}<div class="content">${c}</div></div>`;
+  return `${liveBar(f)}<div class="body">${c}</div>${C_nav(f)}`}
+
+/* ================= frames ================= */
+const DIRS={A:{r:A_render,cls:'dA',frames:[['day','Day view'],['detail','One hour, 2 to 3 pm'],['agents','Connect'],['chat','Chat']],sel:'hour:14'},
+            B:{r:B_render,cls:'dB',frames:[['day','Day view'],['detail','One app, Slack'],['agents','Connect'],['chat','Chat']],sel:'app:slack'},
+            C:{r:C_render,cls:'dC',frames:[['day','Day view'],['detail','One visit, the cafe'],['agents','Connect'],['chat','Chat']],sel:'visit:4'}};
+const INNER_LABEL={day:'Day view with detail',agents:'Connect',chat:'Chat'};
+function build(){
+  document.querySelectorAll('.row[data-dir]').forEach(row=>{
+    const dir=row.dataset.dir,D=DIRS[dir];
+    D.frames.forEach(([scr,label])=>{
+      const w=document.createElement('div');w.className='fwrap';w.dataset.role=scr;
+      w.innerHTML=`<div class="flabel" data-cover="${label}" data-inner="${INNER_LABEL[scr]||label}">${label}</div><div class="phone"><div class="scr ${D.cls}">${status()}<div class="app" style="flex:1;min-height:0;display:flex;flex-direction:column"></div><div class="gest"></div></div></div>`;
+      row.appendChild(w);
+      const f={el:w,dir,state:{screen:scr,day:1,sel:D.sel,start:scr}};frames.push(f);w._f=f;
+    });
+  });
+  renderAll();
+}
+function isWide(){return document.documentElement.dataset.screen==='inner'}
+function render(f){const app=f.el.querySelector('.app');const sc=app.querySelector('.scroll');const top=sc?sc.scrollTop:0;
+  app.innerHTML=DIRS[f.dir].r(f,isWide());
+  const lab=f.el.querySelector('.flabel');lab.textContent=isWide()?lab.dataset.inner:lab.dataset.cover;
+  const ns=app.querySelector('.scroll');if(ns&&f._keepScroll)ns.scrollTop=top;else if(f.state.screen==='chat'){app.querySelectorAll('.scroll').forEach(x=>{if(x.querySelector('.msgs,.qa'))x.scrollTop=1e6})}f._keepScroll=false;
+  if(G.toast&&G.toast.f===f){const t=document.createElement('div');t.className='toast';t.textContent=G.toast.t;f.el.querySelector('.scr').appendChild(t);setTimeout(()=>{t.remove();},1400);G.toast=null}}
+function renderAll(keep){frames.forEach(f=>{f._keepScroll=keep;render(f)})}
+
+/* interactions */
+document.addEventListener('click',e=>{
+  const fw=e.target.closest('.fwrap');if(!fw)return;const f=fw._f;const t=e.target;
+  let el;
+  if(el=t.closest('[data-toggle]')){const k=el.dataset.toggle;if(k in G.trig)G.trig[k]=!G.trig[k];else if(k in G.perms)G.perms[k]=!G.perms[k];else G.collect[k]=!(G.collect[k]??true);renderAll(true);return}
+  if(el=t.closest('[data-act]')){const a=el.dataset.act;
+    if(a==='stop'){G.acting=false;syncCtl();renderAll(true)}
+    if(a==='sendwa'){G.sent=true;renderAll(true)}
+    if(a==='model'){G.model=(G.model+1)%MODELS.length;renderAll(true)}
+    if(a==='copy'){G.toast={f,t:'Address copied'};f._keepScroll=true;render(f)}
+    if(a==='send'){const inp=fw.querySelector('[data-input]');const v=inp&&inp.value.trim();if(v){G.extra.push(['me',v],['ai','This is a mock, so nothing happens here. In the app, '+MODELS[G.model][0]+' would answer using your stored days.']);renderAll(true);const sc=fw.querySelector('.scroll');if(sc)sc.scrollTop=1e6}}
+    return}
+  if(el=t.closest('[data-try]')){G.extra.push(['me',el.dataset.try],['ai','This is a mock, so nothing happens here.']);renderAll(true);return}
+  if(el=t.closest('[data-btab]')){f.state.btab=el.dataset.btab;render(f);return}
+  if(el=t.closest('[data-day]')){if(el.disabled)return;f.state.day=Math.max(0,Math.min(DAYS.length-1,f.state.day+ +el.dataset.day));f.state.scrub=null;f.state.sel=DAYS[f.state.day].key==='mon'?(f.dir==='A'?'hour:18':f.dir==='C'?'visit:2':'app:chrome'):DIRS[f.dir].sel;render(f);return}
+  if(el=t.closest('[data-pickday]')){f.state.day=+el.dataset.pickday;f.state.scrub=null;if(f.state.screen==='search')f.state.screen='day';f.state.sel=DAYS[f.state.day].key==='mon'?(f.dir==='A'?'hour:18':f.dir==='C'?'visit:2':'app:chrome'):DIRS[f.dir].sel;render(f);return}
+  if(el=t.closest('[data-hour]')){const [k,v]=(f.state.sel||'hour:14').split(':');if(k==='hour'){let H=Math.max(6,Math.min(23,+v+ +el.dataset.hour));f.state.sel='hour:'+H;f._keepScroll=false;render(f)}return}
+  if(el=t.closest('[data-sel]')){f.state.sel=el.dataset.sel;if(!isWide())f.state.screen='detail';else if(f.dir==='B')f.state.screen='detail';render(f);return}
+  if(el=t.closest('[data-go]')){f.state.screen=el.dataset.go;render(f);return}
+});
+document.addEventListener('input',e=>{if(e.target.matches('[data-search]')){G.query=e.target.value;const fw=e.target.closest('.fwrap');const f=fw._f;const pos=e.target.selectionStart;render(f);const n=fw.querySelector('[data-search]');n.focus();n.setSelectionRange(pos,pos)}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('[data-input]')){e.target.closest('.composer').querySelector('[data-act=send]').click()}});
+/* ribbon scrub */
+let drag=null;
+document.addEventListener('pointerdown',e=>{const r=e.target.closest('[data-rib]');if(!r)return;drag={r,f:r.closest('.fwrap')._f};r.setPointerCapture(e.pointerId);scrubTo(e)});
+document.addEventListener('pointermove',e=>{if(drag)scrubTo(e)});
+document.addEventListener('pointerup',e=>{if(drag){drag=null}});
+function scrubTo(e){const {r,f}=drag;const b=r.getBoundingClientRect();let x=Math.min(Math.max((e.clientX-b.left)/b.width,0),1);let m=Math.round((R0+x*(R1-R0))/5)*5;f.state.scrub=m;
+  r.querySelector('.scrub').style.left=pct(m)+'%';const ro=f.el.querySelector('[data-readout]');if(ro)ro.innerHTML=readout(getDay(f),m)}
+
+/* page controls */
+const P={theme:'system',screen:'cover',accent:'default',density:'comfortable'};
+const mq=matchMedia('(prefers-color-scheme: dark)');
+function applyTheme(){document.documentElement.dataset.theme=P.theme==='system'?(mq.matches?'dark':'light'):P.theme}
+mq.addEventListener('change',applyTheme);
+function syncCtl(){document.querySelectorAll('[data-ctl]').forEach(c=>{const k=c.dataset.ctl;const v=k==='acting'?(G.acting?'on':'off'):P[k];c.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v))})}
+document.querySelectorAll('[data-ctl] button').forEach(b=>b.addEventListener('click',()=>{const k=b.parentElement.dataset.ctl,v=b.dataset.v;
+  if(k==='acting'){G.acting=v==='on';renderAll(true)} else {P[k]=v;const de=document.documentElement;
+    if(k==='theme')applyTheme(); if(k==='screen'){de.dataset.screen=v;renderAll()} if(k==='accent')de.dataset.accent=v; if(k==='density')de.dataset.density=v}
+  syncCtl()}));
+/* url params for screenshots: ?theme=dark&screen=inner */
+const qp=new URLSearchParams(location.search);if(qp.get('shot'))document.documentElement.dataset.shot='1';['theme','screen','accent','density'].forEach(k=>{if(qp.get(k))P[k]=qp.get(k)});
+document.documentElement.dataset.screen=P.screen;document.documentElement.dataset.accent=P.accent;document.documentElement.dataset.density=P.density;applyTheme();
+build();syncCtl();document.fonts.ready.then(()=>renderAll());
+</script>
+</body>
+</html>

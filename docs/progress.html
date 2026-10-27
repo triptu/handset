@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Handset progress</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #F6F4EF; --card: #FFFFFF; --text: #1F2421; --muted: #5C655F; --line: #E2DED4;
+    --shipped: #2F8F5B; --decision: #C8553D; --question: #B8862A; --running: #3C6E9F;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #161917; --card: #1F2421; --text: #EEF1EC; --muted: #A9B3AB; --line: #343B36;
+      --shipped: #63C28E; --decision: #F08A70; --question: #E3B95A; --running: #7FB0E0; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.55 ui-rounded, "SF Pro Rounded", system-ui, -apple-system, sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 40px 20px 80px; }
+  h1 { font-size: 30px; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 8px; }
+  h2 { font-size: 20px; margin: 40px 0 12px; }
+  .entry { background: var(--card); border-left: 4px solid var(--line); padding: 14px 18px; margin: 0 0 10px; }
+  .entry h3 { margin: 0 0 4px; font-size: 16px; }
+  .entry p, .entry li { margin: 4px 0; color: var(--muted); }
+  .entry ul, .entry ol { margin: 6px 0; padding-left: 20px; }
+  .shipped { border-left-color: var(--shipped); }
+  .decision { border-left-color: var(--decision); }
+  .question { border-left-color: var(--question); }
+  .running { border-left-color: var(--running); }
+  .time { color: var(--muted); font-size: 13px; font-weight: 400; margin-left: 6px; }
+  .shots { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+  .shots figure { margin: 0; width: 200px; }
+  .shots img { width: 100%; display: block; border: 1px solid var(--line); }
+  .shots figcaption { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  code { font-size: 14px; }
+  table { border-collapse: collapse; width: 100%; margin: 10px 0; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  td { color: var(--muted); } td:first-child { color: var(--text); white-space: nowrap; }
+  input[type=search] { width: 100%; padding: 8px 10px; font: inherit; border: 1px solid var(--line); background: var(--card); color: var(--text); margin-bottom: 8px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Handset</h1>
+<p class="sub">A standalone Android app that lets any agent use your phone and keeps a private, day-by-day record of what you did on it. Started 27 Oct 2026. Repo: <a href="https://github.com/triptu/handset">triptu/handset</a> (private).</p>
+
+<h2>Needs you</h2>
+
+
+</div>
+<div class="entry question">
+  <h3>2. Install Tailscale on the Fold 7 (optional, when you want Claude Code on the laptop to reach the phone) <span class="time">16:52</span></h3>
+  <p>The phone has no Tailscale app. The MCP server now listens on Tailscale and the phone itself by default, so without it your laptop can only reach the phone over adb, or through plain Wi-Fi once you turn that switch on. Installing Tailscale needs your sign-in, which I can't do over adb.</p>
+</div>
+
+<h2>Goals</h2>
+<table>
+  <tr><th>When</th><th>Your words</th><th>My reading and status</th></tr>
+  <tr><td>27 Oct 15:00</td><td>"extract it out, make it standalone and push as a private repo with well defined readme and all in my github repo as a new app ... decoupled with ... any other app"</td><td>No account, no outside server, own package id, own signing key, README. Running.</td></tr>
+  <tr><td>27 Oct 15:00</td><td>"With context collection on, It should just store recent useful context locally, and have a pretty context browser, so i can see what i did at any given day. use the local gemini nano model ... to create day summaries"</td><td>Screen text, app usage, notifications and places, kept on the phone, browsed by day, with Nano summaries. Design mocks running.</td></tr>
+  <tr><td>27 Oct 15:00</td><td>"add a chat option, and create MCP or sth to make all this hookable to anything ... on Claude or Chatgpt ... drive the phone or get info"</td><td>MCP server on the phone first, then a public path (Needs you 1).</td></tr>
+  <tr><td>27 Oct 15:00</td><td>"setting up a routine in claude to do sth if my battery is low ... or do sth when my location changes to office ... webhook routine with the app sending the notification"</td><td>Phone events POST to a webhook such as a Claude routine's fire URL; the routine calls the phone back over MCP. Planned.</td></tr>
+  <tr><td>27 Oct 15:00</td><td>"pretty, and useful app which is as privacy friendly as possible, make it eventually open source, and let people basically be able to have whatever agent they use operate their phone"</td><td>Everything stored only on the phone; nothing licensed in the repo. Ongoing.</td></tr>
+  <tr><td>27 Oct 15:20</td><td>"support for local network and tailscale"</td><td>The MCP server listens on the phone, reachable over Wi-Fi and Tailscale. Planned.</td></tr>
+  <tr><td>27 Oct 15:20</td><td>"api key, gemini nano, and support for gemma 4 e4B, maybe from my other app nano chat which has the setup"</td><td>Chat runs on your own API key, Gemini Nano or Gemma 4 E4B; the model code ports from nano-chat. Planned.</td></tr>
+  <tr><td>27 Oct 16:15</td><td>"none of them are clear minimal aesthetics that i prefer. use better-interfaces skill too"</td><td>Design round 2 runs with the Juno reference and the better-interface skill.</td></tr>
+  <tr><td>27 Oct 16:15</td><td>Days, Chat, Agents tabs; name Handset; own Cloudflare relay</td><td>Done (rename) or running (relay).</td></tr>
+  <tr><td>27 Oct 15:40</td><td>"for product design, etc., involve, fable, and Astra agents as well for product brainstorming, for design reviews for elegance and aesthetic reviews"</td><td>Both ran the brainstorm and the design review; both will review round 2 and the built screens.</td></tr>
+  <tr><td>27 Oct 16:55</td><td>"wouldn't routines be set up in claude or agent, why are we showing that? the third tab should be the settings close to what settings already is in the mobile use app, giving granular control over everything. with a new section showing connected agents. remove day summary and any complicated piece which will take us time to figure out and do well. the main goal here is giving the raw stuff to other agents than making this app super functional. the top area is still very busy on the home tab. let's pick B for the design direction and start"</td><td>Tabs Days and Settings (Chat when it's built); no routines, summaries, "Still open" or session lines; header is just "Today ⌄" and search; design B. UI build running.</td></tr>
+</table>
+
+<h2>Running</h2>
+<div class="entry running">
+  <h3>Settings as pages <span class="time">20:15</span></h3>
+  <p>Your words: "the settings page is a mess man, such a long list of so many options, all laid out flat." Claude Opus, branch <code>settings-pages</code>: a short top level like Android's own Settings (Agents, Recording, Connections, Phone events, Safety, Android permissions, About), each row with its current state ("Relay connected", "Off"), each opening its own page. No control dropped.</p>
+</div>
+<div class="entry running">
+  <h3>Chat through nano-chat, not a second chat app <span class="time">20:02</span></h3>
+  <p>Your call: "make it possible for my nano-chat repo to use this, so there aren't two separate local chat apps". Two agents in parallel, both Claude Opus. Handset (branch <code>connect-app</code>): another app on the phone asks to connect, Handset shows "Nano Chat wants to use this phone" with the access switches and Allow, and hands back a local address and token. nano-chat (branch <code>handset</code> in its repo): a "Use this phone" switch per companion and a small tool loop for Nano and Gemma: search your day, catch up, status, open an app, alarms, timers, Do not disturb. Screen-driving tools are left out: their results don't fit Gemma's 2k context and small models drive screens poorly.</p>
+</div>
+
+
+</div>
+<div class="entry running">
+  <h3>UI in design B: built on sample data, review running <span class="time">17:35</span></h3>
+  <p>Branch <code>ui</code>, 8 commits. Days (header "Today ⌄" and search only; month sheet; places with times; raw moments), moment pages, search, Settings with Connected agents at the top and a switch per item, and a rail on the open Fold. Google Sans Flex and Phosphor icons, all values in one theme file; the old screens are deleted. Fable is reviewing the screenshots. Next: wire it to the real store and agents once the store branch lands, then install on your phone.</p>
+  <div class="shots">
+    <figure><img src="progress/images/ui-cover-light-1-today.png" alt=""><figcaption>Real app, emulator, sample data: Today</figcaption></figure>
+    <figure><img src="progress/images/ui-cover-light-7-settings.png" alt=""><figcaption>Settings</figcaption></figure>
+    <figure><img src="progress/images/ui-cover-light-6-search.png" alt=""><figcaption>Search</figcaption></figure>
+    <figure><img src="progress/images/ui-inner-light-2-moment-chrome.png" alt=""><figcaption>Open Fold, a moment opened</figcaption></figure>
+  </div>
+</div>
+
+</div>
+
+<div class="entry shipped">
+  <h3>MCP server on the phone: merged <span class="time">17:45</span></h3>
+  <p>Claude Opus built it on branch <code>mcp-server</code>. On an emulator: Claude Code opened Clock and tapped Timer; Codex read the battery and was refused SMS ("Text messages are off for Codex. The user can turn on Text messages for this agent in Handset, under Settings, Agents, Codex."); the Inspector got a screenshot back as an image; a removed agent's token got 401; calls kept answering with the screen off in deep sleep; the server came back after a reboot. 33 unit tests pass. Astra's review found three serious issues, now being fixed by Opus on the same branch: an agent could open Handset itself and turn on its own permissions (Handset's own screens become off limits to agents); a stranger on the same Wi-Fi could tie up the server without a token (connections get capped and timed out); and the server listened on plain Wi-Fi by default (now only Tailscale and the phone itself, with Wi-Fi as a switch). Also: cancelling a call in the client now stops it on the phone, and <code>now_playing</code> needs the agent's Notifications permission.</p>
+  <div class="shots">
+    <figure><img src="progress/images/settings-agents.png" alt=""><figcaption>Real app, emulator: server switch, address, an agent and its switches (placeholder look until the redesign)</figcaption></figure>
+    <figure><img src="progress/images/pill.png" alt=""><figcaption>The pill names the agent: "Codex is waiting for the screen"</figcaption></figure>
+  </div>
+</div>
+
+
+
+<h2>Plan, after the Fable and Astra brainstorm</h2>
+<div class="entry decision">
+  <p><b>Changed 16:55 by you:</b> the app's job is to hand raw data and control to your agents. Cut: day summaries and titles, session lines, "Left open", routines in the app (they live in Claude). Chat comes after Days and Settings ship. Phone events that call a webhook stay planned as a small Settings item, since the routine itself lives in Claude.</p>
+</div>
+<div class="entry">
+  <p>Both models, working separately, put the same thing first: the phone knows what you read, so <b>finding it again and acting on it</b> is the daily habit. Driving apps is the engine under every use case, not a reason on its own to open the app.</p>
+  <p><b>The five daily uses we build for</b></p>
+  <ol>
+    <li><b>What was that thing?</b> Full-text search over the screens you read, with app and time, in the app and as an MCP tool <code>search_context</code>. "The restaurant Arjun named", "that tracking number".</li>
+    <li><b>Catch me up.</b> <code>inbox_since(time)</code>: notifications and SMS grouped by person, with the existing reply tool. "What came in during the flight?" from Claude.</li>
+    <li><b>Situation routines.</b> Left home, arrived at a place, battery under a level, charging started. The phone POSTs a short payload to a URL (a Claude routine's fire URL); the routine calls back over MCP. Claude is the routine editor; the app has no automation builder.</li>
+    <li><b>Left open.</b> A session that ended on a half-filled form, a typed but unsent message or a cart at checkout shows as "Left open", which you or the agent can resume.</li>
+    <li><b>How I actually spent today.</b> Sessions with one Nano line each ("40 min in Chrome, mostly reading about e-bikes"), and a day summary written over those lines. Agent actions appear inline with your own.</li>
+  </ol>
+  <p><b>How Nano fits in 4k tokens:</b> one session (one app, 10 to 30 minutes of de-duplicated screen text) gives one line plus the names, places and amounts. The day summary reads the session lines. This runs when you open the app, because Nano won't run in the background.</p>
+  <p><b>Privacy rules</b></p>
+  <ul>
+    <li>Stored on the phone, encrypted: screen text, notifications, app sessions and places as visits, plus a log of every agent action. SMS and contacts are read live and never copied.</li>
+    <li>Kept 30 days for raw text; summaries and usage totals kept a year. "Delete today" and "Pause for an hour" are one tap away (a quick settings tile).</li>
+    <li>Always excluded: password fields, the keyboard, this app, and an editable list of bank and authenticator apps.</li>
+    <li>Agents read screen, status, usage, summaries and search without asking. Notifications, SMS, contacts, location and media are switched on once per connected agent.</li>
+    <li>Send, Pay, Buy, Order, Transfer, Post, installing apps, sharing media and reading one-time codes need your tap on the phone every time, whatever the agent says.</li>
+    <li>Screen and notification text goes to agents marked as untrusted content, and it can never change what the phone allows. Webhook payloads carry fields such as the battery level, not message text.</li>
+    <li>No accounts, no analytics, no network except the agents you connect.</li>
+  </ul>
+  <p><b>What we won't build:</b> an automation builder, a user profile the app infers about you, streaks or wellbeing nudges, an assistant personality, cloud sync.</p>
+  <p><b>Where I disagree with both:</b> both said to delay in-app chat. You asked for it, so it stays, but it comes after search, inbox and triggers. Astra also wanted every agent grant to carry a time range and an expiry. I left that out because it adds setup with no concrete risk behind it, since the tap-every-time list already covers the dangerous actions.</p>
+</div>
+
+<h2>Next</h2>
+<ol>
+  <li>Local store (Room with full-text search, encrypted) fed by screen text, notifications, usage sessions and place visits.</li>
+  <li>MCP server on the phone over Wi-Fi and Tailscale, with <code>search_context</code>, <code>inbox_since</code> and <code>day_summary</code> beside the existing tools.</li>
+  <li>Day browser in the chosen design, with Nano session lines and day summaries, and "Left open".</li>
+  <li>Triggers that POST to a URL: left or arrived at a place, battery level, charging.</li>
+  <li>In-app chat on your API key, Nano or Gemma 4 E4B, ported from nano-chat.</li>
+  <li>Public path for claude.ai and ChatGPT through your Cloudflare relay (running).</li>
+</ol>
+
+<h2>Decision log</h2>
+<input type="search" id="filter" placeholder="Filter decisions">
+<table id="decisions">
+  <tr><th>When</th><th>Decision</th><th>Why</th></tr>
+  <tr><td>15:20</td><td>You: collect screen text, app usage, notifications and places.</td><td></td></tr>
+  <tr><td>15:20</td><td>You: chat on your own API key, Gemini Nano or Gemma 4 E4B.</td><td>Reuse nano-chat's model code.</td></tr>
+  <tr><td>15:20</td><td>Agent: Android project in <code>android/</code>, relay later in <code>relay/</code>. Package and app id <code>ai.tushar.mobileuse</code>, name "Mobile use". Flip it if you want another name; renaming is cheap until other people install it.</td><td>Matches nano-chat's <code>ai.tushar.*</code> ids.</td></tr>
+  <tr><td>15:20</td><td>Agent: system font instead of the old licensed fonts.</td><td>They are licensed fonts and can't go in a repo that will be public.</td></tr>
+  <tr><td>15:20</td><td>Agent: Gemini Nano summaries run while the app is open, not overnight.</td><td>ML Kit allows Nano only for the foreground app (error 30, BACKGROUND_USE_BLOCKED). Gemma 4 E4B runs in our own process, so it could write summaries overnight while charging. Your Fold 7 has Nano v2, which also lacks system prompts.</td></tr>
+  <tr><td>15:20</td><td>Agent: new signing key in <code>~/.config/mobile-use/</code>, outside the repo.</td><td>Its own app id and key.</td></tr>
+  <tr><td>16:15</td><td>You: name Handset, tabs Days, Chat, Agents, own Cloudflare relay.</td><td></td></tr>
+  <tr><td>16:20</td><td>Agent: app id <code>ai.tushar.handset</code>; signing key moved to <code>~/.config/handset/</code> with alias <code>handset</code>. The GitHub repo is still <code>mobile-use</code>; say if you want it renamed (GitHub redirects the old URL).</td><td>Renamed before anyone else installs it.</td></tr>
+  <tr><td>16:20</td><td>Agent: MCP server is a small hand-written handler on a plain socket, not the Kotlin MCP SDK.</td><td>Adds 98 KB instead of 1.7 MB, and speaks the current spec (2026-07-28, which Claude Code uses) as well as the older one Codex uses. The SDK only knows the older one.</td></tr>
+  <tr><td>16:20</td><td>Agent: one token per agent you add, instead of one shared token.</td><td>The phone knows which agent acted (the pill and history say "Claude Code is opening WhatsApp"), and removing an agent cuts it off alone.</td></tr>
+  <tr><td>16:20</td><td>Agent: no extra encryption of the database.</td><td>Android already encrypts app storage and keeps it private to the app; backups are off. Extra encryption adds key handling with no concrete risk it removes, short of a rooted phone.</td></tr>
+  <tr><td>16:20</td><td>Agent: places are not looked up by address.</td><td>Android's address lookup sends coordinates to Google. Visits stay unnamed until you name a place once; later visits match by distance.</td></tr>
+  <tr><td>20:10</td><td>You: repo renamed to <code>handset</code>, MIT license, the ported code is fine to open-source.</td><td>Old GitHub links redirect. Still private until you say to make it public.</td></tr>
+  <tr><td>20:00</td><td>You: chat lives in nano-chat, which uses Handset; no chat tab in Handset.</td><td>One local chat app.</td></tr>
+  <tr><td>20:02</td><td>Agent: nano-chat offers the model only the small tools (search, catch up, status, open app, alarms, timer, Do not disturb), not screen driving.</td><td>Gemma runs with a 2048-token context on your Fold and Nano with about 4k; a screen dump alone can exceed that. Claude through the relay handles screen driving.</td></tr>
+  <tr><td>18:20</td><td>Agent: the relay is the default way to connect any agent; Tailscale is listed as the direct, more private option under Connections, and needs no extra code.</td><td>The relay works for every client including Claude Code; Tailscale keeps traffic off Cloudflare for those who want that, and helps people who won't run a relay.</td></tr>
+  <tr><td>17:45</td><td>Agent: all four sources are off until you turn them on; agent actions are always recorded. Places needs "Allow all the time" location.</td><td>Nothing is collected without a switch you flipped. Location every 5 minutes at balanced power, no GPS.</td></tr>
+  <tr><td>17:45</td><td>Agent: one-time codes are masked before they're stored.</td><td>No reason to keep them; an agent can still read a fresh one live through <code>read_sms</code> with that permission.</td></tr>
+  <tr><td>16:55</td><td>You: design B; tabs Days, Chat, Settings; no routines, summaries or other hard pieces.</td><td>Raw data for agents comes first.</td></tr>
+  <tr><td>16:56</td><td>Agent: no Chat tab until chat exists.</td><td>An empty tab is worse than two tabs; adding it later is one line.</td></tr>
+  <tr><td>17:55</td><td>Agent: the MCP server listens only on Tailscale and the phone itself by default; plain Wi-Fi is a switch.</td><td>On café Wi-Fi anyone could see the token and the agent's traffic, and tie up the server. Tailscale encrypts and limits who can reach it.</td></tr>
+  <tr><td>17:55</td><td>Agent: agents can't read or tap Handset's own screens.</td><td>Otherwise an agent, or a message it reads, could make it turn on its own permissions or read a token.</td></tr>
+  <tr><td>16:20</td><td>Agent: relay sign-in has no password. claude.ai or ChatGPT opens the relay's page, and you tap Allow on the phone.</td><td>The phone is the identity; nothing to remember or leak.</td></tr>
+</table>
+
+<h2>Ideas</h2>
+<ul>
+  <li>Android AppFunctions (Android 16) so Gemini can call the app later. Claude and ChatGPT can't use them today.</li>
+</ul>
+
+<h2>Shipped</h2>
+<div class="entry shipped">
+  <h3>claude.ai connected to your phone <span class="time">20:00</span></h3>
+  <p>You added the Handset connector in claude.ai through your relay and approved it on the phone. Your words: "i've connected claude.ai seems to work well".</p>
+</div>
+<div class="entry shipped">
+  <h3>Name a place; agent steps matched by id <span class="time">19:31</span></h3>
+  <p>Tap a place heading in Days to name it (Home, Office, Gym in one tap), rename or forget it; arrival and departure events use the name. An agent's own steps are now matched by its id, so two agents with one name can't see each other's steps. 123 tests; on your phone, the database upgraded to version 5 and the relay reconnected.</p>
+  <div class="shots"><figure><img src="progress/images/name-place.png" alt=""><figcaption>Real app, emulator: naming a place</figcaption></figure></div>
+</div>
+<div class="entry shipped">
+  <h3>Phone events, merged and on your phone <span class="time">19:10</span></h3>
+  <p>Branch <code>phone-events</code>, 112 tests. On an emulator, with battery and charger changes driven over adb, a local server received in order: test, charging_stopped, battery_low at 15% (none again at 12%), charging_started, charging_stopped, battery_low at 10% (a new discharge), charging_started. A 503 was retried once with the same payload. Arriving at or leaving a place, and the notification event, aren't run on a device yet. Astra's review found a leak (the "from" picker offered notification titles as people; now only chat senders or the app name) and delivery gaps; fixed: every event has an <code>event_id</code> so a routine can skip repeats, stranded events resume on restart, the 20-an-hour cap counts real sends. 117 tests.</p>
+  <div class="shots"><figure><img src="progress/images/phone-events-settings.png" alt=""><figcaption>Real app, emulator: the Phone events section</figcaption></figure></div>
+<div class="entry shipped">
+  <h3>New UI, local store, MCP and relay together, on main and on your phone <span class="time">18:20</span></h3>
+  <p>Branch <code>ui</code>: store, MCP server, relay and the new UI together, on real data. 90 tests. It also closed a gap: search and timeline returned notification text to agents whose Notifications switch was off. Claude Code on an emulator: "4 matches for “Bengaluru” … Chrome · screen: Bengaluru - Wikipedia", and after turning that agent's Notifications on: "notification from Asha: Lunch at Toit on 100 Feet Road at 1:30?". Installed on your Fold 7 and connected to the relay (<code>Handset/Relay: connected</code>). Astra's review found four privacy leaks, being fixed now by Opus: the day timeline gave place history to agents without Location; one agent's recorded steps could show message text to another agent; time spent paused or with app usage off got recorded later; Delete today could bring messages back. Also: codes in notification titles weren't masked, and some sample-only fields remain. All six fixed by Opus with tests (100 pass): each agent sees places only with its Location switch; other agents' steps show only the tool and whether it worked; paused and switched-off time is never collected later; Delete today stays deleted (database upgrade 1 to 2, which ran cleanly on your phone); codes masked in titles too; sample-only fields removed.</p>
+  <div class="shots">
+    <figure><img src="progress/images/int-cover-light-1-days.png" alt=""><figcaption>Days with real data (emulator)</figcaption></figure>
+    <figure><img src="progress/images/int-cover-light-3-search.png" alt=""><figcaption>Search</figcaption></figure>
+    <figure><img src="progress/images/int-cover-light-5a-settings-middle.png" alt=""><figcaption>Settings: rules and connections, relay first</figcaption></figure>
+    <figure><img src="progress/images/int-cover-dark-6-agent.png" alt=""><figcaption>An agent's page, dark</figcaption></figure>
+  </div>
+<div class="entry shipped">
+  <h3>Phone side of the relay, merged <span class="time">18:50</span></h3>
+  <p>GPT-6.1 Sol built it; Fable reviewed it (security core clean) and found two bugs, both fixed: New token crashed on a claude.ai agent, and the notification's Stop wiped every relay connection. Also fixed: one approval prompt at a time, 90 seconds; agents show "via claude.ai"; the code to compare comes first; a busy phone answers at once. 58 tests. On an emulator through the public relay: approved sign-in, <code>device_status</code> answered, Stop kept the connection, a second approval while one was pending was refused, a removed agent got 403. Settings rows for it come with the integration.</p>
+</div>
+<div class="entry shipped">
+  <h3>Claude Code drove your Fold 7 over MCP <span class="time">18:05</span></h3>
+  <p>On your phone: Settings, turn on "Let agents connect", Add agent "Claude Code", then on the Mac <code>adb forward tcp:8765 tcp:8765</code> and <code>claude mcp add --transport http -s local handset http://127.0.0.1:8765/mcp</code> with the token. <code>claude mcp list</code>: "handset: ✔ Connected". Asked to check status, open Clock and go home, it answered: "battery is at 52% and the phone is on Wi-Fi … the app opened on the Alarm tab. It lists 8 alarms, and every one is switched off … I pressed home and the phone is back on the home screen." The config is in local scope of a scratch folder only.</p>
+</div>
+<div class="entry shipped">
+  <h3>Cloudflare relay, merged <span class="time">17:05</span></h3>
+  <p><code>relay/</code>, by GPT-6.1 Sol, reviewed by Fable, fixed and redeployed. Live at a <code>helloworld2907.workers.dev</code> URL with a fake phone for testing; the real phone side is the next Android task. Fixes after review: the phone's Allow prompt leads with which site is asking, a stranger can't keep your phone offline, sign-in endpoints are rate-limited, an answer survives the phone switching networks mid-call, nothing is logged, cancelled calls free their slot, and a sign-in you abandon leaves no agent behind. 13 tests pass; through the public URL the MCP Inspector completed sign-in and called the test tool.</p>
+</div>
+<div class="entry shipped">
+  <h3>Runs on your Fold 7 <span class="time">16:52</span></h3>
+  <p>The current main build is installed on your phone (Android 17) with its accessibility service on. Through the adb path: <code>device_status</code> ("Battery: 58%, Wi-Fi, Do not disturb off, next alarm 20:20"), <code>get_screen</code> on One UI Home (24 elements, the widget and dock read correctly), then a batch that opened Clock ("[ok] Opened Clock · elements changed · 815 ms") and pressed Home (347 ms). Handset is asking for notification permission on the phone; tap Allow, because the Send and Pay prompt needs it.</p>
+  <div class="shots"><figure><img src="progress/images/fold7-handset-home.png" alt=""><figcaption>Real phone, cover screen, placeholder look until the redesign</figcaption></figure></div>
+</div>
+<div class="entry shipped">
+  <h3>Standalone app, renamed Handset <span class="time">16:20</span></h3>
+  <p>The module is ported into <code>android/</code> with no sign-in, outside server, licensed fonts or old branding. Every call now goes through one tool runner that any transport can use. New signing key. The release build and 21 unit tests pass. On an emulator, through the adb path: <code>get_screen</code>, <code>open_app</code> Clock ("[ok] Opened Clock · elements changed · 1348 ms"), <code>tap</code> "Timer", <code>device_status</code> ("Battery: 100%, charging"), and a batch where the status call ran beside the screen calls. Commits <code>cadaefc</code> to <code>0d83ad0</code>, rename <code>e1fd4f1</code>. Not yet tried on your phone.</p>
+  <div class="shots">
+    <figure><img src="progress/images/extract-home-light.png" alt=""><figcaption>Real app on an emulator, before the rename and redesign: plain placeholder look.</figcaption></figure>
+    <figure><img src="progress/images/extract-home-dark.png" alt=""><figcaption>Same, dark mode.</figcaption></figure>
+  </div>
+</div>
+<div class="entry shipped">
+  <h3>MCP spike <span class="time">16:10</span></h3>
+  <p>An MCP server inside an Android app answered Claude Code ("The phone's battery is at 100% and it's charging"), Codex and the MCP Inspector, returned a screenshot as an image that Claude described correctly, and kept answering with the screen off in deep Doze while running as a foreground service.</p>
+</div>
+</main>
+<script>
+  const f = document.getElementById('filter');
+  f.addEventListener('input', () => {
+    const q = f.value.toLowerCase();
+    document.querySelectorAll('#decisions tr').forEach((r, i) => { if (i) r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none'; });
+  });
+</script>
+</body>
+</html>

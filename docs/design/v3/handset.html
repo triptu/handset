@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Handset, design round three</title>
+<link rel="stylesheet" href="assets/phosphor-regular.css">
+<link rel="stylesheet" href="assets/phosphor-fill.css">
+<style>
+@font-face { font-family: 'Google Sans Flex'; font-weight: 400 700; font-display: block; src: url(assets/fonts/GoogleSansFlex.woff2) format('woff2'); }
+@font-face { font-family: 'Newsreader'; font-weight: 400 500; font-display: block; src: url(assets/fonts/Newsreader.woff2) format('woff2'); }
+
+:root {
+  --sans: 'Google Sans Flex', Roboto, system-ui, sans-serif;
+  --serif: 'Newsreader', Georgia, serif;
+  --fast: 150ms; --slow: 220ms; --ease: cubic-bezier(.2, 0, 0, 1);
+}
+
+/* Page chrome (not the app) */
+html { background: #E9E7E2; color: #1E1C19; }
+html.dark { background: #121211; color: #E6E3DD; }
+html.dark .device { box-shadow: 0 0 0 1px rgb(255 255 255 / .14); }
+body { margin: 0; font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+.page { max-width: 1880px; margin: 0 auto; padding: 32px 32px 80px; }
+.top { display: flex; flex-wrap: wrap; gap: 16px 40px; align-items: end; justify-content: space-between; margin-bottom: 8px; }
+.top h1 { font: 500 22px/1.3 var(--sans); margin: 0 0 4px; }
+.top p { margin: 0; max-width: 66ch; color: #5F5A52; }
+html.dark .top p, html.dark .note, html.dark .changes li { color: #A8A39A; }
+.controls { display: flex; flex-wrap: wrap; gap: 20px; }
+.seg { display: flex; gap: 2px; align-items: center; }
+.seg span { font-size: 13px; color: #6B665E; margin-right: 6px; }
+html.dark .seg span { color: #9C978E; }
+.seg button { font: 500 14px var(--sans); color: inherit; background: transparent; border: 0; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+.seg button:hover { background: rgb(0 0 0 / .06); }
+html.dark .seg button:hover { background: rgb(255 255 255 / .07); }
+.seg button[aria-pressed=true] { background: rgb(0 0 0 / .09); }
+html.dark .seg button[aria-pressed=true] { background: rgb(255 255 255 / .12); }
+.group { margin-top: 56px; padding: 0 0 8px; }
+.group > h2 { font: 500 18px/1.3 var(--sans); margin: 0 0 4px; }
+.group > p { margin: 0 0 24px; max-width: 80ch; color: #5F5A52; }
+.grid { display: flex; flex-wrap: wrap; gap: 40px 24px; align-items: flex-start; }
+figure { margin: 0; }
+figcaption { font-size: 13px; color: #6B665E; margin: 0 0 10px 4px; max-width: 420px; }
+html.dark figcaption { color: #9C978E; }
+.changes { margin-top: 72px; max-width: 84ch; }
+.changes h2 { font: 500 18px/1.3 var(--sans); margin: 0 0 8px; }
+.changes li { margin-bottom: 6px; color: #5F5A52; }
+:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+/* Phone hardware */
+.device { background: #0B0B0B; padding: 10px; border-radius: 44px; box-shadow: 0 1px 2px rgb(0 0 0 / .2), 0 12px 32px rgb(0 0 0 / .12); }
+.device.inner { border-radius: 30px; }
+.phone { position: relative; overflow: hidden; border-radius: 34px; width: 412px; height: 916px; display: flex; flex-direction: column; }
+.device.inner .phone { width: 840px; height: 930px; border-radius: 20px; }
+
+/* App tokens: one warm neutral, no accent. App icons at low chroma. */
+.phone {
+  --bg: #F6F4EF; --text: #1E1C19; --text-2: #5C574F; --text-3: #6E685F; --surface: #ECE9E2; --surface-2: #FFFFFF;
+  --press: rgb(30 28 25 / .07); --line: rgb(30 28 25 / .1); --scrim: rgb(20 18 16 / .32);
+  --live: #2F8A4C; --danger: #A8402F; --on-danger: #FFFFFF;
+  --app-l: .58; --app-c: .055;
+  --av-amma: #E6D3C0; --av-amma-ink: #6E4A2C; --av-group: #DCE3D9; --av-group-ink: #3E5A44;
+  background: var(--bg); color: var(--text); font-family: var(--sans);
+}
+html.dark .phone {
+  --bg: #1C1B19; --text: #ECE9E3; --text-2: #ABA59B; --text-3: #9C968C; --surface: #292724; --surface-2: #2C2A27;
+  --press: rgb(236 233 227 / .08); --line: rgb(236 233 227 / .1); --scrim: rgb(0 0 0 / .5);
+  --live: #6BC287; --danger: #E8907F; --on-danger: #2A120C;
+  --app-l: .76; --app-c: .045;
+  --av-amma: #4A3B2E; --av-amma-ink: #EBCDB0; --av-group: #33402F; --av-group-ink: #C3D8BC;
+}
+.phone {
+  --c-whatsapp: oklch(var(--app-l) var(--app-c) 155); --c-slack: oklch(var(--app-l) var(--app-c) 330); --c-chrome: oklch(var(--app-l) var(--app-c) 250);
+  --c-swiggy: oklch(var(--app-l) var(--app-c) 55); --c-gmail: oklch(var(--app-l) var(--app-c) 25); --c-spotify: oklch(var(--app-l) var(--app-c) 150);
+  --c-kindle: oklch(var(--app-l) var(--app-c) 230); --c-claude: oklch(var(--app-l) var(--app-c) 40); --c-docs: oklch(var(--app-l) var(--app-c) 255);
+  --c-meet: oklch(var(--app-l) var(--app-c) 160); --c-uber: var(--text-2); --c-place: var(--text-2);
+}
+
+:where(.phone button) { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: inherit; }
+.phone a { color: inherit; text-decoration: none; }
+.phone :focus-visible { outline: 2px solid var(--text); outline-offset: -2px; border-radius: 10px; }
+
+.status { flex: none; height: 36px; display: flex; align-items: center; justify-content: space-between; padding: 0 26px 0 28px; font: 500 14px var(--sans); font-variant-numeric: tabular-nums; }
+.status .ph { font-size: 15px; margin-left: 4px; }
+.gesture { flex: none; height: 20px; display: grid; place-items: center; }
+.gesture::after { content: ''; width: 108px; height: 4px; border-radius: 2px; background: var(--text); opacity: .4; }
+
+/* Agent strip: only while an agent is acting */
+.live { flex: none; display: flex; align-items: center; gap: 10px; padding: 0 4px 0 20px; min-height: 48px; font-size: 14px; background: var(--surface); }
+.live .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--live); flex: none; }
+.live .what { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.live button { font-weight: 650; min-width: 72px; height: 48px; padding: 0 16px; border-radius: 24px; text-align: center; }
+.live button:hover, .live button:active { background: var(--press); }
+
+.body { flex: 1; min-height: 0; display: flex; }
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.scroll { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
+.pane { min-width: 0; display: flex; flex-direction: column; }
+
+/* Bottom bar and rail: selected = filled icon + heavier label */
+.nav { flex: none; display: flex; justify-content: space-around; padding: 6px 0 2px; }
+.nav button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 56px; justify-content: center; color: var(--text-2); font-size: 12px; font-weight: 450; }
+.nav .ph, .nav .ph-fill, .rail .ph, .rail .ph-fill { font-size: 24px; }
+.nav button[aria-current=page], .rail button[aria-current=page] { color: var(--text); font-weight: 700; }
+.nav button:active, .rail button:hover, .rail button:active { background: var(--press); }
+.nav button { border-radius: 16px; }
+.rail { flex: none; width: 88px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 12px; }
+.rail button { width: 72px; min-height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--text-2); font-size: 12px; font-weight: 450; border-radius: 16px; }
+
+/* Headers */
+.head { flex: none; display: flex; align-items: center; gap: 4px; padding: 4px 8px 4px 20px; min-height: 56px; }
+.head.back { padding-left: 4px; }
+.head .grow { flex: 1; min-width: 0; }
+.head h1 { font: 600 20px/1.3 var(--sans); margin: 0; }
+.ib { width: 48px; height: 48px; border-radius: 24px; display: grid; place-items: center; color: var(--text-2); flex: none; }
+.ib .ph { font-size: 22px; }
+.ib:hover, .ib:active { background: var(--press); color: var(--text); }
+.monthbtn { display: inline-flex; align-items: center; gap: 6px; height: 48px; padding: 0 12px; margin-left: -12px; border-radius: 24px; font-weight: 600; font-size: 18px; }
+.monthbtn .ph { font-size: 16px; color: var(--text-2); }
+.monthbtn:hover, .monthbtn:active, .monthbtn[aria-expanded=true] { background: var(--press); }
+.todaybtn { height: 48px; padding: 0 16px; border-radius: 24px; font-weight: 600; font-size: 15px; }
+.todaybtn:hover, .todaybtn:active { background: var(--press); }
+
+/* Week row: its own full-width row */
+.week { flex: none; display: flex; padding: 0 12px 4px; }
+.week button { flex: 1; height: 60px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.week button small { font-size: 12px; line-height: 16px; font-weight: 500; }
+.week button b { font-size: 18px; line-height: 24px; font-weight: 450; }
+.week button:hover, .week button:active { background: var(--press); }
+.week button[aria-current=date] { color: var(--text); }
+.week button[aria-current=date] b { font-weight: 700; text-decoration: underline; text-underline-offset: 6px; text-decoration-thickness: 2px; }
+
+/* Day page */
+.day { padding: 12px 20px 40px; }
+.daytitle { font: 400 32px/1.15 var(--serif); letter-spacing: -.01em; margin: 0 0 12px; text-wrap: balance; }
+.summary { font-size: 17px; line-height: 26px; color: var(--text-2); margin: 0 0 8px; text-wrap: pretty; max-width: 34em; }
+.summary a { border-radius: 4px; padding: 2px 0; box-decoration-break: clone; -webkit-box-decoration-break: clone; transition: background-color var(--fast) var(--ease); }
+.summary a:active, .summary a.pressed { background: var(--press); box-shadow: 0 0 0 3px var(--press); }
+.label { font-size: 13px; line-height: 18px; font-weight: 600; color: var(--text-2); margin: 28px 0 4px; display: flex; justify-content: space-between; gap: 12px; font-variant-numeric: tabular-nums; }
+.label .span { font-weight: 400; color: var(--text-3); }
+
+/* Rows: time on the title's baseline, icon centred on the first line, two lines of preview */
+.row { box-sizing: border-box; display: flex; align-items: flex-start; gap: 14px; width: calc(100% + 24px); margin: 0 -12px; padding: 12px; border-radius: 14px; }
+.row:hover, .row:active, .row[aria-current=true] { background: var(--press); }
+.row .lead { width: 36px; height: 22px; flex: none; display: flex; align-items: center; justify-content: center; }
+.row .lead .ph { font-size: 22px; }
+.row .txt { flex: 1; min-width: 0; }
+.row .l1 { display: flex; align-items: baseline; gap: 12px; }
+.row .t { flex: 1; min-width: 0; font-size: 16px; line-height: 22px; font-weight: 500; }
+.row .time { flex: none; font-size: 13px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.row .p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 14px; line-height: 20px; color: var(--text-2); margin-top: 1px; }
+.row .p.full { display: block; }
+.row.single { align-items: center; min-height: 56px; }
+.av { width: 32px; height: 32px; flex: none; border-radius: 50%; object-fit: cover; display: grid; place-items: center; font-size: 14px; font-weight: 600; }
+.av.amma { background: var(--av-amma); color: var(--av-amma-ink); }
+.av.group { background: var(--av-group); color: var(--av-group-ink); }
+.av.group .ph { font-size: 17px; }
+
+/* Switch (Material 3 shape, monochrome) */
+.sw { flex: none; position: relative; width: 52px; height: 32px; border-radius: 16px; border: 2px solid var(--text-3); box-sizing: border-box; transition: background-color var(--fast) var(--ease), border-color var(--fast) var(--ease); }
+.sw::after { content: ''; position: absolute; top: 50%; left: 6px; width: 16px; height: 16px; border-radius: 50%; background: var(--text-3); transform: translateY(-50%); transition: all var(--fast) var(--ease); }
+[aria-checked=true] .sw, .sw[aria-checked=true] { background: var(--text); border-color: var(--text); }
+[aria-checked=true] .sw::after, .sw[aria-checked=true]::after { left: 22px; width: 24px; height: 24px; background: var(--bg); }
+.swbtn { flex: none; height: 48px; width: 64px; display: grid; place-items: center; border-radius: 24px; margin: -8px -6px -8px 0; }
+.row.rt { align-items: center; padding-right: 12px; }
+.row.rt:hover { background: none; }
+.rt .open { display: flex; gap: 14px; align-items: flex-start; flex: 1; min-width: 0; border-radius: 12px; }
+.row.toggle { align-items: center; }
+
+/* Day list (inner left column) */
+.idx { padding: 0 16px 32px; }
+.dayrow { box-sizing: border-box; display: flex; gap: 12px; align-items: flex-start; width: calc(100% + 16px); margin: 0 -8px; padding: 12px 8px; border-radius: 14px; }
+.dayrow:hover, .dayrow:active, .dayrow[aria-current=true] { background: var(--press); }
+.dayrow .d { width: 34px; flex: none; text-align: center; font-variant-numeric: tabular-nums; color: var(--text-2); padding-top: 1px; }
+.dayrow .d small { display: block; font-size: 11px; font-weight: 500; line-height: 14px; }
+.dayrow .d b { display: block; font-size: 17px; font-weight: 450; line-height: 22px; }
+.dayrow[aria-current=true] .d { color: var(--text); }
+.dayrow[aria-current=true] .d b { font-weight: 700; }
+.dayrow .txt { flex: 1; min-width: 0; }
+.dayrow .t { display: block; font: 400 19px/1.3 var(--serif); }
+.dayrow .p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 14px; line-height: 20px; color: var(--text-2); margin-top: 2px; }
+.idx .label { margin-left: 2px; }
+
+/* Moment pages */
+.meta { font-size: 13px; color: var(--text-3); margin: 0 0 14px; font-variant-numeric: tabular-nums; }
+.read { padding: 4px 20px 32px; }
+.read h2 { font: 600 22px/1.3 var(--sans); margin: 0 0 4px; text-wrap: balance; }
+.read .src { font-size: 14px; color: var(--text-2); margin: 0 0 20px; }
+.read p.body { font-size: 16px; line-height: 1.6; margin: 0 0 14px; max-width: 36em; }
+.read .gap { font-size: 13px; color: var(--text-3); margin: 18px 0; }
+.msg { display: flex; gap: 12px; padding: 8px 0; }
+.msg .who { font-size: 14px; font-weight: 600; }
+.msg .who span { font-weight: 400; color: var(--text-3); font-size: 13px; margin-left: 6px; font-variant-numeric: tabular-nums; }
+.msg .m { font-size: 15px; line-height: 1.5; margin-top: 1px; }
+.steps { list-style: none; padding: 0; margin: 0; }
+.steps li { display: flex; gap: 12px; padding: 8px 0; font-size: 15px; line-height: 1.45; }
+.steps time { color: var(--text-3); font-size: 13px; min-width: 64px; font-variant-numeric: tabular-nums; margin-top: 1px; }
+
+/* Composer: send is ghosted until there is text */
+.composer { flex: none; padding: 4px 12px 10px; }
+.modelbtn { display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 0 10px; margin: 0 0 2px 6px; border-radius: 20px; font-size: 13px; color: var(--text-2); }
+.modelbtn .ph { font-size: 13px; }
+.modelbtn:hover, .modelbtn:active, .modelbtn[aria-expanded=true] { background: var(--press); color: var(--text); }
+.field { display: flex; align-items: center; gap: 2px; background: var(--surface); border-radius: 26px; min-height: 52px; padding: 0 6px 0 18px; }
+.field input { flex: 1; min-width: 0; border: 0; background: none; font: 16px var(--sans); color: var(--text); outline: none; }
+.field input::placeholder { color: var(--text-3); }
+.field:focus-within { outline: 2px solid var(--text-3); outline-offset: 0; }
+.field .ib { width: 40px; height: 40px; }
+.send { width: 40px; height: 40px; border-radius: 20px; display: grid; place-items: center; background: var(--text); color: var(--bg); flex: none; transition: background-color var(--fast) var(--ease), color var(--fast) var(--ease); }
+.send .ph { font-size: 18px; }
+.field:has(input:placeholder-shown) .send { background: transparent; color: var(--text-3); opacity: .7; cursor: default; }
+
+/* Chat */
+.chat { padding: 4px 20px 16px; display: flex; flex-direction: column; gap: 6px; }
+.you { align-self: flex-end; max-width: 80%; background: var(--surface); padding: 10px 14px; border-radius: 20px; font-size: 16px; line-height: 1.45; margin-top: 14px; }
+.bot { font-size: 16px; line-height: 1.55; max-width: 36em; margin-top: 10px; }
+.bot p { margin: 0 0 8px; }
+.cites { margin: 4px 0 8px; }
+.cites .label { margin: 8px 0 0; }
+.draft { background: var(--surface); border-radius: 16px; padding: 12px 14px; margin: 6px 0 8px; }
+.draft small { display: block; font-size: 13px; color: var(--text-2); margin-bottom: 4px; }
+.btns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.btn { height: 48px; padding: 0 20px; border-radius: 24px; font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.btn.primary { background: var(--text); color: var(--bg); }
+.btn.plain:hover, .btn.plain:active { background: var(--press); }
+.btn.danger { background: var(--danger); color: var(--on-danger); }
+.dangertext { color: var(--danger); }
+
+/* Agent page */
+.intro { font-size: 15px; line-height: 1.5; color: var(--text-2); margin: 0 0 4px; max-width: 34em; }
+.kv { display: flex; align-items: center; gap: 12px; width: calc(100% + 24px); margin: 0 -12px; padding: 8px 4px 8px 12px; min-height: 64px; box-sizing: border-box; }
+.kv .txt { flex: 1; min-width: 0; }
+.kv .t { display: block; font-size: 16px; line-height: 22px; font-weight: 500; }
+.kv .p { display: block; font-size: 14px; line-height: 20px; color: var(--text-2); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.removebtn { margin: 28px 0 0 -14px; height: 48px; padding: 0 14px; border-radius: 24px; font-weight: 600; font-size: 15px; color: var(--danger); display: inline-flex; align-items: center; gap: 8px; }
+.removebtn:hover, .removebtn:active { background: var(--press); }
+
+/* Search */
+.sfield { flex: 1; display: flex; align-items: center; background: var(--surface); border-radius: 24px; height: 48px; padding: 0 4px 0 16px; }
+.sfield input { flex: 1; min-width: 0; border: 0; background: none; font: 16px var(--sans); color: var(--text); outline: none; }
+.sfield .ib { width: 40px; height: 40px; }
+mark { background: none; color: inherit; font-weight: 700; }
+
+/* Sheet */
+.scrim { position: absolute; inset: 0; background: var(--scrim); z-index: 5; display: flex; align-items: flex-end; justify-content: center; }
+.inner .scrim { align-items: center; }
+.sheet { background: var(--surface-2); width: 100%; box-sizing: border-box; border-radius: 28px 28px 0 0; padding: 8px 20px 28px; max-height: 88%; overflow-y: auto; animation: up var(--slow) var(--ease); }
+.inner .sheet { width: 520px; border-radius: 28px; padding-top: 20px; animation: fade var(--fast) var(--ease); }
+.sheet .handle { width: 32px; height: 4px; border-radius: 2px; background: var(--text-3); opacity: .5; margin: 6px auto 18px; }
+.inner .sheet .handle { display: none; }
+.sheet h2 { font: 600 20px/1.3 var(--sans); margin: 0 0 6px; }
+.sheet > p { font-size: 15px; line-height: 1.5; color: var(--text-2); margin: 0 0 12px; }
+.sheet .row .ph-check { font-size: 20px; color: var(--text); }
+.sheethead { display: flex; align-items: center; gap: 4px; margin: 0 -8px 4px 0; }
+.sheethead h2 { flex: 1; margin: 0; }
+@keyframes up { from { transform: translateY(100%); } }
+@keyframes fade { from { opacity: 0; transform: scale(.98); } }
+@media (prefers-reduced-motion: reduce) { .sheet { animation: none !important; } .phone * { transition: none !important; } }
+
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center; margin-top: 4px; }
+.cal small { font-size: 12px; color: var(--text-2); padding: 6px 0; font-weight: 500; }
+.cal button { height: 48px; border-radius: 24px; font-size: 16px; font-variant-numeric: tabular-nums; }
+.cal button:hover, .cal button:active { background: var(--press); }
+.cal button:disabled { color: var(--text-3); opacity: .5; cursor: default; }
+.cal button:disabled:hover { background: none; }
+.cal button[aria-current=date] { background: var(--text); color: var(--bg); font-weight: 600; }
+.cal button.today:not([aria-current]) { font-weight: 700; box-shadow: inset 0 0 0 1.5px var(--text-3); }
+.calfoot { font-size: 13px; color: var(--text-2); margin: 12px 0 0; }
+
+.toast { position: absolute; left: 50%; bottom: 96px; transform: translateX(-50%); background: var(--text); color: var(--bg); font-size: 14px; padding: 10px 16px; border-radius: 12px; z-index: 9; max-width: 80%; text-align: center; }
+
+/* Inner screen: day list left, open day right, no filled cards */
+.inner .split { display: flex; flex: 1; min-height: 0; }
+.inner .split > .left { width: 320px; flex: none; border-right: 1px solid var(--line); }
+.inner .split > .right { flex: 1; min-width: 0; }
+.inner .right .day { padding: 20px 32px 40px; }
+.inner .right .read { padding: 4px 32px 32px; }
+.inner .right .composer { padding: 4px 20px 10px; }
+.inner .colwrap { max-width: 600px; width: 100%; margin: 0 auto; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.vis { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top">
+    <div>
+      <h1>Handset, design round three</h1>
+      <p>Clickable mocks of the Android app, one refined design built from round two’s pick (A). Every phone works: tap the tabs, rows, phrases in the summary, the dates, the month, search, the gear and the switches. Swipe a day sideways on the cover screen. What changed is listed at the end.</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Theme"><span>Theme</span>
+        <button data-theme="auto">Auto</button><button data-theme="light">Light</button><button data-theme="dark">Dark</button></div>
+      <div class="seg" role="group" aria-label="Screen"><span>Screen</span>
+        <button data-w="cover">Cover</button><button data-w="inner">Inner</button></div>
+      <div class="seg" role="group" aria-label="Agent acting"><span>Agent acting</span>
+        <button data-live="0">Off</button><button data-live="1">On</button></div>
+    </div>
+  </div>
+  <div id="groups"></div>
+  <section class="changes">
+    <h2>What changed from round two</h2>
+    <ul>
+      <li>The serif is only for day titles. Summaries are sans at 17 px, with no underlines. Phrases still open their moment and darken while touched.</li>
+      <li>The agent strip shows only while an agent is acting, with a 48 dp Stop. Use “Agent acting” above to see it.</li>
+      <li>The month sits above a full-width week row. Tap the month for older days. Away from today, a Today button appears.</li>
+      <li>“Still open” comes after the day’s places and says exactly what is open. Places show their time span.</li>
+      <li>Rows show two lines of preview, the time sits on the title’s line, and app icons are calmer.</li>
+      <li>Selected tabs use a filled icon and a heavier label. Chat is titled Chat, the model is a small line above the composer, and sources are rows.</li>
+      <li>Routines have switches. Agents list what they last did, and each agent has its own page with what it can see, its connection and Remove.</li>
+      <li>The open Fold shows the list of days on the left and the whole day on the right.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+// ---------- Content ----------
+const P = n => `assets/people/${n}.jpg`;
+const APPS = {
+  whatsapp: ['whatsapp-logo', 'WhatsApp'], slack: ['slack-logo', 'Slack'], chrome: ['google-chrome-logo', 'Chrome'],
+  swiggy: ['bowl-food', 'Swiggy'], uber: ['car', 'Uber'], gmail: ['envelope-simple', 'Gmail'], spotify: ['spotify-logo', 'Spotify'],
+  kindle: ['book-open', 'Kindle'], claude: ['asterisk', 'Claude'], docs: ['file-text', 'Google Docs'], meet: ['video-camera', 'Google Meet'],
+  instamart: ['shopping-cart', 'Swiggy Instamart'], place: ['map-pin', ''],
+};
+const appColor = a => ({ instamart: 'swiggy', place: 'place' }[a] || a);
+
+const M = {
+  // Tue 27
+  o1: { app: 'whatsapp', person: 'meera', t: 'Unsent message to Meera', p: 'Can we move Thursday’s investor call to 4? Rajan can only do the evening slot.', time: '6:12 pm', toast: 'Opens WhatsApp with the message' },
+  o2: { app: 'instamart', t: 'Instamart cart at checkout', p: 'Milk, eggs, sourdough and 3 more, ₹486', time: '8:55 pm', toast: 'Opens Swiggy Instamart at checkout' },
+  spotify1: { app: 'spotify', t: 'Spotify', p: 'Lo-fi Beats while you got ready', time: '8:05 am' },
+  gmail1: { app: 'gmail', t: 'Gmail', p: 'Read the Surge update about demo day moving to 19 November, and archived 14 newsletters including Lenny’s Newsletter and The Ken', time: '8:42 am', read: ['Surge cohort 12: demo day moves to 19 November.', 'Office hours with Rajan are open on Thursdays from 4 pm. Book through the portal.', 'Archived 14 newsletters, including Lenny’s Newsletter and The Ken.'] },
+  uber1: { app: 'uber', t: 'Uber', p: 'Ride to Indiranagar, 34 min, ₹212', time: '9:25 am' },
+  slack1: { app: 'slack', t: 'Slack', p: '#release-0-9: you and Rahul agreed to ship Thursday and keep the new onboarding for 0.10', time: '11:42 am', open: 'thread' },
+  wa1: { app: 'whatsapp', group: true, t: 'Founders BLR', p: 'Priya: Drinks at Toit on Friday? 8ish. Arjun and you said yes.', time: '12:30 pm', read: ['Priya: Drinks at Toit on Friday? 8ish', 'Arjun: In', 'You: In, I’ll book a table'] },
+  chrome1: { app: 'chrome', t: 'Chrome', p: 'How ESOPs are taxed when you exercise them, on Zerodha Varsity', time: '1:05 pm', open: 'article' },
+  arjun1: { person: 'arjun', app: 'place', t: 'Arjun', p: 'Coffee at Third Wave, 1 h 20 min', time: '3:20 pm', read: ['You were at Third Wave Coffee, 100 Feet Road, from 3:20 to 4:40 pm.', 'Arjun’s messages before and after: “Here” at 3:18 pm, “Thanks for the ESOP notes” at 4:52 pm.'] },
+  claude1: { app: 'claude', t: 'Claude', p: 'Added Toit, Friday 8 pm to Calendar', time: '4:10 pm', open: 'steps' },
+  swiggy1: { app: 'swiggy', t: 'Swiggy', p: 'Chicken biryani from Meghana Foods, ₹389', time: '8:10 pm' },
+  amma1: { person: 'amma', app: 'whatsapp', t: 'Amma', p: 'WhatsApp call, 24 min', time: '8:40 pm' },
+  rahul1: { person: 'rahul', app: 'slack', t: 'Rahul', p: 'Build is green. Tagging 0.9 in the morning.', time: '9:12 pm', open: 'thread' },
+  kindle1: { app: 'kindle', t: 'Kindle', p: 'The Mom Test, chapter 4, 22 pages', time: '9:30 pm', read: ['“Rule of thumb: Opinions are worthless.”', '“Anything involving the future is an over-optimistic lie.”'] },
+  // Mon 26
+  docs2: { app: 'docs', t: 'Google Docs', p: 'Surge deck notes with Meera, 2 h 10 min', time: '10:20 am' },
+  meera2: { person: 'meera', app: 'whatsapp', t: 'Meera', p: 'Slide 7 still says 40 lakh, should be 55', time: '1:40 pm' },
+  meet2: { app: 'meet', t: 'Google Meet', p: 'Practice pitch with Meera, 45 min', time: '5:00 pm' },
+  uber2: { app: 'uber', t: 'Uber', p: 'Ride home to HSR Layout, ₹238', time: '9:04 pm' },
+  // Sun 25 (quiet)
+  spotify3: { app: 'spotify', t: 'Spotify', p: 'Sunday Morning Jazz', time: '9:30 am' },
+  amma3: { person: 'amma', app: 'whatsapp', t: 'Amma', p: 'Are you coming home for Diwali?', time: '10:15 am' },
+  kindle3: { app: 'kindle', t: 'Kindle', p: 'The Mom Test, chapters 1 to 3', time: '2:10 pm', read: ['“The measure of usefulness of an early customer conversation is whether it gives us concrete facts about our customers’ lives and world views.”'] },
+  lake3: { app: 'place', t: 'Agara Lake', p: 'Walk, 40 min', time: '6:05 pm' },
+  swiggy3: { app: 'swiggy', t: 'Swiggy', p: 'Masala dosa from Rameshwaram Cafe, ₹156', time: '8:20 pm' },
+  // Sat 24
+  park4: { app: 'place', t: 'Cubbon Park', p: 'Run, 5.2 km', time: '7:10 am' },
+  priya4: { person: 'priya', app: 'whatsapp', t: 'Priya', p: 'Lunch at Toit at 1?', time: '11:05 am' },
+  chrome4: { app: 'chrome', t: 'Chrome', p: 'Toit Brewpub, Indiranagar: menu', time: '12:40 pm' },
+  // Fri 23
+  gmail5: { app: 'gmail', t: 'Gmail', p: 'Three Android candidates for the panel', time: '9:50 am' },
+  meet5: { app: 'meet', t: 'Google Meet', p: 'Interview loop, 3 h 40 min', time: '11:00 am' },
+  slack5: { app: 'slack', t: 'Slack', p: '#hiring: offer to Kavya approved', time: '6:30 pm' },
+  // Sat 3 Oct
+  oct3a: { app: 'spotify', t: 'Spotify', p: 'Discover Weekly', time: '9:10 am' },
+  oct3b: { person: 'meera', app: 'whatsapp', t: 'Meera', p: 'Lunch at Truffles at 1? I’ll bring the cap table.', time: '11:30 am' },
+  oct3c: { person: 'meera', app: 'place', t: 'Meera', p: 'Lunch at Truffles, 1 h 25 min', time: '1:05 pm' },
+  oct3d: { app: 'uber', t: 'Uber', p: 'Ride to Toit, Indiranagar, ₹186', time: '7:48 pm' },
+  oct3e: { app: 'whatsapp', group: true, t: 'Surge cohort 12', p: 'Table for 14 under “Surge”. First round is on Rajan.', time: '8:20 pm' },
+};
+
+// k is the day of October 2026. Today is Tuesday 27.
+const DAYS = [
+  { k: 3, title: 'Toit with the Surge batch', summary: ['A slow morning, then ', { t: 'lunch with Meera', m: 'oct3c' }, ' at Truffles to go over the cap table. In the evening you ', { t: 'took an Uber to Toit', m: 'oct3d' }, ' for the cohort dinner.'],
+    groups: [{ label: 'Home', span: '8:30 am to 12:40 pm', items: ['oct3a', 'oct3b'] }, { label: 'Truffles, Koramangala', span: '1:05 to 2:30 pm', items: ['oct3c'] }, { label: 'Toit', span: '8:10 to 11:30 pm', items: ['oct3d', 'oct3e'] }] },
+  { k: 21, title: 'Mostly Slack, and a late dinner', summary: ['You spent most of the day in Slack threads about the 0.9 scope. Dinner with Priya ran past eleven.'], groups: [] },
+  { k: 22, title: 'Board call prep', summary: ['A morning on the board update, then the call at 4. You walked home along 27th Main.'], groups: [] },
+  { k: 23, title: 'Hiring loop for the Android role', summary: ['Three interviews back to back at the office. By evening the team agreed on an offer to Kavya.'],
+    groups: [{ label: 'Office', span: '9:40 am to 7:05 pm', items: ['gmail5', 'meet5', 'slack5'] }] },
+  { k: 24, title: 'Cubbon Park and a long lunch', summary: ['An early run in Cubbon Park, then lunch at Toit with Priya that took most of the afternoon.'],
+    groups: [{ label: 'Cubbon Park', span: '6:50 to 7:50 am', items: ['park4'] }, { label: 'Home', span: '8:30 am to 12:30 pm', items: ['priya4', 'chrome4'] }] },
+  { k: 25, title: 'A slow Sunday at home', summary: ['You stayed in all day. ', { t: 'The afternoon went to Kindle', m: 'kindle3' }, ', and you ', { t: 'walked to Agara Lake', m: 'lake3' }, ' before dinner.'],
+    groups: [{ label: 'Morning', items: ['spotify3', 'amma3'] }, { label: 'Afternoon', items: ['kindle3'] }, { label: 'Evening', items: ['lake3', 'swiggy3'] }] },
+  { k: 26, title: 'Investor prep with Meera', summary: ['Most of the day went to ', { t: 'the Surge deck with Meera', m: 'docs2' }, ', in Google Docs and a practice call. You took an Uber home at nine.'],
+    groups: [{ label: 'Office', span: '9:55 am to 8:50 pm', items: ['docs2', 'meera2', 'meet2'] }, { label: 'Home', span: 'from 9:40 pm', items: ['uber2'] }] },
+  { k: 27, today: true, title: 'Release day with Rahul',
+    summary: ['You and Rahul ', { t: 'agreed to ship 0.9 on Thursday', m: 'slack1' }, ' and keep the new onboarding for 0.10. ', { t: 'Coffee with Arjun', m: 'arjun1' }, ' at Third Wave ran long, and ', { t: 'Claude put Toit on your calendar', m: 'claude1' }, ' for Friday at 8.'],
+    open: ['o1', 'o2'],
+    groups: [
+      { label: 'Home', span: '7:40 to 9:25 am', items: ['spotify1', 'gmail1', 'uber1'] },
+      { label: 'Office', span: '10:05 am to 3:10 pm', items: ['slack1', 'wa1', 'chrome1'] },
+      { label: 'Third Wave Coffee', span: '3:20 to 4:40 pm', items: ['arjun1', 'claude1'] },
+      { label: 'Home', span: 'from 7:40 pm', items: ['swiggy1', 'amma1', 'rahul1', 'kindle1'] },
+    ] },
+];
+const date = k => new Date(2026, 9, k);
+const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const longOf = k => { const d = date(k); return `${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`; };
+const shortOf = k => { const d = date(k); return `${WD[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()].slice(0, 3)}`; };
+const dayOf = k => DAYS.find(d => d.k === k);
+const dayOfMoment = id => DAYS.find(d => (d.open || []).concat(...d.groups.map(g => g.items)).includes(id));
+const placeOfMoment = id => { const d = dayOfMoment(id); const g = d && d.groups.find(g => g.items.includes(id)); return g && g.span ? g.label : null; };
+
+const SEARCH = [
+  { label: 'Today', items: [{ m: 'claude1', p: 'Added <mark>Toit</mark>, Friday 8 pm to Calendar' }, { m: 'wa1', p: 'Priya: Drinks at <mark>Toit</mark> on Friday? 8ish. Arjun and you said yes.' }] },
+  { label: 'Saturday, 24 October', items: [{ m: 'priya4', p: 'Lunch at <mark>Toit</mark> at 1?' }, { m: 'chrome4', p: '<mark>Toit</mark> Brewpub, Indiranagar: menu' }] },
+  { label: 'Saturday, 3 October', items: [{ m: 'oct3d', p: 'Ride to <mark>Toit</mark>, Indiranagar, ₹186' }] },
+];
+
+const AGENTS = {
+  claude: { name: 'Claude', icon: 'asterisk', color: 'var(--c-claude)', last: 'Added Toit, Friday 8 pm to Calendar', when: '4:10 pm',
+    intro: 'Works from claude.ai and the Claude app. Added on 12 October.',
+    conn: [['Connected through', 'Your Claude account, as a connector'], ['Reconnect', 'Opens claude.ai to sign in again']],
+    see: { notifications: true, messages: true, contacts: true, location: true, photos: false },
+    recent: [['Added Toit, Friday 8 pm to Calendar', 'Today, 4:10 pm', 'claude1'], ['Read Founders BLR on WhatsApp', 'Today, 4:09 pm', 'claude1'], ['Muted Slack until 9 am', 'Mon 26 Oct, 11:02 pm']] },
+  claudecode: { name: 'Claude Code', icon: 'terminal-window', color: 'var(--text-2)', last: 'Read #release-0-9 in Slack to write the release notes', when: 'Yesterday',
+    intro: 'Runs on your MacBook Air. Added on 14 October.',
+    conn: [['Address', '100.84.12.7:8765', 'copy'], ['Network', 'Tailscale, MacBook Air'], ['Set up again', 'Shows the command to paste into Claude Code', 'go']],
+    see: { notifications: true, messages: true, contacts: false, location: false, photos: false },
+    recent: [['Read #release-0-9 in Slack to write the release notes', 'Mon 26 Oct, 6:40 pm'], ['Opened GitHub and checked the 0.9 build', 'Mon 26 Oct, 6:42 pm'], ['Took a screenshot of the onboarding screen', 'Sat 24 Oct, 3:15 pm']] },
+  chatgpt: { name: 'ChatGPT', icon: 'open-ai-logo', color: 'var(--text-2)', last: 'Put milk, eggs and sourdough in the Instamart cart', when: '3 Oct',
+    intro: 'Works from chatgpt.com and the ChatGPT app. Added on 2 October.',
+    conn: [['Connected through', 'Your ChatGPT account, as an app'], ['Reconnect', 'Opens chatgpt.com to sign in again']],
+    see: { notifications: false, messages: false, contacts: false, location: true, photos: false },
+    recent: [['Put milk, eggs and sourdough in the Instamart cart', 'Sat 3 Oct, 10:20 am']] },
+};
+const SEE = [['notifications', 'Notifications', 'Reads new notifications as they arrive'], ['messages', 'Messages', 'Reads WhatsApp, SMS and Slack history'], ['contacts', 'Contacts', 'Looks up names and numbers'], ['location', 'Location', 'Knows the place you are at, like Office or Home'], ['photos', 'Photos', 'Opens and shares your photos']];
+
+const ROUTINES = [
+  ['map-pin', 'When I get to Office', 'Do Not Disturb until 1 pm, then open Slack', true],
+  ['battery-low', 'When battery is below 15%', 'Battery saver on, and mute Slack until it charges', true],
+  ['chat-circle', 'When Rahul messages after 10 pm', 'Claude drafts a reply for the morning', true],
+  ['clock', 'Weekdays at 8:30 am', 'Claude sends me the day’s plan on WhatsApp', false],
+];
+const MODELS = [['Gemini Nano', 'on this phone', 'Fast, good for questions about your days.'], ['Gemma 4 E4B', 'on this phone', 'Slower, better at long answers. A 3 GB download.'], ['Claude', 'your API key', 'Sends your question and the moments it needs to Anthropic.']];
+
+// ---------- Rendering helpers ----------
+const ic = (n, extra = '') => `<i class="ph ph-${n}" aria-hidden="true"${extra}></i>`;
+const icf = n => `<i class="ph-fill ph-${n}" aria-hidden="true"></i>`;
+function lead(m) {
+  if (m.person === 'amma') return `<span class="av amma" aria-hidden="true">A</span>`;
+  if (m.person) return `<img class="av" src="${P(m.person)}" alt="">`;
+  if (m.group) return `<span class="av group" aria-hidden="true">${ic('users')}</span>`;
+  return ic(APPS[m.app][0], ` style="color:var(--c-${appColor(m.app)})"`);
+}
+const rowInner = (leadHTML, t, p, time, full) => `<span class="lead">${leadHTML}</span><span class="txt"><span class="l1"><span class="t">${t}</span>${time ? `<span class="time">${time}</span>` : ''}</span>${p ? `<span class="p${full ? ' full' : ''}">${p}</span>` : ''}</span>`;
+function row(id, ph, cur) {
+  const m = M[id];
+  return `<button class="row" data-a="moment" data-id="${id}"${cur ? ' aria-current="true"' : ''}>${rowInner(lead(m), m.t, ph || m.p, m.time)}</button>`;
+}
+const summaryHTML = (segs, pressed) => segs.map(s => typeof s === 'string' ? s : `<a href="#" data-a="moment" data-id="${s.m}"${s.m === pressed ? ' class="pressed"' : ''}>${s.t}</a>`).join('');
+const sw = on => `<span class="sw" aria-hidden="true"></span>`;
+const composer = (ph, model) => `<div class="composer">${model ? `<button class="modelbtn" data-a="sheet" data-sheet="model" aria-haspopup="dialog">${model} ${ic('caret-down')}</button>` : ''}<label class="field"><span class="vis">${ph}</span><input placeholder="${ph}"${ph.startsWith('Ask about your') ? '' : ''}>${model ? `<button class="ib" aria-label="Speak" data-a="toast" data-msg="Listens">${ic('microphone')}</button>` : ''}<button class="send" aria-label="Send" aria-disabled="true" data-a="send">${ic('arrow-up')}</button></label></div>`;
+
+// ---------- Phone ----------
+const G = { w: 'cover', live: false };
+const GROUPS = [
+  { key: 'days', title: 'Days', line: 'Today is a page: a serif title, a short summary, then the day’s places in order, and anything still open at the end.',
+    cover: [['today', 'Today, resting. No agent is acting, so there is no strip.'], ['end', 'The end of today: what is still open comes last'], ['pressed', 'Touching a phrase in the summary. It opens the Slack thread.'], ['calendar', 'Tap “October”: the month, for older days'], ['older', 'An older day from the month. Today is one tap away.'], ['past', 'A quiet Sunday. Nothing was left open.'], ['moment', 'A moment opened: what you read in Chrome'], ['person', 'A person’s messages'], ['search', 'Search']],
+    inner: [['today', 'Open Fold: the list of days, and today at full width'], ['end', 'The end of today'], ['moment', 'A moment replaces the day, with Close'], ['past', 'A quiet Sunday'], ['calendar', 'Tap “October” for older days'], ['search', 'Search']] },
+  { key: 'chat', title: 'Chat', line: 'Answers name their sources as rows, one per claim. The model is a small line above the composer.',
+    cover: [['chat', 'Chat, empty composer: Send is ghosted'], ['typing', 'With text, Send fills in'], ['model', 'Tap the model line']],
+    inner: [['chat', 'Chat, centred'], ['model', 'Tap the model line']] },
+  { key: 'agents', title: 'Agents', line: 'Agents show what they last did. Routines switch on and off in place. Connection details live on each agent’s page.',
+    cover: [['agents', 'Agents and routines'], ['addagent', 'Add agent'], ['agent', 'Claude Code’s page'], ['agent2', 'Claude Code’s page, further down'], ['remove', 'Remove asks first']],
+    inner: [['agents', 'Agents, centred'], ['addagent', 'Add agent'], ['agent', 'Claude Code’s page']] },
+];
+
+function initState(frame) {
+  const st = { tab: 'days', stack: [{ s: 'day', k: 27 }], sheet: null, toast: null, model: 'Gemini Nano', agent: null, see: {}, routines: ROUTINES.map(r => r[3]) };
+  const inner = G.w === 'inner';
+  switch (frame) {
+    case 'pressed': st.pressed = 'slack1'; break;
+    case 'end': st.dayEnd = true; break;
+    case 'calendar': st.sheet = 'calendar'; break;
+    case 'older': st.stack = [{ s: 'day', k: 3 }]; break;
+    case 'past': st.stack = [{ s: 'day', k: 25 }]; break;
+    case 'moment': st.stack.push({ s: 'moment', id: 'chrome1' }); break;
+    case 'person': st.stack.push({ s: 'moment', id: 'rahul1' }); break;
+    case 'search': st.stack.push({ s: 'search', q: 'Toit' }); if (inner) st.stack.push({ s: 'moment', id: 'claude1' }); break;
+    case 'chat': st.tab = 'chat'; break;
+    case 'typing': st.tab = 'chat'; st.typed = 'Remind me to call Arjun on Friday'; break;
+    case 'model': st.tab = 'chat'; st.sheet = 'model'; break;
+    case 'agents': st.tab = 'agents'; break;
+    case 'addagent': st.tab = 'agents'; st.sheet = 'addagent'; break;
+    case 'agent': st.tab = 'agents'; st.agent = 'claudecode'; break;
+    case 'agent2': st.tab = 'agents'; st.agent = 'claudecode'; st.scrollEnd = true; break;
+    case 'remove': st.tab = 'agents'; st.agent = 'claudecode'; st.sheet = 'remove'; st.scrollEnd = true; break;
+  }
+  return st;
+}
+const topOf = st => st.stack[st.stack.length - 1];
+const curDay = st => [...st.stack].reverse().find(x => x.s === 'day')?.k ?? 27;
+
+function statusBar() {
+  return `<div class="status" aria-hidden="true"><span>9:42</span><span>${ic('wifi-high')}${ic('cell-signal-full')}${ic('battery-high')}</span></div>`;
+}
+function liveLine() {
+  if (!G.live) return '';
+  return `<div class="live" role="status"><span class="dot" aria-hidden="true"></span><span class="what">Claude is using Slack</span><button data-a="stop" aria-label="Stop Claude">Stop</button></div>`;
+}
+function navItems(st) {
+  return [['days', 'calendar-blank', 'Days'], ['chat', 'chat-circle', 'Chat'], ['agents', 'robot', 'Agents']]
+    .map(([k, i, l]) => `<button data-a="tab" data-tab="${k}"${st.tab === k ? ' aria-current="page"' : ''}>${st.tab === k ? icf(i) : ic(i)}<span>${l}</span></button>`).join('');
+}
+const headIcons = `<button class="ib" data-a="search" aria-label="Search">${ic('magnifying-glass')}</button><button class="ib" data-a="settings" aria-label="Settings">${ic('gear-six')}</button>`;
+const monthBtn = (st, k) => `<button class="monthbtn" data-a="sheet" data-sheet="calendar" aria-haspopup="dialog"${st.sheet === 'calendar' ? ' aria-expanded="true"' : ''} aria-label="${MONTHS[date(k).getMonth()]}, pick another day">${MONTHS[date(k).getMonth()]} ${ic('caret-down')}</button>`;
+const todayBtn = k => k !== 27 ? `<button class="todaybtn" data-a="day" data-k="27">Today</button>` : '';
+
+function weekWindow(k) {
+  const end = k >= 21 ? 27 : Math.min(27, k + 3);
+  return Array.from({ length: 7 }, (_, i) => end - 6 + i);
+}
+function dayHeader(st, k) {
+  const wk = weekWindow(k).map(n => {
+    const d = date(n);
+    return `<button data-a="day" data-k="${n}" aria-label="${longOf(n)}${n === 27 ? ', today' : ''}"${n === k ? ' aria-current="date"' : ''}><small aria-hidden="true">${WD[d.getDay()][0]}</small><b aria-hidden="true">${d.getDate()}</b></button>`;
+  }).join('');
+  return `<div class="head"><div class="grow">${monthBtn(st, k)}</div>${todayBtn(k)}${headIcons}</div><nav class="week" aria-label="Days around ${shortOf(k)}">${wk}</nav>`;
+}
+
+function dayBody(st, d, selId) {
+  if (!d) return `<div class="day"><p class="summary">Nothing was kept for this day in the mock.</p></div>`;
+  let h = `<div class="day" data-swipe="1">`;
+  h += `<h2 class="daytitle">${d.title}</h2>`;
+  h += `<p class="summary">${summaryHTML(d.summary, st.pressed)}</p>`;
+  for (const g of d.groups) {
+    h += `<div class="label"><span>${g.label}</span>${g.span ? `<span class="span">${g.span}</span>` : ''}</div>`;
+    h += g.items.map(id => row(id, null, id === selId)).join('');
+  }
+  if (d.open && d.open.length) h += `<div class="label">Still open</div>` + d.open.map(id => row(id, null, id === selId)).join('');
+  if (!d.groups.length) h += `<p class="summary" style="margin-top:24px;color:var(--text-3);font-size:15px">Only the summary was kept for this day.</p>`;
+  return h + `</div>`;
+}
+
+function dayList(st, selK) {
+  const first = d => d.summary.map(s => typeof s === 'string' ? s : s.t).join('');
+  let h = `<div class="idx"><div class="label" style="margin-top:4px">This week</div>`;
+  for (const d of DAYS.filter(d => d.k >= 21).reverse()) {
+    const dt = date(d.k);
+    h += `<button class="dayrow" data-a="day" data-k="${d.k}"${d.k === selK ? ' aria-current="true"' : ''} aria-label="${d.today ? 'Today' : longOf(d.k)}: ${d.title}"><span class="d" aria-hidden="true"><small>${d.today ? 'Today' : WD[dt.getDay()]}</small><b>${d.k}</b></span><span class="txt" aria-hidden="true"><span class="t">${d.title}</span><span class="p">${first(d)}</span></span></button>`;
+  }
+  h += `<div class="label">Last week</div>`;
+  for (const [k, t, p] of [[20, 'Demo for the Surge partners', 'A short demo at 11, then lunch with the partners on Lavelle Road.'], [19, 'Laptop died, a day on the phone', 'Most of the day ran from the phone while the MacBook was at the service centre.']]) {
+    h += `<button class="dayrow" data-a="toast" data-msg="This mock has 3 and 21 to 27 October"><span class="d"><small>${WD[date(k).getDay()]}</small><b>${k}</b></span><span class="txt"><span class="t">${t}</span><span class="p">${p}</span></span></button>`;
+  }
+  if (selK < 19) {
+    const d = dayOf(selK);
+    h += `<div class="label">${longOf(selK)}</div><button class="dayrow" aria-current="true" data-a="day" data-k="${selK}"><span class="d"><small>${WD[date(selK).getDay()]}</small><b>${selK}</b></span><span class="txt"><span class="t">${d.title}</span><span class="p">${first(d)}</span></span></button>`;
+  }
+  return h + `</div>`;
+}
+
+function headerTitle(title, back = true, right = '') {
+  return `<div class="head${back ? ' back' : ''}">${back ? `<button class="ib" data-a="back" aria-label="Back">${ic('arrow-left')}</button>` : ''}<h1 class="grow">${title}</h1>${right}</div>`;
+}
+
+function momentView(st, id, inner) {
+  const m = M[id];
+  const d = dayOfMoment(id);
+  const place = placeOfMoment(id);
+  const when = `${d.today ? 'Today' : shortOf(d.k)}, ${m.time}${place ? ' · ' + place : ''}`;
+  const right = m.app && m.app !== 'place' && m.app !== 'claude' ? `<button class="ib" data-a="toast" data-msg="${m.toast || 'Opens ' + APPS[m.app][1]}" aria-label="Open in ${APPS[m.app][1]}">${ic('arrow-square-out')}</button>` : '';
+  let h = `<div class="head back">${inner ? `<button class="ib" data-a="back" aria-label="Close">${ic('x')}</button>` : `<button class="ib" data-a="back" aria-label="Back">${ic('arrow-left')}</button>`}<div class="grow"></div>${right}</div>`;
+  h += `<div class="scroll"><div class="read">`;
+  if (m.open === 'article') {
+    h += `<p class="meta">Chrome · ${when} · 17 min</p><h2>How ESOPs are taxed when you exercise them</h2><p class="src">zerodha.com/varsity</p>
+      <p class="body">When you exercise your options, the difference between the fair market value on that day and your exercise price is taxed as a perquisite, as part of your salary. Your employer deducts TDS on it.</p>
+      <p class="body">When you later sell the shares, the gain over the fair market value at exercise is a capital gain. Unlisted shares held for more than 24 months count as long term.</p>
+      <p class="gap">You scrolled past two sections</p>
+      <p class="body">Employees of eligible startups can defer the tax on exercise for up to five years, or until they leave the company or sell the shares, whichever comes first.</p>`;
+  } else if (m.open === 'thread') {
+    h += `<p class="meta">Slack · #release-0-9 · ${d.today ? 'Today' : longOf(d.k)}</p>
+      <div class="msg"><img class="av" src="${P('rahul')}" alt=""><div><div class="who">Rahul<span>11:38 am</span></div><div class="m">Onboarding isn’t ready. I’d rather ship 0.9 on Thursday without it.</div></div></div>
+      <div class="msg"><span class="av" style="background:var(--surface);color:var(--text-2)" aria-hidden="true">T</span><div><div class="who">You<span>11:42 am</span></div><div class="m">Agreed. Onboarding goes in 0.10. Can you get CI green tonight?</div></div></div>
+      <div class="msg"><img class="av" src="${P('rahul')}" alt=""><div><div class="who">Rahul<span>11:44 am</span></div><div class="m">Yes. Two flaky tests left.</div></div></div>
+      <p class="gap">Later</p>
+      <div class="msg"><img class="av" src="${P('rahul')}" alt=""><div><div class="who">Rahul<span>9:12 pm</span></div><div class="m">Build is green. Tagging 0.9 in the morning.</div></div></div>`;
+  } else if (m.open === 'steps') {
+    h += `<p class="meta">${when}</p><h2>Claude added Toit, Friday 8 pm to Calendar</h2><p class="src">You asked from claude.ai: “book drinks with Founders BLR at Toit on Friday”</p>
+      <ol class="steps">
+        <li><time>4:09 pm</time><span>Read “Drinks at Toit on Friday?” in Founders BLR on WhatsApp</span></li>
+        <li><time>4:10 pm</time><span>Opened Calendar and made “Toit with Founders BLR”, Friday 30 October, 8 to 10 pm</span></li>
+        <li><time>4:10 pm</time><span>Added Toit, 100 Feet Road, Indiranagar as the place</span></li>
+        <li><time>4:11 pm</time><span>Asked before sending in Founders BLR. You tapped Allow.</span></li>
+      </ol>`;
+  } else {
+    const app = m.app && m.app !== 'place' ? APPS[m.app][1] + ' · ' : '';
+    h += `<p class="meta">${app}${when}</p><h2>${m.t}</h2><p class="src">${m.p}</p>`;
+    for (const r of (m.read || ['Nothing else from this moment was kept.'])) h += `<p class="body">${r}</p>`;
+  }
+  h += `</div></div>` + composer('Ask about this');
+  return h;
+}
+
+function searchView(st, q, selId) {
+  let h = `<div class="head back"><button class="ib" data-a="back" aria-label="Back">${ic('arrow-left')}</button><label class="sfield"><span class="vis">Search your days</span><input value="${q}" placeholder="Search your days"><button class="ib" data-a="toast" data-msg="Clears the search" aria-label="Clear search">${ic('x')}</button></label></div>`;
+  h += `<div class="scroll"><div class="day" style="padding-top:0">`;
+  for (const g of SEARCH) {
+    h += `<div class="label" style="margin-top:20px">${g.label}</div>`;
+    h += g.items.map(it => row(it.m, it.p, it.m === selId)).join('');
+  }
+  return h + `</div></div>`;
+}
+
+function settingsView(st) {
+  const t = (key, title, p, on) => { const v = st.see['set-' + key] ?? on; return `<button class="row toggle" role="switch" aria-checked="${v}" data-a="see" data-key="set-${key}" data-def="${on}"><span class="txt"><span class="l1"><span class="t">${title}</span></span><span class="p full">${p}</span></span>${sw()}</button>`; };
+  const r = (title, p, right) => `<button class="row" data-a="toast" data-msg="Opens ${title}"><span class="txt"><span class="l1"><span class="t">${title}</span>${right ? `<span class="time">${right}</span>` : ''}</span><span class="p full">${p}</span></span></button>`;
+  return headerTitle('Settings') + `<div class="scroll"><div class="day" style="padding-top:0">
+    <div class="label" style="margin-top:8px">Your days</div>
+    ${t('memory', 'Screen memory', 'Keeps the text of screens you open, on this phone.', true)}
+    ${t('summaries', 'Day summaries', 'Gemini Nano writes each day’s title and summary on this phone. Nothing is uploaded.', true)}
+    ${r('Apps never read', 'Banking, password managers, keyboards and 9 more.')}
+    <div class="label">Agents</div>
+    ${t('ask', 'Ask me before Send or Pay', 'A tap on Send, Pay, Buy or Order waits for you to tap Allow.', true)}
+    ${r('Phone access', 'Accessibility, notifications and battery.', 'All on')}
+    <div class="label">Look</div>
+    ${r('Theme', 'Follows the system.', 'Auto')}
+  </div></div>`;
+}
+
+function chatView(st) {
+  const m = MODELS.find(x => x[0] === st.model);
+  const cite = (id, t, p, time) => `<button class="row" data-a="moment" data-id="${id}">${rowInner(lead(M[id]), t, p, time)}</button>`;
+  return headerTitle('Chat', false, `<button class="ib" data-a="toast" data-msg="Starts a new chat" aria-label="New chat">${ic('note-pencil')}</button>`) + `
+  <div class="scroll"><div class="chat">
+    <div class="you">What did Rahul and I decide about 0.9?</div>
+    <div class="bot"><p>You agreed to ship 0.9 on Thursday and leave the new onboarding for 0.10. Rahul said he’d get CI green tonight, and at 9:12 pm he wrote that the build is green.</p>
+      <div class="cites"><div class="label">From</div>
+      ${cite('slack1', 'Rahul in #release-0-9', '“Onboarding isn’t ready. I’d rather ship 0.9 on Thursday without it.”', '11:38 am')}
+      ${cite('rahul1', 'Rahul in #release-0-9', '“Build is green. Tagging 0.9 in the morning.”', '9:12 pm')}</div></div>
+    <div class="you">Tell Amma I’ll call her tomorrow morning, I’m sleeping early</div>
+    <div class="bot"><p>Here’s the message. I’ll send it on WhatsApp when you say so.</p>
+      <div class="draft"><small>To Amma on WhatsApp</small>Sleeping early today, Amma. I’ll call you tomorrow morning.</div>
+      <div class="btns"><button class="btn primary" data-a="toast" data-msg="Sent to Amma">${ic('paper-plane-right')}Send to Amma</button><button class="btn plain" data-a="toast" data-msg="Opens the message to edit">Edit</button></div></div>
+  </div></div>` + composer('Ask about your days, or give a task', `${m[0]} · ${m[1]}`);
+}
+
+function agentsView(st) {
+  if (st.agent) return agentPage(st, st.agent);
+  const a = id => { const g = AGENTS[id]; const live = G.live && id === 'claude';
+    return `<button class="row" data-a="agent" data-id="${id}">${rowInner(ic(g.icon, ` style="color:${g.color}"`), g.name, live ? 'Using Slack now' : g.last, live ? 'Now' : g.when)}</button>`; };
+  const r = (i) => { const [icon, t, p] = ROUTINES[i]; const on = st.routines[i];
+    return `<div class="row rt"><button class="open" data-a="toast" data-msg="Opens the routine">${rowInner(ic(icon, ' style="color:var(--text-2)"'), t, p)}</button><button class="swbtn" role="switch" aria-checked="${on}" aria-label="${t}" data-a="routine" data-i="${i}">${sw()}</button></div>`; };
+  return headerTitle('Agents', false) + `<div class="scroll"><div class="day" style="padding-top:0">
+    <div class="label" style="margin-top:4px">Connected</div>
+    ${a('claude')}${a('claudecode')}${a('chatgpt')}
+    <button class="row single" data-a="sheet" data-sheet="addagent"><span class="lead">${ic('plus', ' style="color:var(--text-2)"')}</span><span class="txt"><span class="t">Add agent</span></span></button>
+    <div class="label">Routines</div>
+    ${ROUTINES.map((_, i) => r(i)).join('')}
+    <button class="row single" data-a="toast" data-msg="Opens a new routine"><span class="lead">${ic('plus', ' style="color:var(--text-2)"')}</span><span class="txt"><span class="t">New routine</span></span></button>
+  </div></div>`;
+}
+
+function agentPage(st, id) {
+  const g = AGENTS[id];
+  const see = SEE.map(([k, t, p]) => { const on = st.see[id + k] ?? g.see[k];
+    return `<button class="row toggle" role="switch" aria-checked="${on}" data-a="see" data-key="${id + k}" data-def="${g.see[k]}"><span class="txt"><span class="l1"><span class="t">${t}</span></span><span class="p full">${p}</span></span>${sw()}</button>`; }).join('');
+  const conn = g.conn.map(([t, v, kind]) => kind === 'copy'
+    ? `<div class="kv"><span class="txt"><span class="t">${t}</span><span class="p">${v}</span></span><button class="ib" data-a="toast" data-msg="Address copied" aria-label="Copy address">${ic('copy')}</button></div>`
+    : `<button class="row" data-a="toast" data-msg="${v}">${rowInner('', t, v).replace('<span class="lead"></span>', '')}</button>`).join('');
+  const recent = g.recent.map(([t, when, mid]) => `<button class="row" ${mid ? `data-a="moment" data-id="${mid}"` : 'data-a="toast" data-msg="Opens the steps it took"'}><span class="txt"><span class="l1"><span class="t" style="font-weight:400">${t}</span></span><span class="p">${when}</span></span></button>`).join('');
+  return headerTitle(g.name) + `<div class="scroll" data-agentscroll><div class="day" style="padding-top:0">
+    <p class="intro">${g.intro}</p>
+    <div class="label">What it can see</div>
+    <p class="intro" style="font-size:14px;margin-bottom:6px">While it works, it reads your screen and uses your apps. You approve messages and payments before they happen.</p>
+    ${see}
+    <div class="label">Connection</div>
+    ${conn}
+    <div class="label">Recent</div>
+    ${recent}
+    <button class="removebtn" data-a="sheet" data-sheet="remove">${ic('trash')}Remove ${g.name}</button>
+  </div></div>`;
+}
+
+function sheetHTML(st) {
+  if (!st.sheet || (st.sheet === 'remove' && !st.agent)) return '';
+  let h = '';
+  if (st.sheet === 'addagent') {
+    const r = (icon, color, t, p) => `<button class="row" data-a="toast" data-msg="Shows how to connect ${t}">${rowInner(ic(icon, ` style="color:${color}"`), t, p, '', true)}</button>`;
+    h = `<h2 id="sh">Add agent</h2><p>Agents you add can read your screen and use your apps. You approve messages and payments before they happen, and Stop at the top of the screen ends anything at once.</p>
+      ${r('asterisk', 'var(--c-claude)', 'Claude', 'claude.ai and the Claude app')}
+      ${r('terminal-window', 'var(--text-2)', 'Claude Code', 'On your computer')}
+      ${r('open-ai-logo', 'var(--text-2)', 'ChatGPT', 'chatgpt.com and the ChatGPT app')}
+      ${r('code', 'var(--text-2)', 'Codex', 'On your computer')}
+      ${r('plugs', 'var(--text-2)', 'Another AI app', 'For an AI app not listed here. Handset gives you an address and a key to paste into the app’s settings.')}`;
+  } else if (st.sheet === 'model') {
+    const r = ([t, where, p]) => `<button class="row" data-a="model" data-model="${t}" aria-pressed="${t === st.model}">${rowInner('', `${t} · ${where}`, p, '', true).replace('<span class="lead"></span>', '')}<span class="lead" style="height:22px">${t === st.model ? ic('check') : ''}</span></button>`;
+    h = `<h2 id="sh">Model</h2><p>Chat reads your days to answer. Models on this phone keep everything here.</p>${MODELS.map(r).join('')}`;
+  } else if (st.sheet === 'remove') {
+    const g = AGENTS[st.agent];
+    h = `<h2 id="sh">Remove ${g.name}?</h2><p>It loses access to this phone at once. To use it again, you set it up again on your MacBook Air.</p>
+      <div class="btns" style="justify-content:flex-end;margin-top:20px"><button class="btn plain" data-a="closesheet">Cancel</button><button class="btn danger" data-a="removed">Remove</button></div>`;
+  } else if (st.sheet === 'calendar') {
+    const sel = curDay(st);
+    let cells = ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(x => `<small aria-hidden="true">${x}</small>`).join('');
+    cells += '<span></span>'.repeat(date(1).getDay());
+    for (let n = 1; n <= 31; n++) {
+      const has = !!dayOf(n);
+      cells += `<button ${n > 27 ? 'disabled' : `data-a="${has ? 'day' : 'toast'}" data-k="${n}" data-msg="This mock has 3 and 21 to 27 October"`} class="${n === 27 ? 'today' : ''}"${n === sel ? ' aria-current="date"' : ''} aria-label="${longOf(n)}${n === 27 ? ', today' : ''}">${n}</button>`;
+    }
+    h = `<div class="sheethead"><button class="ib" data-a="toast" data-msg="Opens September" aria-label="September">${ic('caret-left')}</button><h2 id="sh" style="text-align:center">October 2026</h2><button class="ib" disabled aria-label="November" style="opacity:.35;cursor:default">${ic('caret-right')}</button></div>
+      <div class="cal">${cells}</div>
+      <div class="btns" style="justify-content:space-between;margin-top:12px"><p class="calfoot" style="margin:0">Days start when Screen memory was turned on.</p>${sel !== 27 ? `<button class="btn plain" data-a="day" data-k="27">Go to today</button>` : ''}</div>`;
+  }
+  return `<div class="scrim" data-a="closesheet"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh" data-stop><div class="handle"></div>${h}</div></div>`;
+}
+
+function render(ph) {
+  const st = ph.st; const inner = G.w === 'inner';
+  const t = topOf(st);
+  let main = '';
+  let showNav = true;
+  const wrap = h => inner ? `<div class="colwrap">${h}</div>` : h;
+  if (st.tab === 'chat') main = wrap(chatView(st));
+  else if (st.tab === 'agents') { main = wrap(agentsView(st)); if (st.agent && !inner) showNav = false; }
+  else if (t.s === 'settings') { main = wrap(settingsView(st)); showNav = inner; }
+  else if (!inner) {
+    if (t.s === 'moment') { main = momentView(st, t.id); showNav = false; }
+    else if (t.s === 'search') { main = searchView(st, t.q); showNav = false; }
+    else { const k = curDay(st); main = dayHeader(st, k) + `<div class="scroll">${dayBody(st, dayOf(k))}</div>`; }
+  } else {
+    // Inner: list of days on the left, the open day (or a moment) on the right
+    const k = curDay(st);
+    const momentTop = t.s === 'moment';
+    const searchV = st.stack.find(x => x.s === 'search');
+    const left = searchV ? searchView(st, searchV.q, momentTop ? t.id : null)
+      : `<div class="head"><div class="grow">${monthBtn(st, k)}</div>${headIcons}</div><div class="scroll">${dayList(st, k)}</div>`;
+    const right = momentTop ? momentView(st, t.id, true) : `${k !== 27 ? `<div class="head" style="justify-content:flex-end">${todayBtn(k)}</div>` : ''}<div class="scroll">${dayBody(st, dayOf(k))}</div>`;
+    main = `<div class="split"><div class="pane left">${left}</div><div class="pane right">${right}</div></div>`;
+  }
+  const nav = inner ? `<nav class="rail" aria-label="Sections">${navItems(st)}</nav>` : '';
+  ph.el.innerHTML = statusBar() + liveLine() +
+    `<div class="body">${nav}<div class="main">${main}</div></div>` +
+    (!inner && showNav ? `<nav class="nav" aria-label="Sections">${navItems(st)}</nav>` : '') +
+    `<div class="gesture" aria-hidden="true"></div>` + sheetHTML(st) +
+    (st.toast ? `<div class="toast" role="status">${st.toast}</div>` : '');
+  if (st.typed) { const i = ph.el.querySelector('.chat ~ * input, .composer input'); if (i) { i.value = st.typed; syncSend(i); } }
+  if (st.dayEnd) { const s = [...ph.el.querySelectorAll('.scroll')].find(x => x.querySelector('.daytitle')); if (s) s.scrollTop = s.scrollHeight; }
+  if (st.scrollEnd) { const s = ph.el.querySelector('[data-agentscroll]'); if (s) s.scrollTop = s.scrollHeight; }
+}
+function syncSend(input) {
+  const s = input.closest('.field')?.querySelector('.send'); if (s) s.setAttribute('aria-disabled', input.value ? 'false' : 'true');
+}
+
+function act(ph, el, e) {
+  const st = ph.st; const a = el.dataset.a; const inner = G.w === 'inner';
+  if (a === 'closesheet' && e.target !== el && e.target.closest('[data-stop]') && !e.target.closest('button[data-a=closesheet]')) return;
+  st.toast = null; st.pressed = null; st.scrollEnd = false; st.dayEnd = false;
+  switch (a) {
+    case 'tab': st.tab = el.dataset.tab; st.sheet = null; st.agent = null; if (st.tab === 'days') st.stack = [{ s: 'day', k: 27 }]; break;
+    case 'moment': {
+      st.sheet = null; st.tab = 'days'; st.agent = null;
+      const id = el.dataset.id;
+      if (topOf(st).s === 'moment' && inner) st.stack[st.stack.length - 1] = { s: 'moment', id };
+      else if (!st.stack.some(x => x.s === 'day')) st.stack = [{ s: 'day', k: dayOfMoment(id).k }, { s: 'moment', id }];
+      else st.stack.push({ s: 'moment', id });
+      break;
+    }
+    case 'day': st.sheet = null; st.stack = [{ s: 'day', k: +el.dataset.k }]; if (!dayOf(+el.dataset.k)) { st.toast = 'This mock has 3 and 21 to 27 October'; st.stack = [{ s: 'day', k: 27 }]; } break;
+    case 'back': st.sheet = null; if (st.tab === 'agents' && st.agent) st.agent = null; else if (st.stack.length > 1) st.stack.pop(); break;
+    case 'search': st.stack.push({ s: 'search', q: 'Toit' }); break;
+    case 'settings': st.stack.push({ s: 'settings' }); break;
+    case 'sheet': st.sheet = el.dataset.sheet; if (st.sheet === 'remove') st.scrollEnd = true; break;
+    case 'closesheet': st.sheet = null; break;
+    case 'model': st.model = el.dataset.model; st.sheet = null; break;
+    case 'agent': st.agent = el.dataset.id; break;
+    case 'routine': st.routines[+el.dataset.i] = !st.routines[+el.dataset.i]; break;
+    case 'see': { const k = el.dataset.key; st.see[k] = !(st.see[k] ?? el.dataset.def === 'true'); break; }
+    case 'removed': st.toast = 'Removed ' + AGENTS[st.agent].name; st.sheet = null; st.agent = null; break;
+    case 'send': { const i = el.closest('.field').querySelector('input'); if (!i.value) return; st.toast = 'Sends'; st.typed = null; break; }
+    case 'stop': G.live = false; syncControls(); renderAll(); return;
+    case 'toast': st.toast = el.dataset.msg; break;
+  }
+  if (st.toast) { clearTimeout(ph.tt); ph.tt = setTimeout(() => { st.toast = null; render(ph); }, 1800); }
+  render(ph);
+}
+
+// ---------- Page ----------
+const phones = [];
+function build() {
+  const root = document.getElementById('groups');
+  root.innerHTML = GROUPS.map(g => `<section class="group" id="grp-${g.key}"><h2>${g.title}</h2><p class="note">${g.line}</p><div class="grid"></div></section>`).join('');
+  phones.length = 0;
+  for (const g of GROUPS) {
+    const grid = document.querySelector(`#grp-${g.key} .grid`);
+    for (const [frame, cap] of g[G.w]) {
+      const fig = document.createElement('figure');
+      fig.innerHTML = `<figcaption>${G.live && frame === 'today' && G.w === 'cover' ? 'Today, while Claude is acting: the strip with Stop' : cap}</figcaption><div class="device ${G.w}"><div class="phone"></div></div>`;
+      grid.appendChild(fig);
+      const ph = { el: fig.querySelector('.phone'), st: initState(frame) };
+      ph.el.addEventListener('click', e => { const el = e.target.closest('[data-a]'); if (el && ph.el.contains(el)) { if (el.tagName === 'A') e.preventDefault(); act(ph, el, e); } });
+      ph.el.addEventListener('input', e => { if (e.target.matches('.field input')) syncSend(e.target); });
+      let x0 = null;
+      ph.el.addEventListener('pointerdown', e => { x0 = G.w === 'cover' && e.target.closest('[data-swipe="1"]') ? e.clientX : null; });
+      ph.el.addEventListener('pointerup', e => {
+        if (x0 == null) return; const dx = e.clientX - x0; x0 = null;
+        if (Math.abs(dx) < 60) return;
+        const k = curDay(ph.st) + (dx < 0 ? 1 : -1);
+        if (k > 27) return;
+        if (!dayOf(k)) { ph.st.toast = 'This mock has 3 and 21 to 27 October'; render(ph); return; }
+        ph.st.stack = [{ s: 'day', k }]; render(ph);
+      });
+      ph.el.addEventListener('keydown', e => { if (e.key === 'Escape' && ph.st.sheet) { ph.st.sheet = null; render(ph); } });
+      phones.push(ph);
+    }
+  }
+  renderAll();
+}
+const renderAll = () => phones.forEach(render);
+
+const q = new URLSearchParams(location.search);
+let theme = q.get('theme') || 'auto';
+G.w = q.get('w') || 'cover';
+G.live = q.get('live') === '1';
+const mq = matchMedia('(prefers-color-scheme: dark)');
+function applyTheme() { document.documentElement.classList.toggle('dark', theme === 'dark' || (theme === 'auto' && mq.matches)); }
+mq.addEventListener('change', applyTheme);
+function syncControls() {
+  document.querySelectorAll('[data-theme]').forEach(b => b.setAttribute('aria-pressed', b.dataset.theme === theme));
+  document.querySelectorAll('[data-w]').forEach(b => b.setAttribute('aria-pressed', b.dataset.w === G.w));
+  document.querySelectorAll('[data-live]').forEach(b => b.setAttribute('aria-pressed', (b.dataset.live === '1') === G.live));
+}
+document.querySelector('.controls').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.theme) { theme = b.dataset.theme; applyTheme(); }
+  if (b.dataset.w) { G.w = b.dataset.w; build(); }
+  if (b.dataset.live) { G.live = b.dataset.live === '1'; renderAll(); }
+  syncControls();
+});
+applyTheme(); syncControls(); build();
+</script>
+</body>
+</html>
