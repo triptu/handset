@@ -72,10 +72,7 @@
 </table>
 
 <h2>Running</h2>
-<div class="entry running">
-  <h3>Settings as pages <span class="time">20:15</span></h3>
-  <p>Your words: "the settings page is a mess man, such a long list of so many options, all laid out flat." Claude Opus, branch <code>settings-pages</code>: a short top level like Android's own Settings (Agents, Recording, Connections, Phone events, Safety, Android permissions, About), each row with its current state ("Relay connected", "Off"), each opening its own page. No control dropped.</p>
-</div>
+
 <div class="entry running">
   <h3>Chat through nano-chat, not a second chat app <span class="time">20:02</span></h3>
   <p>Your call: "make it possible for my nano-chat repo to use this, so there aren't two separate local chat apps". Two agents in parallel, both Claude Opus. Handset (branch <code>connect-app</code>): another app on the phone asks to connect, Handset shows "Nano Chat wants to use this phone" with the access switches and Allow, and hands back a local address and token. nano-chat (branch <code>handset</code> in its repo): a "Use this phone" switch per companion and a small tool loop for Nano and Gemma: search your day, catch up, status, open an app, alarms, timers, Do not disturb. Screen-driving tools are left out: their results don't fit Gemma's 2k context and small models drive screens poorly.</p>
@@ -181,6 +178,11 @@
 </ul>
 
 <h2>Shipped</h2>
+<div class="entry shipped">
+  <h3>Settings as pages, on your phone <span class="time">20:25</span></h3>
+  <p>A short top level like Android's own Settings: the master switch, then Agents, Recording, Connections, Phone events, Safety, Android permissions, About, each with its current state and its own page. No control dropped. The README screenshot is updated.</p>
+  <div class="shots"><figure><img src="progress/images/settings-top.png" alt=""><figcaption>Real app, emulator: the new top level</figcaption></figure></div>
+</div>
 <div class="entry shipped">
   <h3>Another app on the phone can connect with one tap <span class="time">21:00</span></h3>
   <p>An app such as nano-chat asks Handset to connect; Handset shows "&lt;App&gt; wants to use this phone" with the agent switches (all off) and Allow, and returns a local address and token. Astra's review led to three fixes: a covered tap on Allow is ignored on every Android version, the token is issued only once Handset holds port 8765, and an app's token works only on the phone itself. Uninstalling the app revokes it. 136 tests. The contract is in the README so any app can use it.</p>
