@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-/** Which times count as not recorded: before a source was turned on, and during a pause */
+/** Which times count as not recorded: before a source was turned on, during a pause, and while stopped */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35], application = Application::class)
 class RecordingTest {
@@ -41,6 +41,22 @@ class RecordingTest {
         assertTrue(recording.excluded(Source.NOTIFICATIONS, start + 1))
         assertFalse(recording.excluded(Source.NOTIFICATIONS, now))
         assertFalse(recording.excluded(Source.NOTIFICATIONS, start - 1))
+    }
+
+    @Test
+    fun stoppingLastsUntilResumedAndKeepsEachSwitch() {
+        recording.setOn(Source.SCREEN, true)
+        val start = now
+        recording.stop()
+        now += 30 * 24 * HOUR
+        assertTrue(recording.stopped)
+        assertFalse(recording.recording(Source.SCREEN))
+        recording.resume()
+        assertFalse(recording.stopped)
+        assertTrue(recording.isOn(Source.SCREEN))
+        assertTrue(recording.excluded(Source.NOTIFICATIONS, now - 1))
+        assertFalse(recording.excluded(Source.NOTIFICATIONS, now))
+        assertEquals(listOf(start to now), recording.pauses())
     }
 
     private companion object {

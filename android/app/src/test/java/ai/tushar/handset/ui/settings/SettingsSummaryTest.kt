@@ -15,6 +15,7 @@ class SettingsSummaryTest {
         recording = emptyList(),
         keep = Keep.MONTH,
         pausedUntil = null,
+        stopped = false,
         relay = null,
         direct = false,
         events = null,
@@ -47,6 +48,7 @@ class SettingsSummaryTest {
         assertEquals("Screen text and notifications · 30 days", off.copy(recording = listOf(Source.SCREEN, Source.NOTIFICATIONS)).text(SettingsSection.RECORDING))
         assertEquals("App use and places", off.copy(recording = listOf(Source.APP_USE, Source.PLACES)).text(SettingsSection.RECORDING))
         assertEquals("Paused until 3:15 pm", off.copy(recording = listOf(Source.SCREEN), pausedUntil = Instant.EPOCH).text(SettingsSection.RECORDING))
+        assertEquals("Stopped", off.copy(recording = listOf(Source.SCREEN), stopped = true).text(SettingsSection.RECORDING))
     }
 
     @Test

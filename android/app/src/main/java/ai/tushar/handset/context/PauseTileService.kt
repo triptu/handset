@@ -20,7 +20,11 @@ class PauseTileService : TileService() {
         val tile = qsTile ?: return
         val recording = Handset.instance.recording
         tile.state = if (recording.paused) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
-        tile.subtitle = if (recording.paused) "Until ${DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(recording.pausedUntil.value))}" else "For an hour"
+        tile.subtitle = when {
+            recording.stopped -> "Stopped"
+            recording.paused -> "Until ${DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(recording.pausedUntil.value))}"
+            else -> "For an hour"
+        }
         tile.updateTile()
     }
 }

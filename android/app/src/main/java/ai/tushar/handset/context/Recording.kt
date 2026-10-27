@@ -44,7 +44,7 @@ enum class Source(val title: String, val detail: String, val pref: String) {
 /** How long screen text and notifications are kept. App use, places and agent steps are kept a year. */
 enum class Keep(val days: Int, val label: String) { WEEK(7, "7 days"), MONTH(30, "30 days"), QUARTER(90, "90 days") }
 
-/** The switch for each [Source], "Pause for an hour" and how long text is kept, with the app's other settings */
+/** The switch for each [Source], "Pause for an hour", stopping it all, and how long text is kept, with the app's other settings */
 class Recording(private val context: Context, private val preferences: SharedPreferences, private val clock: () -> Long = System::currentTimeMillis) {
     private val _pausedUntil = MutableStateFlow(preferences.getLong(PAUSED_UNTIL, 0L))
 
@@ -87,10 +87,18 @@ class Recording(private val context: Context, private val preferences: SharedPre
     /** Whether any source is switched on */
     val anyOn: Boolean get() = Source.entries.any(::isOn)
 
-    fun pauseForAnHour() {
+    /** Whether recording is off until the user turns it on again, rather than paused until a time */
+    val stopped: Boolean get() = _pausedUntil.value == STOPPED
+
+    fun pauseForAnHour() = pauseUntil(clock() + HOUR_MS)
+
+    /** Keeps nothing until [resume], and leaves each source's switch as it is */
+    fun stop() = pauseUntil(STOPPED)
+
+    private fun pauseUntil(at: Long) {
         val now = clock()
         val (going, past) = pauses().partition { it.second > now }
-        setPausedUntil(now + HOUR_MS, past + ((going.minOfOrNull { it.first } ?: now) to now + HOUR_MS))
+        setPausedUntil(at, past + ((going.minOfOrNull { it.first } ?: now) to at))
     }
 
     /** Ends the pause now, and keeps it as the span it lasted */
@@ -111,6 +119,7 @@ class Recording(private val context: Context, private val preferences: SharedPre
         const val PAUSES = "recording_pauses"
         const val ON_SINCE = "_on_since"
         const val HOUR_MS = 60 * 60_000L
+        const val STOPPED = Long.MAX_VALUE
 
         /** Longer than any read back: app use reads a day back at most */
         const val PAUSES_KEPT_MS = 2 * 24 * HOUR_MS

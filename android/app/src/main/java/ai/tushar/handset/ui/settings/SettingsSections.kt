@@ -23,7 +23,7 @@ enum class SettingsSection(val title: String, @DrawableRes val icon: Int) {
  * What the top level reads to sum up each section. [agents] are the names of the agents that are on, beside a count of
  * [pausedAgents]. [recording] holds the sources that are on and allowed, [relay] is
  * null until a relay is connected, [events] is null until events have an address, and [pausedUntil] is null unless
- * recording is paused.
+ * recording is paused until a time. [stopped] is true while recording is off until the user turns it on.
  */
 data class SettingsState(
     val agents: List<String>,
@@ -31,6 +31,7 @@ data class SettingsState(
     val recording: List<Source>,
     val keep: Keep,
     val pausedUntil: Instant?,
+    val stopped: Boolean,
     val relay: RelayState?,
     val direct: Boolean,
     val events: List<Trigger>?,
@@ -61,6 +62,7 @@ fun SettingsState.summary(section: SettingsSection, time: (Instant) -> String): 
     SettingsSection.SAFETY -> Summary(if (askBeforeSending) "Asks before Send or Pay" else "Doesn't ask before Send or Pay")
     SettingsSection.RECORDING -> Summary(
         when {
+            stopped -> "Stopped"
             pausedUntil != null -> "Paused until ${time(pausedUntil)}"
             recording.isEmpty() -> "Off"
             // How long applies to screen text and notifications alone

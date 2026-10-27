@@ -51,7 +51,7 @@ import kotlinx.coroutines.delay
 import java.time.Instant
 
 /**
- * Settings' top level: the switch that lets agents use the phone, then a row per [SettingsSection] with its state in a
+ * Settings' top level: the switches that let agents use the phone and that record the day, then a row per [SettingsSection] with its state in a
  * few words. [selected] is the section open beside the list on a wide screen.
  */
 @Composable
@@ -76,6 +76,28 @@ fun SettingsTab(
                 controlEnabled,
                 lead = { PhIcon(R.drawable.ph_hand_tap) },
             ) { handset.switchControl(it) }
+            // Off keeps each source's switch, so on again records what it did before. With nothing to record, it opens
+            // Recording to choose.
+            val recordingSomething = state.recording.isNotEmpty()
+            SwitchRow(
+                "Record my day",
+                when {
+                    !recordingSomething -> "Choose what to keep under Recording."
+                    state.stopped -> "Nothing is kept until you turn this on."
+                    else -> "Off stops it all. Your choices under Recording stay."
+                },
+                recordingSomething && !state.stopped,
+                lead = { PhIcon(R.drawable.ph_record) },
+            ) { on ->
+                when {
+                    !recordingSomething -> onSection(SettingsSection.RECORDING)
+                    on -> handset.recording.resume()
+                    else -> {
+                        handset.recording.stop()
+                        handset.collector.stop()
+                    }
+                }
+            }
             Spacer(Modifier.height(12.dp))
             SettingsSection.entries.forEach { section ->
                 val summary = state.summary(section, format::time)
@@ -128,7 +150,8 @@ private fun rememberSettingsState(handset: Handset, agents: AgentDirectory, setu
             pausedAgents = connected.count { !it.enabled },
             recording = Source.entries.filter { recording.isOn(it) && it.granted(context) },
             keep = recording.keep,
-            pausedUntil = Instant.ofEpochMilli(pausedUntil).takeIf { pausedUntil > System.currentTimeMillis() },
+            pausedUntil = Instant.ofEpochMilli(pausedUntil).takeIf { pausedUntil > System.currentTimeMillis() && !recording.stopped },
+            stopped = recording.stopped,
             relay = relay.takeIf { relayUrl != null },
             direct = direct,
             events = handset.events.destinations.load()?.let { Trigger.entries.filter(handset.events::isOn) },

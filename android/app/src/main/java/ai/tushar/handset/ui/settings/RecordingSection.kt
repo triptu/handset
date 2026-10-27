@@ -90,7 +90,11 @@ fun RecordingSection(handset: Handset, onBack: (() -> Unit)?, onExcludedApps: ()
         ListRow("Keep screen text and notifications", text = "App use and places are kept a year.", trailing = keep.label, onClick = { pickKeep = true })
         val paused = pausedUntil > System.currentTimeMillis()
         ListRow(
-            if (paused) "Paused until ${format.time(Instant.ofEpochMilli(pausedUntil))}" else "Pause for an hour",
+            when {
+                recording.stopped -> "Stopped"
+                paused -> "Paused until ${format.time(Instant.ofEpochMilli(pausedUntil))}"
+                else -> "Pause for an hour"
+            },
             text = if (paused) "Tap to start keeping again now." else "Nothing is kept until the hour is up.",
             onClick = {
                 if (paused) {

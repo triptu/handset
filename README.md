@@ -113,7 +113,7 @@ Every step an agent takes, refused and stopped ones included, is kept in the day
 
 Under Settings, Recording, four sources each have a switch, all off at first. Screen text keeps the text of the screens you open, for search. Notifications are kept as they arrive, for catching up. App use is which app was open and when. Places are where you stayed 10 minutes or more. Tap a place in Days to name it.
 
-The Days tab shows each day by time. Open a moment to read the screens you saw, a conversation, or an agent's steps, and search everything kept. **Pause for an hour** stops recording, from Settings or a quick settings tile. **Delete today** removes everything since midnight. Password managers, payment apps, keyboards and the apps you add under **Apps never read** are never recorded.
+The Days tab shows each day by time. Open a moment to read the screens you saw, a conversation, or an agent's steps, and search everything kept. **Record my day**, at the top of Settings, stops all recording until you turn it on again, and keeps your choice of sources. **Pause for an hour** stops it for an hour, from Settings or a quick settings tile. **Delete today** removes everything since midnight. Password managers, payment apps, keyboards and the apps you add under **Apps never read** are never recorded.
 
 ## Privacy
 
