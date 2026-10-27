@@ -4,9 +4,9 @@
 
 Handset gives your AI agents your phone. Claude, ChatGPT, Claude Code, Codex or any other MCP client can read the screen, open apps, tap, type and scroll, the way you would. It can also keep a private record of your day on the phone, which you browse in the app and your agents can search.
 
-<a href="https://github.com/triptu/handset/blob/main/site/public/media/trailer.mp4"><img src="site/public/media/poster.png" width="720" alt="Handset's launch trailer: an agent sets a timer, the day record, each agent's switches, Send waiting for your tap, and Stop"></a>
+<a href="https://github.com/triptu/handset/blob/main/site/public/media/trailer.mp4"><img src="site/public/media/poster.png" width="720" alt="Handset's launch trailer: Claude and ChatGPT plan a trip from what the phone saw, catch up on messages, send a reply that waits for your tap, and a low battery that starts the conversation"></a>
 
-[Watch the trailer](https://github.com/triptu/handset/blob/main/site/public/media/trailer.mp4) (56 s, sound optional) · Website: [handset.tushar.ai](https://handset.tushar.ai)
+[Watch the trailer](https://github.com/triptu/handset/blob/main/site/public/media/trailer.mp4) (59 s, sound optional) · Website: [handset.tushar.ai](https://handset.tushar.ai)
 
 Nothing leaves the phone until you connect an agent, and each agent gets its own switches for what it may read. A tap on Send or Pay waits for your tap. Stop ends anything. The app is open source under the MIT license.
 
