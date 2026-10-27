@@ -30,7 +30,7 @@
     <main>
       <section class="hero wrap">
         <h1>Handset gives your AI agents your phone.</h1>
-        <p class="lede">Claude, ChatGPT, Claude Code, Codex or any other MCP client can read the screen, open apps, tap, type and scroll, the way you would. Nothing leaves the phone until you connect an agent, and each agent gets its own switches for what it may read.</p>
+        <p class="lede">Claude, ChatGPT, Claude Code, Codex or any other MCP client can read the screen, open apps, tap, type and scroll, the way you would. Nothing leaves the phone until you connect an agent, and each agent gets its own switches for what it may read. Claude and ChatGPT reach the phone through a small relay you deploy to your own Cloudflare account.</p>
         <div class="actions">
           <a class="button" href="https://github.com/triptu/handset/releases/latest/download/handset.apk">
             <svg aria-hidden="true" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/></svg>
@@ -39,6 +39,7 @@
           <a class="button secondary" href="https://github.com/triptu/handset">Source on GitHub</a>
         </div>
         <p class="fine">Android 11 or newer. Free and open source under the MIT license.</p>
+        <p class="jump"><a href="#install">Install it</a> · <a href="#connect">Connect an agent</a></p>
       </section>
 
       <figure class="trailer wrap-wide">
@@ -84,27 +85,14 @@
         </div>
       </section>
 
-      <section class="feature wrap">
-        <div class="copy">
-          <h2>A private record of your day</h2>
-          <p>If you want it, Handset keeps the text of the screens you open, your notifications, which app was open and where you stayed. Each source has its own switch, and all are off at first.</p>
-          <p>The Days tab shows each day by time, and you can search everything kept. Your agents can search it too, within their switches. Password managers, payment apps and keyboards are never recorded.</p>
-        </div>
-        <div class="shots two">
-          <img src="/shots/days.webp" width="450" height="1000" loading="lazy" alt="Today in Days: messages, apps and an agent’s steps, each with its time" />
-          <img src="/shots/search.webp" width="450" height="1000" loading="lazy" alt="Searching the day record for a place name" />
-        </div>
-      </section>
-
-      <section class="feature wrap">
-        <div class="copy">
-          <h2>The phone can start a routine</h2>
-          <p>Handset can tell a Claude routine, or any address that takes a POST, when the battery runs low, charging starts or stops, you arrive at or leave a place, or someone you picked sends a notification.</p>
-          <p>An event carries its type, the time, and the battery level, place name, or the person’s or app’s name. Never what a message says.</p>
-        </div>
-        <div class="shots">
-          <img src="/shots/events.webp" width="450" height="1000" loading="lazy" alt="Phone events settings: battery below 20%, charging started or stopped, arrived at or left a place, a notification from someone" />
-        </div>
+      <section class="install wrap" id="install">
+        <h2>Install it</h2>
+        <ol class="steps">
+          <li>On the phone, download <a href="https://github.com/triptu/handset/releases/latest/download/handset.apk">handset.apk</a> and open it to install. The <a href="https://github.com/triptu/handset/releases">releases page</a> lists each APK’s SHA-256 and signing certificate.</li>
+          <li>Open Handset. Its setup walks you through three Android settings: Accessibility, Notification access and Unrestricted battery.</li>
+          <li>Android greys out Accessibility for an app installed from a file. Try once, then open the app’s App info, tap ⋮, choose <b>Allow restricted settings</b>, and turn it on again.</li>
+        </ol>
+        <p class="note">Handset isn’t on Play. It drives the phone through an accessibility service, and Play allows those only in apps for people with disabilities.</p>
       </section>
 
       <section class="connect wrap" id="connect">
@@ -131,14 +119,27 @@
         </div>
       </section>
 
-      <section class="install wrap" id="install">
-        <h2>Install it</h2>
-        <ol class="steps">
-          <li>On the phone, download <a href="https://github.com/triptu/handset/releases/latest/download/handset.apk">handset.apk</a> and open it to install. The <a href="https://github.com/triptu/handset/releases">releases page</a> lists each APK’s SHA-256 and signing certificate.</li>
-          <li>Open Handset. Its setup walks you through three Android settings: Accessibility, Notification access and Unrestricted battery.</li>
-          <li>Android greys out Accessibility for an app installed from a file. Try once, then open the app’s App info, tap ⋮, choose <b>Allow restricted settings</b>, and turn it on again.</li>
-        </ol>
-        <p class="note">Handset isn’t on Play. It drives the phone through an accessibility service, and Play allows those only in apps for people with disabilities.</p>
+      <section class="feature wrap">
+        <div class="copy">
+          <h2>A private record of your day</h2>
+          <p>If you want it, Handset keeps what you saw on screen, your notifications, the apps you used and where you stayed. Every source is off at first. The Days tab shows each day by time, and you can search it.</p>
+          <p><a class="arrow-link" href="https://github.com/triptu/handset#the-day-record">More on the day record</a></p>
+        </div>
+        <div class="shots two">
+          <img src="/shots/days.webp" width="450" height="1000" loading="lazy" alt="Today in Days: messages, apps and an agent’s steps, each with its time" />
+          <img src="/shots/search.webp" width="450" height="1000" loading="lazy" alt="Searching the day record for a place name" />
+        </div>
+      </section>
+
+      <section class="feature wrap">
+        <div class="copy">
+          <h2>The phone can start a routine</h2>
+          <p>Handset can tell a Claude routine when the battery runs low, charging starts, you arrive somewhere, or someone you picked sends a notification. It never sends what a message says.</p>
+          <p><a class="arrow-link" href="https://github.com/triptu/handset#phone-events">More on phone events</a></p>
+        </div>
+        <div class="shots">
+          <img src="/shots/events.webp" width="450" height="1000" loading="lazy" alt="Phone events settings: battery below 20%, charging started or stopped, arrived at or left a place, a notification from someone" />
+        </div>
       </section>
 
       <section class="privacy wrap" id="privacy">

@@ -230,6 +230,13 @@ h1 {
   color: var(--text-2);
 }
 
+.jump {
+  margin-top: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
 /* The trailer, or three screens in its place until it exists */
 .trailer {
   position: relative;
@@ -314,6 +321,21 @@ h2 {
 
 .shots.two img {
   width: min(calc(50% - var(--gap) / 2), 16rem);
+}
+
+/* Side by side, two screens are too small to read on a narrow phone, so they scroll */
+@media (max-width: 30rem) {
+  .shots.two {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .shots.two img {
+    flex: none;
+    width: 78%;
+    scroll-snap-align: start;
+  }
 }
 
 @media (min-width: 52rem) {
