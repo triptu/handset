@@ -72,10 +72,7 @@
 </table>
 
 <h2>Running</h2>
-<div class="entry running">
-  <h3>Pause an agent without removing it <span class="time">21:20</span></h3>
-  <p>Your words: "need an option to disable a connected app without removing it". Claude Opus, branch <code>agent-pause</code>. A switch at the top of every agent's page (apps on this phone, claude.ai and ChatGPT through the relay, Claude Code and other token agents). Paused keeps its token or sign-in and its switches; every call is refused with a message saying how to turn it back on, and a running call stops.</p>
-</div>
+
 
 
 
@@ -179,6 +176,11 @@
 </ul>
 
 <h2>Shipped</h2>
+<div class="entry shipped">
+  <h3>Pause an agent without removing it, on your phone <span class="time">22:18</span></h3>
+  <p>A switch at the top of each agent's page; paused agents keep their token or sign-in and switches, show "Paused" in the list, and every call gets "Handset has paused Codex on this phone. The user can turn it back on in Handset, under Settings, Agents." (emulator proof). Reconnecting or signing in again turns it back on. 148 tests.</p>
+  <div class="shots"><figure><img src="progress/images/agent-paused.png" alt=""><figcaption>Real app, emulator: a paused agent's page</figcaption></figure></div>
+</div>
 <div class="entry shipped">
   <h3>Chat through nano-chat, on your phone <span class="time">21:05</span></h3>
   <p>nano-chat's main (local repo, no remote) now has a "Use this phone" switch per companion, connecting through Handset's one-tap screen. Gemma uses LiteRT-LM's native tool calling; Nano (no function calling in the ML Kit version the app uses) uses a JSON call format with one retry. Tools: search, catch up, day timeline, status, open app, alarm, timer, Do not disturb, what's playing; at most 3 per reply, results cut to fit the context. Astra's review led to three fixes: once a reply has read anything from your phone, it can't act for the rest of that reply (so a message can't make it turn on Do not disturb); a failed reply keeps its completed steps and Try again doesn't repeat them; turning the switch off stops a running reply and deletes the token when no companion uses it. 44 tests. Not yet tried with the real Nano and Gemma on your Fold.</p>
