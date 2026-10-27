@@ -176,7 +176,7 @@ private fun ConnectAppScreen(label: String, packageName: String, icon: ImageBitm
             Text(
                 "Like any agent you connect, it reads the screen, opens apps, and taps and types in them." +
                     (if (asksFirst) " Handset asks you before it taps Send or Pay." else "") +
-                    " You can remove it in Settings, under Connected agents.",
+                    " You can remove it in Settings, under Agents.",
                 style = AppType.bodySmall,
                 color = colors.text2,
                 modifier = Modifier.padding(top = 12.dp),

@@ -137,8 +137,9 @@ fun SectionLabel(text: String, modifier: Modifier = Modifier, top: Dp = AppSize.
 }
 
 /**
- * The one row: a leading glyph, a title with a line under it, and a time or value on the right. It reaches 12dp past
- * the page's margin on both sides, so its pressed tint has room while its text lines up with the page.
+ * The one row: a leading glyph, a title with a line under it, and a time or value on the right, or [end] such as a
+ * chevron. It reaches 12dp past the page's margin on both sides, so its pressed tint has room while its text lines up
+ * with the page. [SwitchRow] and [CheckRow] are this row with a switch or a check at the end.
  */
 @Composable
 fun ListRow(
@@ -152,33 +153,52 @@ fun ListRow(
     textLines: Int = 1,
     titleStyle: TextStyle = AppType.rowTitle,
     titleColor: Color = AppTheme.colors.text,
+    textColor: Color = AppTheme.colors.text2,
     lead: (@Composable () -> Unit)? = null,
     end: (@Composable () -> Unit)? = null,
     onClick: (() -> Unit)?,
 ) {
-    val colors = AppTheme.colors
-    val shape = RoundedCornerShape(AppSize.rowRadius)
+    val touch = if (onClick != null) Modifier.pressable(RoundedCornerShape(AppSize.rowRadius), selected, role = role, onClick = onClick) else Modifier
+    RowLayout(title, modifier, touch, text, richText, trailing, textLines, titleStyle, titleColor, textColor, lead, end)
+}
+
+@Composable
+private fun RowLayout(
+    title: String,
+    modifier: Modifier,
+    touch: Modifier,
+    text: String?,
+    richText: AnnotatedString?,
+    trailing: String?,
+    textLines: Int,
+    titleStyle: TextStyle,
+    titleColor: Color,
+    textColor: Color,
+    lead: (@Composable () -> Unit)?,
+    end: (@Composable () -> Unit)?,
+) {
+    val single = text == null && richText == null
     Row(
         modifier
             .bleed()
-            .defaultMinSize(minHeight = if (text == null && richText == null) AppSize.rowSingleMinHeight else AppSize.rowMinHeight)
-            .then(if (onClick != null) Modifier.pressable(shape, selected, role = role, onClick = onClick) else Modifier)
+            .defaultMinSize(minHeight = if (single) AppSize.rowSingleMinHeight else AppSize.rowMinHeight)
+            .then(touch)
             .padding(horizontal = AppSize.rowPadX, vertical = AppSize.rowPadY),
         horizontalArrangement = Arrangement.spacedBy(AppSize.rowGap),
-        verticalAlignment = if ((text == null && richText == null) || end != null) Alignment.CenterVertically else Alignment.Top,
+        verticalAlignment = if (single || end != null) Alignment.CenterVertically else Alignment.Top,
     ) {
         if (lead != null) {
-            Box(Modifier.width(AppSize.lead).height(if (text == null && richText == null) AppSize.lead else 40.dp), contentAlignment = Alignment.Center) { lead() }
+            Box(Modifier.width(AppSize.lead).height(if (single) AppSize.lead else 40.dp), contentAlignment = Alignment.Center) { lead() }
         }
         Column(Modifier.weight(1f)) {
             Text(title, style = titleStyle, color = titleColor)
             if (richText != null) {
-                Text(richText, style = AppType.rowText, color = colors.text2, maxLines = textLines, overflow = TextOverflow.Ellipsis)
+                Text(richText, style = AppType.rowText, color = textColor, maxLines = textLines, overflow = TextOverflow.Ellipsis)
             } else if (text != null) {
-                Text(text, style = AppType.rowText, color = colors.text2, maxLines = textLines, overflow = TextOverflow.Ellipsis)
+                Text(text, style = AppType.rowText, color = textColor, maxLines = textLines, overflow = TextOverflow.Ellipsis)
             }
         }
-        if (trailing != null) Text(trailing, style = AppType.time, color = colors.text3)
+        if (trailing != null) Text(trailing, style = AppType.time, color = AppTheme.colors.text3)
         if (end != null) end()
     }
 }
@@ -194,49 +214,26 @@ private fun Modifier.layoutBleed(by: Dp): Modifier = this.then(
     },
 )
 
-/** A setting with a switch. The whole row toggles it. */
+/** A [ListRow] whose whole row toggles a switch */
 @Composable
 fun SwitchRow(title: String, text: String?, checked: Boolean, enabled: Boolean = true, lead: (@Composable () -> Unit)? = null, onChange: (Boolean) -> Unit) {
     val colors = AppTheme.colors
     val interaction = remember { MutableInteractionSource() }
-    Row(
-        Modifier
-            .bleed()
-            .defaultMinSize(minHeight = if (text == null) AppSize.rowSingleMinHeight else AppSize.rowMinHeight)
-            .touchState(interaction, RoundedCornerShape(AppSize.rowRadius), selected = false)
-            .toggleable(checked, interactionSource = interaction, indication = null, enabled = enabled, role = Role.Switch, onValueChange = onChange)
-            .padding(horizontal = AppSize.rowPadX, vertical = AppSize.rowPadY),
-        horizontalArrangement = Arrangement.spacedBy(AppSize.rowGap),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (lead != null) Box(Modifier.width(AppSize.lead), contentAlignment = Alignment.Center) { lead() }
-        Column(Modifier.weight(1f)) {
-            Text(title, style = AppType.rowTitle, color = if (enabled) colors.text else colors.text3)
-            if (text != null) Text(text, style = AppType.rowText, color = colors.text2)
-        }
-        SwitchTrack(checked)
-    }
+    val touch = Modifier
+        .touchState(interaction, RoundedCornerShape(AppSize.rowRadius), selected = false)
+        .toggleable(checked, interactionSource = interaction, indication = null, enabled = enabled, role = Role.Switch, onValueChange = onChange)
+    RowLayout(title, Modifier, touch, text, null, null, Int.MAX_VALUE, AppType.rowTitle, if (enabled) colors.text else colors.text3, colors.text2, lead) { SwitchTrack(checked) }
 }
 
-/** One of several choices that can each be on, with a check while it is. The whole row toggles it. */
+/** A [ListRow] for one of several choices that can each be on, with a check while it is. The whole row toggles it. */
 @Composable
 fun CheckRow(title: String, text: String?, checked: Boolean, onChange: (Boolean) -> Unit) {
     val colors = AppTheme.colors
     val interaction = remember { MutableInteractionSource() }
-    Row(
-        Modifier
-            .bleed()
-            .defaultMinSize(minHeight = if (text == null) AppSize.rowSingleMinHeight else AppSize.rowMinHeight)
-            .touchState(interaction, RoundedCornerShape(AppSize.rowRadius), selected = false)
-            .toggleable(checked, interactionSource = interaction, indication = null, role = Role.Checkbox, onValueChange = onChange)
-            .padding(horizontal = AppSize.rowPadX, vertical = AppSize.rowPadY),
-        horizontalArrangement = Arrangement.spacedBy(AppSize.rowGap),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(Modifier.weight(1f)) {
-            Text(title, style = AppType.rowTitle, color = colors.text)
-            if (text != null) Text(text, style = AppType.rowText, color = colors.text2)
-        }
+    val touch = Modifier
+        .touchState(interaction, RoundedCornerShape(AppSize.rowRadius), selected = false)
+        .toggleable(checked, interactionSource = interaction, indication = null, role = Role.Checkbox, onValueChange = onChange)
+    RowLayout(title, Modifier, touch, text, null, null, Int.MAX_VALUE, AppType.rowTitle, colors.text, colors.text2, null) {
         Box(Modifier.size(AppSize.iconSmall)) { if (checked) PhIcon(R.drawable.ph_check, tint = colors.accent, size = AppSize.iconSmall) }
     }
 }

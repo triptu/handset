@@ -78,7 +78,7 @@ fun PhoneEventRows(events: PhoneEvents, store: ContextStore) {
     if (destination == null) {
         ListRow(
             "Send events to a routine",
-            text = "Tell a Claude routine, or any web address, when the battery runs low, charging starts or stops, you arrive at or leave a place, or someone you pick writes.",
+            text = "Tell a Claude routine or any web address when the battery runs low, charging starts or stops, you come or go, or someone writes.",
             textLines = 4,
             titleColor = colors.accent,
             lead = { PhIcon(R.drawable.ph_plus, tint = colors.accent) },
@@ -91,7 +91,7 @@ fun PhoneEventRows(events: PhoneEvents, store: ContextStore) {
         SwitchRow("Charging started or stopped", "Each time the charger goes in or comes out.", on[Trigger.CHARGING] == true) { switch(Trigger.CHARGING, it) }
         SwitchRow(
             "Arrived at or left a place",
-            if (events.placesRecording) "Places you named in Days, once you've stayed 10 minutes, and when you leave." else "Nothing is sent while Places is off. Turn it on under What Handset records.",
+            if (events.placesRecording) "Places you named in Days, once you've stayed 10 minutes, and when you leave." else "Nothing is sent while Places is off. Turn it on in Recording.",
             on[Trigger.PLACES] == true,
         ) { switch(Trigger.PLACES, it) }
         SwitchRow("A notification from someone", "From the people and apps you pick.", on[Trigger.NOTIFICATIONS] == true) { switch(Trigger.NOTIFICATIONS, it) }
@@ -99,7 +99,7 @@ fun PhoneEventRows(events: PhoneEvents, store: ContextStore) {
             ListRow("From", text = from.joinToString(", ") { it.label }.ifEmpty { "No one yet" }, textLines = 2, end = { Chevron() }, onClick = { pickFrom = true })
         }
         Text(
-            "An event carries its type, the time, and the battery level, place, person or app. Never what a message says. At most 20 are sent an hour, and each shows in Days.",
+            "Sends the event, its time and the battery, place, person or app. Never what a message says. At most 20 an hour.",
             style = AppType.rowText,
             color = colors.text2,
             modifier = Modifier.padding(vertical = 8.dp),
@@ -209,7 +209,7 @@ private fun FromDialog(store: ContextStore, current: List<From>, onDismiss: () -
             val (people, apps) = choices ?: (emptyList<From.Person>() to emptyList())
             Column(Modifier.padding(top = 8.dp).heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
                 if (choices != null && people.isEmpty() && apps.isEmpty()) {
-                    Text("None yet. Turn on Notifications under What Handset records, and the people and apps that write to you show here.", style = AppType.rowText, color = colors.text2, modifier = Modifier.padding(vertical = 8.dp))
+                    Text("None yet. Turn on Notifications in Recording, and the people and apps that write to you show here.", style = AppType.rowText, color = colors.text2, modifier = Modifier.padding(vertical = 8.dp))
                 }
                 if (people.isNotEmpty()) SectionLabel("People", top = 8.dp)
                 people.forEach { person -> CheckRow(person.name, null, person in picked) { toggle(person, it) } }

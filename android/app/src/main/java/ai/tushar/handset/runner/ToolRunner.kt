@@ -190,7 +190,7 @@ class ToolRunner(
                     id,
                     Code.DENIED,
                     "This needs the user's approval, but Handset's notifications are off, so the phone can't ask. " +
-                        "Ask the user to turn them on, or to turn off asking before Send and Pay in Handset's Settings, under Rules for every agent: $prompt",
+                        "Ask the user to turn them on, or to turn off asking before Send and Pay in Handset's Settings, under Safety: $prompt",
                 )
             }
             Consent.Answer.TIMED_OUT -> {

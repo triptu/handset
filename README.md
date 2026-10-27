@@ -11,7 +11,7 @@ You install it from a file, not from Play. It drives the phone through an access
 <p>
 <img src="docs/progress/images/int-cover-light-1-days.png" width="230" alt="The Days tab: a day's notifications, apps and agent steps in order">
 <img src="docs/progress/images/int-cover-dark-6-agent.png" width="230" alt="An agent's page: switches for notifications, text messages, contacts, location and photos, and its recent steps">
-<img src="docs/progress/images/int-cover-light-5a-settings-middle.png" width="230" alt="Settings: the Send or Pay prompt, the pill, the relay and the direct connection">
+<img src="docs/progress/images/settings-top.png" width="230" alt="Settings: agents, recording, connections, phone events, safety, permissions">
 </p>
 
 ## Install and turn it on
@@ -24,7 +24,7 @@ You need a phone on Android 11 or newer. Build the APK as described under [Build
 
 Android greys out the Accessibility switch for an app installed from a file. Try to turn it on once, then open the app's App info, tap ⋮ and choose Allow restricted settings, and turn it on again.
 
-Setup also offers contacts, text messages, location, photos and videos, and screen time. Each one is off until you turn it on, and each has a switch in Settings. A tool that needs one that is off tells the agent so.
+Setup also offers contacts, text messages, location, photos and videos, and screen time. Each one is off until you turn it on, and each has a switch in Settings, Android permissions. A tool that needs one that is off tells the agent so.
 
 ## Connect an agent
 
@@ -78,7 +78,7 @@ An app on the same phone, such as an on-device chat app, can connect as an agent
 
 Handset knows the app by its package name and the SHA-256 of its signing certificate. Connecting again from the same app gives it a new token and keeps its switches, so it can ask again whenever it lost its token. The same package signed with another key is a different agent. Uninstalling the app removes its agent, and its token stops working. The token works only at `127.0.0.1` on the phone itself, never over Wi-Fi, Tailscale or a relay.
 
-The app shows under Connected agents as "On this phone". Its calls go through every check other agents' calls do: its switches, Send and Pay approval, Stop, the activity record, and Handset's private screens.
+The app shows under Settings, Agents as "On this phone". Its calls go through every check other agents' calls do: its switches, Send and Pay approval, Stop, the activity record, and Handset's private screens.
 
 ## What agents can do
 

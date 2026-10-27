@@ -109,7 +109,7 @@ class ContextTools {
     private fun requireAny(vararg sources: Source) {
         if (sources.none { handset.recording.isOn(it) }) {
             val names = sources.joinToString(" or ") { it.title }
-            throw ToolFailure("The phone isn't recording $names. Ask the user to turn it on in Handset's Settings, under What Handset records.")
+            throw ToolFailure("The phone isn't recording $names. Ask the user to turn it on in Handset's Settings, under Recording.")
         }
     }
 

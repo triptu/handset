@@ -17,6 +17,9 @@ import ai.tushar.handset.ui.settings.AddAgentScreen
 import ai.tushar.handset.ui.settings.AgentDirectory
 import ai.tushar.handset.ui.settings.AgentScreen
 import ai.tushar.handset.ui.settings.ExcludedAppsScreen
+import ai.tushar.handset.ui.settings.SettingsLinks
+import ai.tushar.handset.ui.settings.SettingsSection
+import ai.tushar.handset.ui.settings.SettingsSectionScreen
 import ai.tushar.handset.ui.settings.SettingsTab
 import ai.tushar.handset.ui.theme.AppMotion
 import ai.tushar.handset.ui.theme.AppSize
@@ -94,6 +97,7 @@ enum class Tab(val title: String, @DrawableRes val icon: Int) {
 sealed interface Page {
     data object Search : Page
     data class Moment(val id: MomentId) : Page
+    data class Section(val section: SettingsSection) : Page
     data class Agent(val id: String) : Page
     data object AddAgent : Page
     data object ExcludedApps : Page
@@ -103,6 +107,7 @@ sealed interface Page {
 
     fun encode(): String = when (this) {
         is Moment -> "moment:${id.value}"
+        is Section -> "section:${section.name}"
         is Agent -> "agent:$id"
         else -> this::class.simpleName!!
     }
@@ -111,6 +116,7 @@ sealed interface Page {
         fun decode(text: String): Page = when {
             text.startsWith("moment:") -> Moment(MomentId(text.removePrefix("moment:")))
             text.startsWith("agent:") -> Agent(text.removePrefix("agent:"))
+            text.startsWith("section:") -> Section(SettingsSection.valueOf(text.removePrefix("section:")))
             else -> listOf(Search, AddAgent, ExcludedApps, Setup, About, Licences).first { it::class.simpleName == text }
         }
     }
@@ -148,11 +154,6 @@ fun AppShell(handset: Handset, data: AppData, setup: SetupStatus, version: Int, 
     val pager = rememberPagerState { pageCount }
     val date = dayOfPage(today, pager.currentPage)
 
-    val stack = if (tab == Tab.DAYS) days else settings
-    BackHandler(enabled = stack.isNotEmpty() || tab != Tab.DAYS) {
-        if (stack.isNotEmpty()) stack.removeAt(stack.lastIndex) else tab = Tab.DAYS
-    }
-
     fun openMoment(id: MomentId, wide: Boolean) {
         // On a wide screen the pane holds one moment, so opening another replaces it
         if (wide && days.lastOrNull() is Page.Moment) days[days.lastIndex] = Page.Moment(id) else days.add(Page.Moment(id))
@@ -160,6 +161,25 @@ fun AppShell(handset: Handset, data: AppData, setup: SetupStatus, version: Int, 
 
     BoxWithConstraints(Modifier.fillMaxSize().background(colors.background)) {
         val wide = maxWidth >= AppSize.wideFrom
+        // On a wide screen the section beside Settings' list is its first page, so back from it leaves the tab
+        val stack = if (tab == Tab.DAYS) days else settings
+        val pages = if (wide && tab == Tab.SETTINGS && settings.firstOrNull() is Page.Section) settings.size - 1 else stack.size
+        BackHandler(enabled = pages > 0 || tab != Tab.DAYS) {
+            if (pages > 0) stack.removeAt(stack.lastIndex) else tab = Tab.DAYS
+        }
+        fun openSection(section: SettingsSection) {
+            // A section starts Settings' stack afresh beside the list; on a phone it opens over the list
+            if (wide) settings.clear()
+            settings.add(Page.Section(section))
+        }
+        val links = SettingsLinks(
+            onAgent = { settings.add(Page.Agent(it)) },
+            onAddAgent = { settings.add(Page.AddAgent) },
+            onExcludedApps = { settings.add(Page.ExcludedApps) },
+            onSetup = { settings.add(Page.Setup) },
+            onAbout = { settings.add(Page.About) },
+            onLicences = { settings.add(Page.Licences) },
+        )
         Column(Modifier.fillMaxSize().statusBarsPadding().imePadding()) {
             ActingLine(acting) { handset.switchControl(false) }
             Row(Modifier.weight(1f)) {
@@ -177,7 +197,11 @@ fun AppShell(handset: Handset, data: AppData, setup: SetupStatus, version: Int, 
                                 } else {
                                     Column {
                                         DaysHeader(date, onPickDay = { monthOpen = true }, onSearch = { days.removeAll { it is Page.Moment }; days.add(Page.Search) })
-                                        DayPager(pager, today, data.days, version + edits, selectedMoment.takeIf { wide }, handset.recording.anyOn, { openMoment(it.id, wide) }, { placeOpen = it }, { tab = Tab.SETTINGS }, selectedPlace = placeOpen?.id)
+                                        DayPager(pager, today, data.days, version + edits, selectedMoment.takeIf { wide }, handset.recording.anyOn, { openMoment(it.id, wide) }, { placeOpen = it }, {
+                                            tab = Tab.SETTINGS
+                                            settings.clear()
+                                            settings.add(Page.Section(SettingsSection.RECORDING))
+                                        }, selectedPlace = placeOpen?.id)
                                     }
                                 }
                             }
@@ -205,33 +229,49 @@ fun AppShell(handset: Handset, data: AppData, setup: SetupStatus, version: Int, 
                                 }
                             }
                         }
-                        Tab.SETTINGS -> Fade(settings.lastOrNull()) { top ->
-                            val back: () -> Unit = { settings.removeAt(settings.lastIndex) }
-                            when (top) {
-                                null -> holder.SaveableStateProvider("settings") {
-                                    SettingsTab(
-                                        handset, data.agents, data.days, setup, controlEnabled,
-                                        onAgent = { settings.add(Page.Agent(it)) },
-                                        onAddAgent = { settings.add(Page.AddAgent) },
-                                        onExcludedApps = { settings.add(Page.ExcludedApps) },
-                                        onSetup = { settings.add(Page.Setup) },
-                                        onAbout = { settings.add(Page.About) },
-                                        onLicences = { settings.add(Page.Licences) },
-                                    )
+                        Tab.SETTINGS -> {
+                            // A page of Settings: on a phone over the list, and on a wide screen in the pane beside it
+                            val settingsPage: @Composable (Page) -> Unit = { top ->
+                                val back: () -> Unit = { settings.removeAt(settings.lastIndex) }
+                                when (top) {
+                                    is Page.Section -> SettingsSectionScreen(top.section, handset, data.agents, data.days, setup, links, onBack = back.takeIf { !wide })
+                                    Page.AddAgent -> AddAgentScreen(data.agents, handset.mcp, onBack = back) { id ->
+                                        settings[settings.lastIndex] = Page.Agent(id)
+                                    }
+                                    is Page.Agent -> AgentScreen(top.id, data.agents, data.days, handset.mcp, onBack = back, onConnections = {
+                                        settings.clear()
+                                        settings.add(Page.Section(SettingsSection.CONNECTIONS))
+                                    }) { id ->
+                                        tab = Tab.DAYS
+                                        days.removeAll { it is Page.Moment }
+                                        days.add(Page.Moment(id))
+                                    }
+                                    Page.ExcludedApps -> ExcludedAppsScreen(onBack = back)
+                                    Page.Setup -> setupScreen(back)
+                                    Page.About -> AboutScreen(onBack = back)
+                                    Page.Licences -> LicencesScreen(onBack = back)
+                                    else -> Unit
                                 }
-                                Page.AddAgent -> AddAgentScreen(data.agents, handset.mcp, onBack = back) { id ->
-                                    settings[settings.lastIndex] = Page.Agent(id)
+                            }
+                            val list: @Composable (SettingsSection?) -> Unit = { selected ->
+                                holder.SaveableStateProvider("settings") {
+                                    SettingsTab(handset, data.agents, setup, controlEnabled, selected, ::openSection)
                                 }
-                                is Page.Agent -> AgentScreen(top.id, data.agents, data.days, handset.mcp, onBack = back, onConnections = { settings.clear() }) { id ->
-                                    tab = Tab.DAYS
-                                    days.removeAll { it is Page.Moment }
-                                    days.add(Page.Moment(id))
+                            }
+                            if (wide) {
+                                val section = (settings.firstOrNull() as? Page.Section)?.section ?: SettingsSection.entries.first()
+                                Row(Modifier.fillMaxSize()) {
+                                    Box(Modifier.width(AppSize.listWidth).fillMaxHeight()) { list(section) }
+                                    Box(
+                                        Modifier.weight(1f).fillMaxHeight().padding(start = 8.dp, end = 12.dp)
+                                            .clip(RoundedCornerShape(topStart = AppSize.paneRadius, topEnd = AppSize.paneRadius))
+                                            .background(colors.pane),
+                                    ) {
+                                        Fade(settings.lastOrNull() ?: Page.Section(section)) { settingsPage(it) }
+                                    }
                                 }
-                                Page.ExcludedApps -> ExcludedAppsScreen(onBack = back)
-                                Page.Setup -> setupScreen(back)
-                                Page.About -> AboutScreen(onBack = back)
-                                Page.Licences -> LicencesScreen(onBack = back)
-                                else -> Unit
+                            } else {
+                                Fade(settings.lastOrNull()) { top -> if (top == null) list(null) else settingsPage(top) }
                             }
                         }
                     }
