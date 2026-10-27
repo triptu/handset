@@ -2,9 +2,9 @@
 
 # Handset
 
-Handset is an Android app that gives your AI agents your phone. Claude, ChatGPT, Claude Code, Codex or any other MCP client can read the screen, open apps, tap, type and scroll, the way you would. It can also keep a private record of what you did on the phone each day, which you browse in the app and your agents can search.
+Handset gives your AI agents your phone. Claude, ChatGPT, Claude Code, Codex or any other MCP client can read the screen, open apps, tap, type and scroll, the way you would. It can also keep a private record of your day on the phone, which you browse in the app and your agents can search.
 
-Everything stays on the phone unless you connect an agent. Each agent gets its own switches for what it may read. A tap on Send or Pay waits for your tap. Stop ends anything. The app is open source under the MIT license.
+Nothing leaves the phone until you connect an agent, and each agent gets its own switches for what it may read. A tap on Send or Pay waits for your tap. Stop ends anything. The app is open source under the MIT license.
 
 You install it from a file, not from Play. It drives the phone through an accessibility service, and Play allows those only in apps for people with disabilities.
 
@@ -18,21 +18,15 @@ You install it from a file, not from Play. It drives the phone through an access
 
 You need a phone on Android 11 or newer. On the phone, download [handset.apk](https://github.com/triptu/handset/releases/latest/download/handset.apk), the newest release, and open it to install. Each [release](https://github.com/triptu/handset/releases) lists the APK's SHA-256 and its signing certificate, so you can check what you install. A newer APK installs over the old one and keeps your settings. You can also [build it from source](#build-from-source).
 
-Open the app. Its setup screen walks through three Android settings:
+Open the app. Its setup screen walks through three Android settings. Accessibility lets agents read the screen and act on it. Notification access lets them read and reply to notifications and control what's playing. Unrestricted battery keeps the phone reachable while the screen is off.
 
-- **Accessibility** lets agents read the screen and act on it.
-- **Notification access** lets them read and reply to notifications and control what's playing.
-- **Unrestricted battery** keeps the phone reachable while the screen is off.
+Android greys out the Accessibility switch for an app installed from a file. Try to turn it on once, then open the app's App info, tap ⋮, choose Allow restricted settings, and turn it on again.
 
-Android greys out the Accessibility switch for an app installed from a file. Try to turn it on once, then open the app's App info, tap ⋮ and choose Allow restricted settings, and turn it on again.
-
-Setup also offers contacts, text messages, location, photos and videos, and screen time. Each one is off until you turn it on, and each has a switch in Settings, Android permissions. A tool that needs one that is off tells the agent so.
+Setup also offers contacts, text messages, location, photos and videos, and screen time. Each is off until you turn it on, and each has a switch under Settings, Android permissions. When a tool needs one you left off, it tells the agent which one.
 
 ## Connect an agent
 
-Agents reach the phone one of two ways. Both are off until you turn them on.
-
-To stop one agent for a while without removing it, turn off the switch at the top of its page under Settings, Agents. Its calls are refused until you turn it on again, and it keeps its token or sign-in and its switches. Connecting an app again, or signing in again from the same relay client, turns a paused agent back on.
+There are three ways in, and all are off until you turn them on.
 
 ### Through a relay, for claude.ai and ChatGPT
 
@@ -42,7 +36,7 @@ The relay is a small Cloudflare Worker you deploy yourself. It gives your phone 
 2. Add that address as a custom connector in claude.ai or as a custom MCP app in ChatGPT. On the relay's sign-in page, enter the phone ID Handset shows.
 3. The phone shows a notification with the site that asked, the client's name and a six-digit code. Allow only if you started the sign-in on that site and the code matches the browser.
 
-The approved agent appears under Settings, Agents, with every switch off. Turn on only what it needs. Removing it there revokes its grant. **Disconnect the relay** removes every agent that signed in through it.
+The agent then appears under Settings, Agents, with every switch off. Turn on only what it needs. Removing it there revokes its grant, and **Disconnect the relay** removes every agent that signed in through it.
 
 A Claude connector works in the Claude apps under the same account, and in Claude routines. The phone must be online when the agent calls it.
 
@@ -64,13 +58,13 @@ export HANDSET_TOKEN=hs_...
 codex mcp add handset --url http://100.101.102.103:8765/mcp --bearer-token-env-var HANDSET_TOKEN
 ```
 
-Any MCP client needs that URL and the header `Authorization: Bearer <token>`. The traffic is plain HTTP, which Tailscale encrypts. On Wi-Fi anyone on the network could read it, so turn on **Also on Wi-Fi** only on a network you trust. **New token** on the agent's page replaces its token. **Remove** revokes it. The phone keeps only a hash of each token.
+Any MCP client needs that URL and the header `Authorization: Bearer <token>`. The traffic is plain HTTP. Tailscale encrypts it, but on Wi-Fi anyone on the network could read it, so turn on **Also on Wi-Fi** only on a network you trust. **New token** on the agent's page replaces its token and **Remove** revokes it. The phone keeps only a hash of each token.
 
 To try it from a computer over USB, forward the port with `adb forward tcp:8765 tcp:8765` and use `127.0.0.1` as the address.
 
 ### From another app on this phone
 
-An app on the same phone, such as an on-device chat app, can connect as an agent with one tap. Nobody copies a token.
+An app on the same phone, such as an on-device chat app, can connect as an agent with one tap, and nobody copies a token. This is the contract an app builds to.
 
 1. The app starts the action `ai.tushar.handset.action.CONNECT_APP` for a result, with `ActivityResultContracts.StartActivityForResult` or `startActivityForResult`. A plain `startActivity` is refused, since Handset must know which app is asking. On Android 11 and later, add `<queries><package android:name="ai.tushar.handset" /></queries>` to the app's manifest.
 2. Handset shows "<App> wants to use this phone" with the app's name, icon and package, and the same switches as any agent's page, all off. The user taps **Allow** or **Don't allow**.
@@ -84,9 +78,13 @@ Handset knows the app by its package name and the SHA-256 of its signing certifi
 
 The app shows under Settings, Agents as "On this phone". Its calls go through every check other agents' calls do: its switches, Send and Pay approval, Stop, the activity record, and Handset's private screens.
 
+### Pausing an agent
+
+To stop one agent for a while without removing it, turn off the switch at the top of its page under Settings, Agents. Its calls are refused until you turn it on again, and it keeps its token or sign-in and its switches. Connecting an app again, or signing in again from the same relay client, turns a paused agent back on.
+
 ## What agents can do
 
-Every agent can read the screen, the phone's status, the app list and screen time, and act on the screen. Notifications, text messages, contacts, location, and photos and videos are off for each agent until you turn them on on its page under Settings, Agents. Agents can't open or read Handset's own screens.
+Every agent can read the screen, the phone's status, the app list and screen time, and act on the screen. Notifications, text messages, contacts, location, and photos and videos are off for each agent until you turn them on, on its page under Settings, Agents. Agents can't open or read Handset's own screens.
 
 | Tools | What they do |
 |---|---|
@@ -99,33 +97,29 @@ Every agent can read the screen, the phone's status, the app list and screen tim
 | `read_sms`, `find_contact`, `get_location`, `list_media`, `view_media`, `share_media` | Your own things, each behind its switch. |
 | `search_context`, `day_timeline` | Search the day record, and read one day's apps, places, notifications and agent steps in order. |
 
-Screen actions run one at a time, in the order they arrive, so the actions an agent sends in one turn don't race. Each action waits for the screen to settle before it answers, and says whether anything changed. The rest run as soon as they arrive. A call has 2 minutes by default. [docs/development.md](docs/development.md) describes how a call settles and how to try tools over adb.
-
-### What you see
+Screen actions run one at a time, in the order they arrive, so the actions an agent sends in one turn don't race. Each waits for the screen to settle before it answers, and says whether anything changed. The other tools run as soon as they arrive. A call has 2 minutes by default. [docs/development.md](docs/development.md) describes how a call settles and how to try tools over adb.
 
 While an agent works, a pill at the top of the screen says who is doing what, such as "Claude Code is opening Clock", with Stop. Each tap shows as a ring and each swipe as a moving dot. Stop ends the running call and the waiting ones, and refuses new ones until you turn agents on again.
 
-With **Ask me before tapping Send or Pay** on, a tap on an element labelled Send, Pay, Buy, Order, Transfer, Post or Publish waits for you to tap Allow in a notification. While it waits, other screen calls wait too, so the agent can't tap Allow itself.
+With **Ask me before tapping Send or Pay** on, a tap on an element labelled Send, Pay, Buy, Order, Transfer, Post or Publish waits for you to tap Allow in a notification. Other screen calls wait with it, so the agent can't tap Allow itself.
 
 Every step an agent takes, refused and stopped ones included, is kept in the day record and shows in Days.
 
 ## The day record
 
-Under Settings, Recording, four sources each have a switch, all off at first:
-
-- **Screen text**, the text of the screens you open, for search.
-- **Notifications** as they arrive, for catching up.
-- **App use**, which app was open and when.
-- **Places**, where you stayed 10 minutes or more. Tap a place in Days to name it.
+Under Settings, Recording, four sources each have a switch, all off at first. Screen text keeps the text of the screens you open, for search. Notifications are kept as they arrive, for catching up. App use is which app was open and when. Places are where you stayed 10 minutes or more. Tap a place in Days to name it.
 
 The Days tab shows each day by time. Open a moment to read the screens you saw, a conversation, or an agent's steps, and search everything kept. **Pause for an hour** stops recording, from Settings or a quick settings tile. **Delete today** removes everything since midnight. Password managers, payment apps, keyboards and the apps you add under **Apps never read** are never recorded.
 
 ## Privacy
 
-- **What is stored.** The day record and every agent's steps, in a database in the app's private storage on the phone. Screen text and notifications are kept 7, 30 or 90 days, as you choose. App use, places, agent steps and phone events are kept a year.
-- **What leaves the phone.** A tool's result goes to the agent that called it. Phone events go to the one address you gave. Nothing else is sent, and the day record is never uploaded.
-- **Who is in between.** A direct connection has nobody. A relay connection passes through Cloudflare and your relay, which can read calls in transit, and the AI provider receives the results. The relay stores sign-in records, never call content. The [relay guide](relay/README.md#privacy) has the detail.
-- **What each agent sees.** Only the sources you turned on for it. Search and the day's timeline leave out what it can't read. Another agent's steps show only the tool and whether it worked.
+The day record and every agent's steps live in a database in the app's private storage on the phone. Screen text and notifications are kept 7, 30 or 90 days, as you choose. App use, places, agent steps and phone events are kept a year.
+
+A tool's result goes to the agent that called it. Phone events go to the one address you gave. Nothing else is sent, and the day record is never uploaded.
+
+A direct connection has nobody in between. A relay connection passes through Cloudflare and your relay, which can read calls in transit, and the AI provider receives the results. The relay stores sign-in records, never call content. The [relay guide](relay/README.md#privacy) has the detail.
+
+Each agent sees only the sources you turned on for it. Search and the day's timeline leave out what it can't read. Another agent's steps show only the tool and whether it worked.
 
 ## Phone events
 
