@@ -11,10 +11,10 @@ import java.time.Instant
 /** Settings' top level, one row per section, in this order. Agents' error messages name these titles. */
 enum class SettingsSection(val title: String, @DrawableRes val icon: Int) {
     AGENTS("Agents", R.drawable.ph_robot),
-    CONNECTIONS("Connections", R.drawable.ph_plugs),
-    SAFETY("Safety", R.drawable.ph_shield_check),
     RECORDING("Recording", R.drawable.ph_record),
+    CONNECTIONS("Connections", R.drawable.ph_plugs),
     PHONE_EVENTS("Phone events", R.drawable.ph_lightning),
+    SAFETY("Safety", R.drawable.ph_shield_check),
     PERMISSIONS("Android permissions", R.drawable.ph_key),
     ABOUT("About", R.drawable.ph_info),
 }
