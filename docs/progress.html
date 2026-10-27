@@ -73,10 +73,7 @@
 
 <h2>Running</h2>
 
-<div class="entry running">
-  <h3>Chat through nano-chat, not a second chat app <span class="time">20:02</span></h3>
-  <p>Your call: "make it possible for my nano-chat repo to use this, so there aren't two separate local chat apps". Two agents in parallel, both Claude Opus. Handset (branch <code>connect-app</code>): another app on the phone asks to connect, Handset shows "Nano Chat wants to use this phone" with the access switches and Allow, and hands back a local address and token. nano-chat (branch <code>handset</code> in its repo): a "Use this phone" switch per companion and a small tool loop for Nano and Gemma: search your day, catch up, status, open an app, alarms, timers, Do not disturb. Screen-driving tools are left out: their results don't fit Gemma's 2k context and small models drive screens poorly.</p>
-</div>
+
 
 
 </div>
@@ -178,6 +175,10 @@
 </ul>
 
 <h2>Shipped</h2>
+<div class="entry shipped">
+  <h3>Chat through nano-chat, on your phone <span class="time">21:05</span></h3>
+  <p>nano-chat's main (local repo, no remote) now has a "Use this phone" switch per companion, connecting through Handset's one-tap screen. Gemma uses LiteRT-LM's native tool calling; Nano (no function calling in the ML Kit version the app uses) uses a JSON call format with one retry. Tools: search, catch up, day timeline, status, open app, alarm, timer, Do not disturb, what's playing; at most 3 per reply, results cut to fit the context. Astra's review led to three fixes: once a reply has read anything from your phone, it can't act for the rest of that reply (so a message can't make it turn on Do not disturb); a failed reply keeps its completed steps and Try again doesn't repeat them; turning the switch off stops a running reply and deletes the token when no companion uses it. 44 tests. Not yet tried with the real Nano and Gemma on your Fold.</p>
+</div>
 <div class="entry shipped">
   <h3>Settings as pages, on your phone <span class="time">20:25</span></h3>
   <p>A short top level like Android's own Settings: the master switch, then Agents, Recording, Connections, Phone events, Safety, Android permissions, About, each with its current state and its own page. No control dropped. The README screenshot is updated.</p>
