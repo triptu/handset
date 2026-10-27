@@ -43,7 +43,9 @@ cut)
     git commit -q -m "Version $version" -- "$GRADLE_FILE"
   fi
   git tag -a "v$version" -F "$notes"
-  git push -q origin main "v$version"
+  # Two pushes: GitHub starts no workflow for a tag pushed together with its branch
+  git push -q origin main
+  git push -q origin "v$version"
   echo "Pushed main and v$version"
   ;;
 verify)
