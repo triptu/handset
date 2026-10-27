@@ -11,6 +11,7 @@ import java.time.Instant
 class SettingsSummaryTest {
     private val off = SettingsState(
         agents = emptyList(),
+        pausedAgents = 0,
         recording = emptyList(),
         keep = Keep.MONTH,
         pausedUntil = null,
@@ -37,6 +38,8 @@ class SettingsSummaryTest {
     @Test
     fun `agents are listed by name`() {
         assertEquals("Claude, Claude Code", off.copy(agents = listOf("Claude", "Claude Code")).text(SettingsSection.AGENTS))
+        assertEquals("Claude · 1 paused", off.copy(agents = listOf("Claude"), pausedAgents = 1).text(SettingsSection.AGENTS))
+        assertEquals("2 paused", off.copy(pausedAgents = 2).text(SettingsSection.AGENTS))
     }
 
     @Test

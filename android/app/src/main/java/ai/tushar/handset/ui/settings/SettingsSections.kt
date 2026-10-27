@@ -20,12 +20,14 @@ enum class SettingsSection(val title: String, @DrawableRes val icon: Int) {
 }
 
 /**
- * What the top level reads to sum up each section. [recording] holds the sources that are on and allowed, [relay] is
+ * What the top level reads to sum up each section. [agents] are the names of the agents that are on, beside a count of
+ * [pausedAgents]. [recording] holds the sources that are on and allowed, [relay] is
  * null until a relay is connected, [events] is null until events have an address, and [pausedUntil] is null unless
  * recording is paused.
  */
 data class SettingsState(
     val agents: List<String>,
+    val pausedAgents: Int,
     val recording: List<Source>,
     val keep: Keep,
     val pausedUntil: Instant?,
@@ -41,7 +43,9 @@ data class SettingsState(
 data class Summary(val text: String, val attention: Boolean = false)
 
 fun SettingsState.summary(section: SettingsSection, time: (Instant) -> String): Summary = when (section) {
-    SettingsSection.AGENTS -> Summary(agents.joinToString(", ").ifEmpty { "None yet" })
+    SettingsSection.AGENTS -> Summary(
+        listOfNotNull(agents.joinToString(", ").ifEmpty { null }, "$pausedAgents paused".takeIf { pausedAgents > 0 }).joinToString(" · ").ifEmpty { "None yet" },
+    )
     SettingsSection.CONNECTIONS -> Summary(
         listOfNotNull(
             when (relay) {

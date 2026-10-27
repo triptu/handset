@@ -188,6 +188,9 @@ object AppSize {
 }
 
 /** Durations in ms. Things come in fast and leave a little slower. */
+/** How faint a control that can't be used now is drawn */
+const val DisabledAlpha = 0.4f
+
 object AppMotion {
     const val fast = 150
     const val slow = 220

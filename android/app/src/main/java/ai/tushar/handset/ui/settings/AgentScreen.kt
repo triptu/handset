@@ -64,6 +64,11 @@ fun AgentScreen(id: String, agents: AgentDirectory, days: DayRepository, mcp: Mc
     Column(Modifier.fillMaxSize()) {
         PageHeader(agent.name, onBack = onBack)
         PageColumn(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+            SwitchRow(
+                "Let ${agent.name} use this phone",
+                if (agent.enabled) "Off ends its running step and refuses new ones. It stays connected." else "${agent.name} can't act until you turn this on. It stays connected.",
+                agent.enabled,
+            ) { agents.setEnabled(agent.id, it) }
             if (agent.added != null) {
                 val day = format.longDay(agent.added).let { if (agent.added >= LocalDate.now().minusDays(1)) it.lowercase() else it }
                 Text("Added $day.", style = AppType.rowText, color = colors.text2)
@@ -77,7 +82,7 @@ fun AgentScreen(id: String, agents: AgentDirectory, days: DayRepository, mcp: Mc
                 modifier = Modifier.padding(bottom = 6.dp),
             )
             Source.entries.forEach { source ->
-                SwitchRow(source.title, source.detail, source in agent.sources) { agents.setSource(agent.id, source, it) }
+                SwitchRow(source.title, source.detail, source in agent.sources, enabled = agent.enabled) { agents.setSource(agent.id, source, it) }
             }
 
             SectionLabel("How it connects")
