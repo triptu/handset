@@ -20,6 +20,7 @@ import ai.tushar.handset.runner.ToolRunner
 import ai.tushar.handset.tools.CallLabels
 import ai.tushar.handset.tools.ToolArgs
 import ai.tushar.handset.tools.Toolkit
+import ai.tushar.handset.transport.mcp.McpHandler
 import ai.tushar.handset.transport.mcp.McpServer
 import ai.tushar.handset.transport.mcp.certificate
 import android.app.Application
@@ -99,7 +100,9 @@ class Handset(context: Context) {
     }
 
     /** The MCP server's switch and the agents the user added */
-    val mcp = McpServer(context)
+    val mcp = McpServer(context).also { server ->
+        server.agents.onPause = { agent -> runner.stopAgent(agent.id, McpHandler.paused(agent.name)) }
+    }
     val relay = ai.tushar.handset.transport.relay.RelayClient(context, this)
 
     /** The text of the screens the user saw, while Screen text is on. It is written to the store, on the phone. */

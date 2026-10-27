@@ -57,13 +57,13 @@ class RelayClient(private val context: Context, private val handset: Handset) {
     }
 
     init {
-        handset.mcp.agents.beforeRemove = { agent -> agent.relayGrantId?.let { grant ->
+        handset.mcp.agents.beforeRevoke = { grant ->
             tombstone(grant)
             scope.launch {
                 callGrants.filterValues { it == grant }.keys.toList().forEach { calls[it]?.cancel() }
                 sendRevoke(grant)
             }
-        } }
+        }
     }
 
     /** Call from the UI with the pasted/scanned HTTPS origin. No network starts until this call. */
@@ -246,7 +246,7 @@ class RelayClient(private val context: Context, private val handset: Handset) {
                 val allow = answer == Consent.Answer.ALLOWED && System.currentTimeMillis() < expires && grant !in tombstones()
                 if (allow) {
                     check(prefs.edit().putLong("provisional:$grant", expires).commit())
-                    handset.mcp.agents.addRelay(name, grant, host)
+                    handset.mcp.agents.addRelay(name, grant, host, message.text("clientId"))
                 }
                 if (allow) socket?.send(frame("approval_answer") { put("id", id); put("allow", true) })
                 else denyApproval(id, when (answer) {

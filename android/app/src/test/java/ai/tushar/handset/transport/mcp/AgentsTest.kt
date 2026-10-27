@@ -1,6 +1,11 @@
 package ai.tushar.handset.transport.mcp
 
+import ai.tushar.handset.runner.ToolResult
+import ai.tushar.handset.tools.PhoneTool
+import ai.tushar.handset.tools.ToolOutput
+import ai.tushar.handset.tools.objectSchema
 import android.content.SharedPreferences
+import kotlinx.coroutines.runBlocking
 import java.lang.reflect.Proxy
 import org.junit.Assert.*
 import org.junit.Test
@@ -45,6 +50,79 @@ class AgentsTest {
         assertEquals(first.id, agents.find(newToken)!!.id)
         assertFalse(second.canRenew)
         assertNull(agents.renew(second))
+    }
+
+    @Test fun aPausedAgentIsRefusedAndRecordedThenItsTokenWorksAgain() {
+        val agents = Agents(preferences())
+        val (agent, token) = agents.add("Codex")
+        agents.setSource(agent, Source.CONTACTS, true)
+        val paused = mutableListOf<String>()
+        agents.onPause = { paused += it.id }
+        val ran = mutableListOf<String>()
+        val refused = mutableListOf<String>()
+        val handler = McpHandler(
+            listOf(PhoneTool("device_status", "Status", objectSchema()) { ToolOutput("Battery 80%") }),
+            agents::find,
+            { call -> ran += call.tool; ToolResult.Done(call.id, ToolOutput("Battery 80%"), 1) },
+            "",
+            "test",
+            refused = { call, detail -> refused += "${call.agent} ${call.tool}: $detail" },
+        )
+        val call = """{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"device_status"}}"""
+        val auth = mapOf("Authorization" to "Bearer $token")
+
+        agents.setEnabled(agent, false)
+        assertEquals(listOf(agent.id), paused)
+        val reply = runBlocking { handler.handle(call, auth) }
+        assertEquals(200, reply.status)
+        assertTrue(reply.json!!, reply.json.contains("\"isError\":true"))
+        assertTrue(reply.json, reply.json.contains(McpHandler.paused("Codex")))
+        assertEquals(listOf("Codex device_status: Paused"), refused)
+        assertTrue(ran.isEmpty())
+
+        agents.setEnabled(agent, true)
+        val again = runBlocking { handler.handle(call, auth) }
+        assertTrue(again.json!!, again.json.contains("Battery 80%"))
+        assertEquals(listOf("device_status"), ran)
+        assertEquals(setOf(Source.CONTACTS), agents.all.value.single().sources)
+    }
+
+    @Test fun anAppConnectingAgainWhilePausedIsTurnedOn() {
+        val agents = Agents(preferences())
+        val app = PhoneApp("ai.tushar.nanochat", "aa11")
+        val (agent, _) = agents.connectApp("Nano Chat", app, setOf(Source.CONTACTS))
+        agents.setEnabled(agent, false)
+        assertFalse(agents.all.value.single().enabled)
+        val (again, token) = agents.connectApp("Nano Chat", app, setOf(Source.CONTACTS))
+        assertEquals(agent.id, again.id)
+        assertTrue(agents.find(token)!!.enabled)
+    }
+
+    @Test fun aPausedRelayAgentSigningInAgainTakesTheNewGrant() {
+        val agents = Agents(preferences())
+        val revoked = mutableListOf<String>()
+        agents.beforeRevoke = { revoked += it }
+        val first = agents.addRelay("Claude", "grant-1", "claude.ai", "client")
+        agents.setSource(first, Source.LOCATION, true)
+        // Signing in again while it is on adds another agent, as before
+        val second = agents.addRelay("Claude", "grant-2", "claude.ai", "client")
+        assertNotEquals(first.id, second.id)
+        agents.remove(second)
+        agents.setEnabled(first, false)
+        val back = agents.addRelay("Claude", "grant-3", "claude.ai", "client")
+        assertEquals(first.id, back.id)
+        val kept = agents.all.value.single()
+        assertEquals("grant-3", kept.relayGrantId)
+        assertTrue(kept.enabled)
+        assertEquals(setOf(Source.LOCATION), kept.sources)
+        assertEquals(listOf("grant-2", "grant-1"), revoked)
+    }
+
+    @Test fun aPausedAgentStaysPausedAfterReload() {
+        val prefs = preferences()
+        val agent = Agents(prefs).add("Codex").first
+        Agents(prefs).setEnabled(agent, false)
+        assertFalse(Agents(prefs).all.value.single().enabled)
     }
 
     @Test fun anotherCertificateForTheSamePackageIsAnotherAgent() {
