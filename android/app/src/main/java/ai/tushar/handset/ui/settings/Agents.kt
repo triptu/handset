@@ -16,9 +16,17 @@ import java.time.ZoneId
 /**
  * An agent the user connected and what it may read. [added] is null for an agent added before the day was kept. [via]
  * is the site an agent signed in from through the relay, such as claude.ai, which has no token to renew. [app] is the
- * package of an app on this phone that connected itself and holds its own token.
+ * package of an app on this phone that connected itself and holds its own token. [enabled] is false while it is paused.
  */
-data class ConnectedAgent(val id: String, val name: String, val added: LocalDate?, val sources: Set<Source>, val via: String? = null, val app: String? = null) {
+data class ConnectedAgent(
+    val id: String,
+    val name: String,
+    val added: LocalDate?,
+    val sources: Set<Source>,
+    val via: String? = null,
+    val app: String? = null,
+    val enabled: Boolean = true,
+) {
     val canRenew: Boolean get() = via == null && app == null
 }
 
@@ -35,6 +43,9 @@ interface AgentDirectory {
     fun renew(id: String): NewToken?
 
     fun setSource(id: String, source: Source, on: Boolean)
+
+    /** Pauses the agent, ending its calls, or turns it on again with everything it had */
+    fun setEnabled(id: String, on: Boolean)
 
     /** Revokes the agent's access at once */
     fun remove(id: String)
@@ -53,6 +64,7 @@ class McpAgentDirectory(private val registry: Agents, scope: CoroutineScope, pri
         agent.sources,
         agent.relayHost ?: if (agent.viaRelay) "the relay" else null,
         agent.app?.packageName,
+        agent.enabled,
     )
 
     private fun find(id: String) = registry.all.value.firstOrNull { it.id == id }
@@ -63,6 +75,10 @@ class McpAgentDirectory(private val registry: Agents, scope: CoroutineScope, pri
 
     override fun setSource(id: String, source: Source, on: Boolean) {
         find(id)?.let { registry.setSource(it, source, on) }
+    }
+
+    override fun setEnabled(id: String, on: Boolean) {
+        find(id)?.let { registry.setEnabled(it, on) }
     }
 
     override fun remove(id: String) {
@@ -76,7 +92,7 @@ class FakeAgentDirectory(private val today: LocalDate = LocalDate.now()) : Agent
         listOf(
             ConnectedAgent("claude", "Claude", today.minusDays(15), setOf(Source.NOTIFICATIONS, Source.CONTACTS, Source.LOCATION), via = "claude.ai"),
             ConnectedAgent("claude-code", "Claude Code", today.minusDays(13), setOf(Source.NOTIFICATIONS)),
-            ConnectedAgent("chatgpt", "ChatGPT", today.minusDays(25), setOf(Source.LOCATION), via = "chatgpt.com"),
+            ConnectedAgent("chatgpt", "ChatGPT", today.minusDays(25), setOf(Source.LOCATION), via = "chatgpt.com", enabled = false),
             ConnectedAgent("nano-chat", "Nano Chat", today.minusDays(2), emptySet(), app = "ai.tushar.nanochat"),
         ),
     )
@@ -94,6 +110,8 @@ class FakeAgentDirectory(private val today: LocalDate = LocalDate.now()) : Agent
     override fun setSource(id: String, source: Source, on: Boolean) = state.update { all ->
         all.map { if (it.id == id) it.copy(sources = if (on) it.sources + source else it.sources - source) else it }
     }
+
+    override fun setEnabled(id: String, on: Boolean) = state.update { all -> all.map { if (it.id == id) it.copy(enabled = on) else it } }
 
     override fun remove(id: String) = state.update { all -> all.filter { it.id != id } }
 }

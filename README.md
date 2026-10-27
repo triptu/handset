@@ -30,6 +30,8 @@ Setup also offers contacts, text messages, location, photos and videos, and scre
 
 Agents reach the phone one of two ways. Both are off until you turn them on.
 
+To stop one agent for a while without removing it, turn off the switch at the top of its page under Settings, Agents. Its calls are refused until you turn it on again, and it keeps its token or sign-in and its switches. Connecting an app again, or signing in again from the same relay client, turns a paused agent back on.
+
 ### Through a relay, for claude.ai and ChatGPT
 
 The relay is a small Cloudflare Worker you deploy yourself. It gives your phone a public HTTPS address. The phone connects out to it, so it needs no public IP or open port. The [relay guide](relay/README.md) covers deploying it in three commands and adding it to Claude or ChatGPT.
@@ -76,7 +78,7 @@ An app on the same phone, such as an on-device chat app, can connect as an agent
    - `agent_id`: the agent's id in Handset
 4. Otherwise it returns `RESULT_CANCELED` with `reason`: `denied` (the user said no or went back), `not_for_result`, `handset_off` (agents are switched off in Handset), or `port_in_use` (another app holds port 8765 on the phone, so Handset gave no token).
 
-Handset knows the app by its package name and the SHA-256 of its signing certificate. Connecting again from the same app gives it a new token and keeps its switches, so it can ask again whenever it lost its token. The same package signed with another key is a different agent. Uninstalling the app removes its agent, and its token stops working. The token works only at `127.0.0.1` on the phone itself, never over Wi-Fi, Tailscale or a relay.
+Handset knows the app by its package name and the SHA-256 of its signing certificate. Connecting again from the same app gives it a new token, keeps its switches and turns it on if it was paused, so it can ask again whenever it lost its token. The same package signed with another key is a different agent. Uninstalling the app removes its agent, and its token stops working. The token works only at `127.0.0.1` on the phone itself, never over Wi-Fi, Tailscale or a relay.
 
 The app shows under Settings, Agents as "On this phone". Its calls go through every check other agents' calls do: its switches, Send and Pay approval, Stop, the activity record, and Handset's private screens.
 

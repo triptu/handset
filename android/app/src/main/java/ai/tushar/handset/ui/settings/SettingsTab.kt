@@ -124,7 +124,8 @@ private fun rememberSettingsState(handset: Handset, agents: AgentDirectory, setu
     return remember(version, connected, relay, relayUrl, direct, pausedUntil, setup) {
         val recording = handset.recording
         SettingsState(
-            agents = connected.map { it.name },
+            agents = connected.filter { it.enabled }.map { it.name },
+            pausedAgents = connected.count { !it.enabled },
             recording = Source.entries.filter { recording.isOn(it) && it.granted(context) },
             keep = recording.keep,
             pausedUntil = Instant.ofEpochMilli(pausedUntil).takeIf { pausedUntil > System.currentTimeMillis() },
@@ -188,7 +189,8 @@ private fun AgentsSection(agents: AgentDirectory, days: DayRepository, onBack: (
         connected.forEach { agent ->
             ListRow(
                 agent.name,
-                text = agent.via?.let { "via $it" } ?: agent.app?.let { listOfNotNull("On this phone", lastUsed[agent.id]?.let { "last used ${format.moment(it)}" }).joinToString(" · ") } ?: lastUsed[agent.id]?.let { "Last used ${format.moment(it)}" } ?: "Not used yet",
+                text = (agent.via?.let { "via $it" } ?: agent.app?.let { listOfNotNull("On this phone", lastUsed[agent.id]?.let { "last used ${format.moment(it)}" }).joinToString(" · ") } ?: lastUsed[agent.id]?.let { "Last used ${format.moment(it)}" } ?: "Not used yet")
+                    .let { if (agent.enabled) it else "Paused · ${it.replaceFirstChar(Char::lowercaseChar)}" },
                 lead = { AgentGlyph(agent.name) },
                 end = { Chevron() },
                 onClick = { links.onAgent(agent.id) },

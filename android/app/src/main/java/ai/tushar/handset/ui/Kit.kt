@@ -4,6 +4,7 @@ import ai.tushar.handset.R
 import ai.tushar.handset.ui.theme.AppMotion
 import ai.tushar.handset.ui.theme.AppSize
 import ai.tushar.handset.ui.theme.AppTheme
+import ai.tushar.handset.ui.theme.DisabledAlpha
 import ai.tushar.handset.ui.theme.AppType
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.animateColorAsState
@@ -43,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -222,7 +224,9 @@ fun SwitchRow(title: String, text: String?, checked: Boolean, enabled: Boolean =
     val touch = Modifier
         .touchState(interaction, RoundedCornerShape(AppSize.rowRadius), selected = false)
         .toggleable(checked, interactionSource = interaction, indication = null, enabled = enabled, role = Role.Switch, onValueChange = onChange)
-    RowLayout(title, Modifier, touch, text, null, null, Int.MAX_VALUE, AppType.rowTitle, if (enabled) colors.text else colors.text3, colors.text2, lead) { SwitchTrack(checked) }
+    RowLayout(title, Modifier, touch, text, null, null, Int.MAX_VALUE, AppType.rowTitle, if (enabled) colors.text else colors.text3, colors.text2, lead) {
+        Box(Modifier.alpha(if (enabled) 1f else DisabledAlpha)) { SwitchTrack(checked) }
+    }
 }
 
 /** A [ListRow] for one of several choices that can each be on, with a check while it is. The whole row toggles it. */
@@ -309,7 +313,7 @@ fun FilledButton(text: String, modifier: Modifier = Modifier, container: Color =
         modifier
             .heightIn(min = AppSize.touch)
             .clip(CircleShape)
-            .background(if (enabled) container else container.copy(alpha = 0.4f))
+            .background(if (enabled) container else container.copy(alpha = DisabledAlpha))
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center,

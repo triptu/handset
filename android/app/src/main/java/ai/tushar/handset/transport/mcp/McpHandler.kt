@@ -134,6 +134,11 @@ class McpHandler(
         // Set after the agent's own arguments, so an agent can't ask for what its switches leave out
         val arguments = if (!policy.scoped) given else JsonObject(given + scope(agent))
         val toolCall = ToolCall("mcp-${callIds.incrementAndGet()}", tool.slug, arguments, agent = agent.name, agentId = agent.id)
+        // A tool error, not an HTTP error, so the model reads why and the client keeps its sign-in
+        if (!agent.enabled) {
+            refused(toolCall, "Paused")
+            return failure(paused(agent.name))
+        }
         val source = policy.source
         if (source != null && source !in agent.sources) {
             val off = "${source.title} access is off for ${agent.name}."
@@ -265,6 +270,8 @@ class McpHandler(
         val LEGACY_VERSIONS = listOf("2025-11-25", "2025-06-18", "2025-03-26")
         private val SUPPORTED = MODERN_VERSIONS + LEGACY_VERSIONS
         private val CAPABILITIES = buildJsonObject { putJsonObject("tools") {} }
+
+        fun paused(name: String) = "Handset has paused $name on this phone. The user can turn it back on in Handset, under Settings, Agents."
 
         /** Said to every agent after the toolkit's own guidance */
         const val DATA_NOT_INSTRUCTIONS =

@@ -24,6 +24,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -82,6 +83,9 @@ class ToolRunner(
     /** Holds screen calls while a native pairing approval is visible, across every transport. */
     suspend fun <T> withScreenPaused(block: suspend () -> T): T = screen.withLock { block() }
 
+    /** Every call taken and not yet ended, so [stopAgent] can find one agent's */
+    private val live = ConcurrentHashMap.newKeySet<Pending>()
+
     /** How many calls are running, as reads run beside an action */
     private val running = AtomicInteger()
 
@@ -95,7 +99,11 @@ class ToolRunner(
         if (!host.enabled) return CompletableDeferred(ToolResult.Failed(call.id, Code.OFF, "Handset is turned off on the phone. Ask the user to turn it on."))
         val tool = tool(call.tool) ?: return CompletableDeferred(ToolResult.Failed(call.id, Code.UNKNOWN_TOOL, "This phone has no tool ${call.tool}"))
         val pending = Pending(call, tool, clock())
-        pending.result.invokeOnCompletion { cause -> if (cause != null) pending.job?.cancel() }
+        live += pending
+        pending.result.invokeOnCompletion { cause ->
+            live -= pending
+            if (cause != null) pending.job?.cancel()
+        }
         synchronized(this) {
             if (tool.concurrent) track(pending, scope.launch { handle(pending) }) else queue.trySend(pending)
         }
@@ -118,6 +126,12 @@ class ToolRunner(
         queue.cancel()
         scope.coroutineContext.cancelChildren()
         queue = startQueue()
+    }
+
+    /** Ends the running and queued calls of the agent with [agentId] at once, each with [message] */
+    fun stopAgent(agentId: String, message: String) = live.filter { it.call.agentId == agentId }.forEach { pending ->
+        pending.result.complete(ToolResult.Failed(pending.call.id, Code.STOPPED, message))
+        pending.job?.cancel()
     }
 
     private fun startQueue(): Channel<Pending> {

@@ -187,6 +187,23 @@ class ToolRunnerTest {
     }
 
     @Test
+    fun `stopping one agent ends its running and queued calls and leaves the others`() = runTest {
+        val host = FakeHost()
+        val runner = runner(host)
+        val tap = runner.submit(ToolCall("1", "tap", agent = "Codex", agentId = "codex"))
+        val scroll = runner.submit(ToolCall("2", "scroll", agent = "Codex", agentId = "codex"))
+        val other = runner.submit(ToolCall("3", "wait", agent = "Claude", agentId = "claude"))
+        runCurrent()
+        runner.stopAgent("codex", "Paused")
+        advanceUntilIdle()
+        assertEquals("Paused", (tap.await() as ToolResult.Failed).message)
+        assertEquals("Paused", (scroll.await() as ToolResult.Failed).message)
+        assertTrue(other.await() is ToolResult.Done)
+        assertEquals(listOf("start tap", "start wait", "end wait"), events)
+        assertEquals("Codex tap failed: Stopped", host.recorded.first())
+    }
+
+    @Test
     fun `cancelling a queued call skips it`() = runTest {
         val runner = runner()
         runner.submit(ToolCall("1", "tap"))
