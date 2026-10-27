@@ -23,6 +23,7 @@ ICONS = {
         "bowl-food", "car", "envelope-simple", "music-notes", "book-open", "asterisk", "file-text", "video-camera",
         "users", "terminal-window", "sparkle", "code", "plugs", "trash", "copy", "check",
         "map-trifold", "squares-four", "lock-simple", "hand-tap", "plus", "paper-plane-tilt",
+        "robot", "shield-check", "record", "lightning", "key", "info",
     ],
 }
 
