@@ -74,16 +74,6 @@
 
 <h2>Running</h2>
 
-<div class="entry running">
-  <h3>Launch trailers for Handset and Nano Chat <span class="time">28 Oct</span></h3>
-  <p>Opus (Claude 3) records both apps in an emulator with sample data only, then cuts two sibling trailers in the explainers studio: about 45 to 60 seconds each, music and big on-screen text, readable muted, in a Fold-like frame. Each comes with a poster and a short loop for the websites.</p>
-</div>
-
-<div class="entry running">
-  <h3>Project sites: handset.tushar.ai and nanochat.tushar.ai <span class="time">28 Oct</span></h3>
-  <p>Opus (Claude 4) builds a one-page site in a <code>site/</code> folder of each app's repo, a Vercel project for each that deploys on push, and the two listings with ink covers on sites.tushar.ai/projects. You'll get the DNS records to add. The trailers go in when they're ready, then into both READMEs.</p>
-</div>
-
 <div class="entry shipped">
   <h3>MCP server on the phone: merged <span class="time">17:45</span></h3>
   <p>Claude Opus built it on branch <code>mcp-server</code>. On an emulator: Claude Code opened Clock and tapped Timer; Codex read the battery and was refused SMS ("Text messages are off for Codex. The user can turn on Text messages for this agent in Handset, under Settings, Agents, Codex."); the Inspector got a screenshot back as an image; a removed agent's token got 401; calls kept answering with the screen off in deep sleep; the server came back after a reboot. 33 unit tests pass. Astra's review found three serious issues, now being fixed by Opus on the same branch: an agent could open Handset itself and turn on its own permissions (Handset's own screens become off limits to agents); a stranger on the same Wi-Fi could tie up the server without a token (connections get capped and timed out); and the server listened on plain Wi-Fi by default (now only Tailscale and the phone itself, with Wi-Fi as a switch). Also: cancelling a call in the client now stops it on the phone, and <code>now_playing</code> needs the agent's Notifications permission.</p>
@@ -169,6 +159,11 @@
 </ul>
 
 <h2>Shipped</h2>
+<div class="entry shipped">
+  <h3>Launch trailers and project sites <span class="time">28 Oct</span></h3>
+  <p>Two trailers, Handset 56 s and Nano Chat 51 s, recorded on the Fold emulator with sample data only, with generated music and big on-screen text. They're on <a href="https://handset.tushar.ai">handset.tushar.ai</a> and <a href="https://nanochat.tushar.ai">nanochat.tushar.ai</a> (one-page sites in each repo's <code>site/</code> folder, deployed by Vercel on push), and as a poster linking to the video at the top of both READMEs. Both apps are listed with ink covers on <a href="https://sites.tushar.ai/projects/">sites.tushar.ai/projects</a>. Astra reviewed the sites; its four findings are fixed.</p>
+</div>
+
 <div class="entry shipped">
   <h3>Pause an agent without removing it, on your phone <span class="time">22:18</span></h3>
   <p>A switch at the top of each agent's page; paused agents keep their token or sign-in and switches, show "Paused" in the list, and every call gets "Handset has paused Codex on this phone. The user can turn it back on in Handset, under Settings, Agents." (emulator proof). Reconnecting or signing in again turns it back on. 148 tests.</p>
