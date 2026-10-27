@@ -1,8 +1,8 @@
 # Handset relay
 
-A public MCP address for your phone, so claude.ai, ChatGPT and other web apps can reach it. It is a Cloudflare Worker you deploy yourself. Handset opens an outbound WebSocket to it, so the phone needs no public IP or open port. Agents sign in through OAuth, and each sign-in needs your approval on the phone.
+The relay gives your phone a public MCP address, so claude.ai, ChatGPT and other web apps can reach it. It is a Cloudflare Worker you deploy yourself. Handset opens an outbound WebSocket to it, so the phone needs no public IP or open port. Agents sign in through OAuth, and each sign-in needs your approval on the phone.
 
-The relay runs on its own. A phone, or anything standing in for one, speaks [the phone protocol](PROTOCOL.md). A fake phone is included so you can test the relay before connecting a real one.
+The relay runs on its own. A phone, or anything standing in for one, speaks [the phone protocol](PROTOCOL.md), and a fake phone is included so you can test the relay before connecting a real one.
 
 ## Deploy your own
 
@@ -16,7 +16,7 @@ bun run deploy --stage production --yes
 
 The second command opens Cloudflare sign-in. Skip it when your Alchemy profile already has Cloudflare credentials. The deploy prints a `https://…workers.dev` address. Keep the same stack name and stage for later deploys, so the phone grants already made survive.
 
-Alchemy makes one Worker, one KV namespace for OAuth records, and one Durable Object namespace, where each phone gets its own SQLite object. Idle sockets hibernate. Usage falls under [Cloudflare's free plan limits](https://developers.cloudflare.com/durable-objects/platform/pricing/). A rate limit on registration and sign-in, set in `alchemy.run.ts`, slows abuse before OAuth can write to KV.
+Alchemy makes one Worker, one KV namespace for OAuth records, and one Durable Object namespace, where each phone gets its own SQLite object. Idle sockets hibernate, and usage falls under [Cloudflare's free plan limits](https://developers.cloudflare.com/durable-objects/platform/pricing/). A rate limit on registration and sign-in, set in `alchemy.run.ts`, slows abuse before OAuth can write to KV.
 
 Paste the printed address into Handset under Settings, Connections, Relay. Handset makes a key and shows the phone ID. Agents connect to the same address with `/mcp` on the end. Opening the address in a browser shows the same instructions.
 
@@ -28,7 +28,7 @@ Paste the printed address into Handset under Settings, Connections, Relay. Hands
 
 The browser returns to Claude. Turn Handset on in a chat's connector menu. The same connector works in the Claude apps under the same account, and in a Claude routine. The phone must be online when the routine calls it. Claude's [custom connector guide](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp) lists which plans allow custom connectors.
 
-The code binds the browser session to the prompt on the phone. A phishing page can relay a real sign-in and show the same code, so a matching code doesn't prove the client is one you trust. The host is what to check.
+The code ties the browser session to the prompt on the phone. A phishing page can relay a real sign-in and show the same code, so a matching code doesn't prove the client is one you trust. The host is what to check.
 
 ## Connect ChatGPT
 
@@ -36,11 +36,11 @@ On ChatGPT web, turn on developer mode if your plan offers it. Under Settings, A
 
 ## Privacy
 
-TLS ends at Cloudflare, for the agent's HTTPS connection and the phone's WebSocket alike. Cloudflare and the relay can read calls in transit. This is not end-to-end encryption. The AI provider receives whatever the phone returns.
+TLS ends at Cloudflare, for the agent's HTTPS connection and the phone's WebSocket alike. Cloudflare and the relay can read calls in transit, so this is not end-to-end encryption. The AI provider receives whatever the phone returns.
 
-The relay never stores a call's content. It holds it in memory only while forwarding. It stores OAuth client registrations, encrypted grants and token records, phone grant IDs, client names and approval records. An approval expires after five minutes. Access tokens last an hour and refresh tokens 30 days. A phone grant stays until you remove the agent in Handset, which also stops its refreshed tokens. Request and response bodies are never logged, and Worker observability is off in the deploy. Keep it that way, and don't add frame logging to a proxy.
+The relay never stores a call's content. It holds it in memory only while forwarding. What it does store is OAuth client registrations, encrypted grants and token records, phone grant IDs, client names and approval records. An approval expires after five minutes. Access tokens last an hour and refresh tokens 30 days. A phone grant stays until you remove the agent in Handset, which also stops its refreshed tokens. Request and response bodies are never logged, and Worker observability is off in the deploy. Keep it that way, and don't add frame logging to a proxy.
 
-Permissions, the Send or Pay prompt and Stop stay on the phone. When the phone is offline a call fails at once. Nothing is queued. A call times out after two minutes. If one disconnects or times out, check the phone before retrying, since the action may have completed.
+Permissions, the Send or Pay prompt and Stop stay on the phone. When the phone is offline a call fails at once, and nothing is queued. A call times out after two minutes. If one disconnects or times out, check the phone before retrying, since the action may have completed.
 
 The relay forwards stateless streamable HTTP with JSON answers. It doesn't support SSE or server-started streams.
 
