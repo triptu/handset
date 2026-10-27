@@ -228,6 +228,19 @@ class McpHandlerTest {
         assertEquals(401, send(body, mapOf("authorization" to token)).status)
     }
 
+    @Test fun anAppsTokenWorksOnlyOverLoopback() {
+        val appToken = Agents.newToken()
+        val app = Agent("3", "Chat", Agents.hash(appToken), app = PhoneApp("com.example.chat", "ab"))
+        val handler = McpHandler(tools, { Agents.find(listOf(app), it) }, { ToolResult.Done(it.id, ToolOutput("ok"), 1) }, "", "test")
+        val body = """{"jsonrpc":"2.0","id":2,"method":"tools/list"}"""
+        val appAuth = mapOf("Authorization" to "Bearer $appToken")
+        assertEquals(401, runBlocking { handler.handle(body, appAuth) }.status)
+        assertEquals(401, runBlocking { handler.handle(body, appAuth, http = true, loopback = false) }.status)
+        assertEquals(200, runBlocking { handler.handle(body, appAuth, loopback = true) }.status)
+        // An agent added by name works from anywhere it can reach
+        assertEquals(200, send(body).status)
+    }
+
     @Test fun aRevokedTokenIsUnauthorized() {
         val revoked = McpHandler(tools, { Agents.find(emptyList(), it) }, { error("never runs") }, "", "test")
         assertEquals(401, runBlocking { revoked.handle("""{"jsonrpc":"2.0","id":2,"method":"tools/list"}""", auth) }.status)
@@ -246,10 +259,10 @@ class McpHandlerTest {
     }
 
     @Test fun httpAllowsOnlyPostOnMcp() = runBlocking {
-        assertEquals(405, serveHttp("GET", "/mcp", auth, { "" }, handler).status)
-        assertEquals(405, serveHttp("DELETE", "/mcp", auth, { "" }, handler).status)
-        assertEquals(404, serveHttp("POST", "/other", auth, { "" }, handler).status)
-        val unauthorized = serveHttp("POST", "/mcp", emptyMap(), { "{}" }, handler)
+        assertEquals(405, serveHttp("GET", "/mcp", auth, { "" }, handler, loopback = false).status)
+        assertEquals(405, serveHttp("DELETE", "/mcp", auth, { "" }, handler, loopback = false).status)
+        assertEquals(404, serveHttp("POST", "/other", auth, { "" }, handler, loopback = false).status)
+        val unauthorized = serveHttp("POST", "/mcp", emptyMap(), { "{}" }, handler, loopback = false)
         assertEquals("Bearer", unauthorized.headers["WWW-Authenticate"])
     }
 }

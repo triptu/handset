@@ -21,6 +21,7 @@ import ai.tushar.handset.tools.CallLabels
 import ai.tushar.handset.tools.ToolArgs
 import ai.tushar.handset.tools.Toolkit
 import ai.tushar.handset.transport.mcp.McpServer
+import ai.tushar.handset.transport.mcp.certificate
 import android.app.Application
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope
@@ -169,6 +170,8 @@ class Handset(context: Context) {
             ContextWorker.schedule(application)
             instance.places.sync()
             instance.events.sync()
+            // An app uninstalled while Handset wasn't told loses its agent here
+            instance.mcp.agents.forgetGoneApps(application.packageManager::certificate)
         }
     }
 }

@@ -19,9 +19,14 @@ enum class Source(val title: String, val detail: String) {
     PHOTOS("Photos and videos", "Opening and sharing your photos"),
 }
 
+/** Another app on this phone, known by its package and the SHA-256 of its signing certificate */
+@Serializable
+data class PhoneApp(val packageName: String, val certificate: String)
+
 /**
  * An agent the user added by name. Its token is kept only as [tokenHash], so the phone can check it but never show it
- * again. [added] is when, in ms, or 0 for an agent added before it was kept.
+ * again. [added] is when, in ms, or 0 for an agent added before it was kept. [app] is set for an app on this phone that
+ * connected itself, which holds its own token.
  */
 @Serializable
 data class Agent(
@@ -32,9 +37,10 @@ data class Agent(
     val relayGrantId: String? = null,
     val relayHost: String? = null,
     val added: Long = 0,
+    val app: PhoneApp? = null,
 ) {
     val viaRelay: Boolean get() = relayGrantId != null
-    val canRenew: Boolean get() = relayGrantId == null
+    val canRenew: Boolean get() = relayGrantId == null && app == null
 }
 
 /** The agents the user added, kept in [preferences]. Removing an agent revokes its token. */
@@ -69,6 +75,29 @@ class Agents(private val preferences: SharedPreferences) {
         val token = newToken()
         update(agent.id) { it.copy(tokenHash = hash(token)) }
         return token
+    }
+
+    /**
+     * Connects [app] as an agent called [name] that may read [sources], and returns it with its new token. The same app
+     * connecting again gets a new token in place of its old one. The same package with another certificate is another app.
+     */
+    @Synchronized
+    fun connectApp(name: String, app: PhoneApp, sources: Set<Source>): Pair<Agent, String> {
+        val token = newToken()
+        val known = _all.value.firstOrNull { it.app == app }
+        val agent = known?.copy(name = name.trim(), tokenHash = hash(token), sources = sources)
+            ?: Agent(UUID.randomUUID().toString(), name.trim(), hash(token), sources, added = System.currentTimeMillis(), app = app)
+        save(if (known == null) _all.value + agent else _all.value.map { if (it.id == agent.id) agent else it })
+        return agent to token
+    }
+
+    /** The agent [app] connected as, or null */
+    fun forApp(app: PhoneApp): Agent? = _all.value.firstOrNull { it.app == app }
+
+    /** Removes each app agent whose app is no longer installed with the same certificate. [certificate] is null for none. */
+    @Synchronized
+    fun forgetGoneApps(certificate: (packageName: String) -> String?) {
+        _all.value.filter { agent -> agent.app?.let { certificate(it.packageName) != it.certificate } == true }.forEach(::remove)
     }
 
     @Synchronized

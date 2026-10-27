@@ -96,7 +96,7 @@ fun SettingsTab(
             connected.forEach { agent ->
                 ListRow(
                     agent.name,
-                    text = agent.via?.let { "via $it" } ?: lastUsed[agent.id]?.let { "Last used ${format.moment(it)}" } ?: "Not used yet",
+                    text = agent.via?.let { "via $it" } ?: agent.app?.let { listOfNotNull("On this phone", lastUsed[agent.id]?.let { "last used ${format.moment(it)}" }).joinToString(" · ") } ?: lastUsed[agent.id]?.let { "Last used ${format.moment(it)}" } ?: "Not used yet",
                     lead = { AgentGlyph(agent.name) },
                     end = { Chevron() },
                     onClick = { onAgent(agent.id) },

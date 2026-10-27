@@ -57,14 +57,20 @@ class McpHandler(
     /** Calls running, by the agent's id and the request's id, so `notifications/cancelled` can end them */
     private val inFlight = ConcurrentHashMap<Pair<String, String>, Job>()
 
-    /** [http] is true when [headers] came with the request, which a 2026 client must then send in full */
-    suspend fun handle(body: String, headers: Map<String, String>, http: Boolean = false): McpReply {
+    /**
+     * [http] is true when [headers] came with the request, which a 2026 client must then send in full. [loopback] is
+     * true when the request came over a socket from this phone to its loopback address, the only way an app on this
+     * phone may call.
+     */
+    suspend fun handle(body: String, headers: Map<String, String>, http: Boolean = false, loopback: Boolean = false): McpReply {
         val header = headers.mapKeys { it.key.lowercase() }::get
         // Browsers send an Origin, native clients don't; a page on another site must not reach the phone
         val origin = header("origin")
         if (origin != null && origin !in allowedOrigins) return error(403, JsonNull, -32600, "Origin $origin is not allowed")
         val token = header("authorization")?.takeIf { it.startsWith("Bearer ", ignoreCase = true) }?.substring(7)?.trim()
         val agent = token?.let(agentFor) ?: return error(401, JsonNull, -32001, "Unauthorized: send the token Handset showed when you added this agent, as Authorization: Bearer <token>")
+        // An app's token works only on the phone itself, so one that leaked is no use from the Wi-Fi, Tailscale or the relay
+        if (agent.app != null && !loopback) return error(401, JsonNull, -32001, "Unauthorized: this token belongs to an app on the phone and works only at http://127.0.0.1:${McpServer.PORT}$PATH")
 
         val message = runCatching { Json.parseToJsonElement(body) as? JsonObject }.getOrNull() ?: return error(400, JsonNull, -32700, "Parse error")
         val id = message["id"]

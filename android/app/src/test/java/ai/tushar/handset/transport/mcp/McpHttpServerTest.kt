@@ -12,8 +12,12 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeTrue
 import org.junit.Test
+import java.net.Inet4Address
 import java.net.InetAddress
+import java.net.NetworkInterface
+import java.net.ServerSocket
 import java.net.Socket
 
 class McpHttpServerTest {
@@ -87,6 +91,33 @@ class McpHttpServerTest {
             runBlocking { withTimeout(2_000) { ended.await() } }
         } finally {
             waiting.stop()
+        }
+    }
+
+    @Test fun anAppsTokenWorksOnTheLoopbackSocketAndNoOther() {
+        val token = Agents.newToken()
+        val app = Agent("1", "Chat", Agents.hash(token), app = PhoneApp("com.example.chat", "ab"))
+        val handler = McpHandler(emptyList(), { Agents.find(listOf(app), it) }, { error("never runs") }, "", "test")
+        val other = NetworkInterface.getNetworkInterfaces().asSequence().filter { it.isUp && !it.isLoopback }
+            .flatMap { it.inetAddresses.asSequence() }.firstOrNull { it is Inet4Address }
+        // One port for both addresses, since 0 would give each its own
+        val port = ServerSocket(0).use { it.localPort }
+        val listening = McpHttpServer(port, handler)
+        try {
+            listening.listen(setOfNotNull(InetAddress.getLoopbackAddress(), other))
+            fun statusFrom(address: InetAddress): String {
+                val socket = Socket(address, listening.localPort).also { peers += it }
+                socket.soTimeout = 3_000
+                val body = """{"jsonrpc":"2.0","id":1,"method":"tools/list"}"""
+                // A header can't claim loopback
+                socket.getOutputStream().write("POST /mcp HTTP/1.1\r\nAuthorization: Bearer $token\r\nHost: 127.0.0.1\r\nX-Forwarded-For: 127.0.0.1\r\nContent-Length: ${body.length}\r\n\r\n$body".toByteArray())
+                return socket.getInputStream().bufferedReader().readLine()
+            }
+            assertEquals("HTTP/1.1 200 OK", statusFrom(InetAddress.getLoopbackAddress()))
+            assumeTrue("no network address to connect over", other != null)
+            assertEquals("HTTP/1.1 401 Unauthorized", statusFrom(other!!))
+        } finally {
+            listening.stop()
         }
     }
 

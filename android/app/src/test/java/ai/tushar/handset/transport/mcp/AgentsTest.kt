@@ -34,6 +34,49 @@ class AgentsTest {
         assertNull(old.relayHost)
     }
 
+    @Test fun anAppConnectingAgainGetsANewTokenAndKeepsItsAgent() {
+        val agents = Agents(preferences())
+        val app = PhoneApp("ai.tushar.nanochat", "aa11")
+        val (first, oldToken) = agents.connectApp("Nano Chat", app, setOf(Source.CONTACTS))
+        val (second, newToken) = agents.connectApp("Nano Chat", app, setOf(Source.CONTACTS))
+        assertEquals(first.id, second.id)
+        assertEquals(setOf(Source.CONTACTS), agents.all.value.single().sources)
+        assertNull(agents.find(oldToken))
+        assertEquals(first.id, agents.find(newToken)!!.id)
+        assertFalse(second.canRenew)
+        assertNull(agents.renew(second))
+    }
+
+    @Test fun anotherCertificateForTheSamePackageIsAnotherAgent() {
+        val agents = Agents(preferences())
+        val (real, realToken) = agents.connectApp("Nano Chat", PhoneApp("ai.tushar.nanochat", "aa11"), setOf(Source.SMS))
+        val (other, otherToken) = agents.connectApp("Nano Chat", PhoneApp("ai.tushar.nanochat", "bb22"), emptySet())
+        assertNotEquals(real.id, other.id)
+        assertEquals(2, agents.all.value.size)
+        assertEquals(setOf(Source.SMS), agents.find(realToken)!!.sources)
+        assertEquals(emptySet<Source>(), agents.find(otherToken)!!.sources)
+    }
+
+    @Test fun uninstallingAnAppRevokesItsTokenAndLeavesOtherAgents() {
+        val agents = Agents(preferences())
+        val (_, appToken) = agents.connectApp("Nano Chat", PhoneApp("ai.tushar.nanochat", "aa11"), emptySet())
+        val (_, kept) = agents.connectApp("Other", PhoneApp("com.example.other", "cc33"), emptySet())
+        val (_, typed) = agents.add("Claude Code")
+        val installed = mutableMapOf("ai.tushar.nanochat" to "aa11", "com.example.other" to "cc33")
+        agents.forgetGoneApps(installed::get)
+        assertNotNull(agents.find(appToken))
+        installed.remove("ai.tushar.nanochat")
+        agents.forgetGoneApps(installed::get)
+        assertNull(agents.find(appToken))
+        assertNotNull(agents.find(kept))
+        assertNotNull(agents.find(typed))
+        // Reinstalled with another key, the old agent's token doesn't come back
+        installed["com.example.other"] = "dd44"
+        agents.forgetGoneApps(installed::get)
+        assertNull(agents.find(kept))
+        assertEquals(1, agents.all.value.size)
+    }
+
     private fun preferences(): SharedPreferences {
         var stored: String? = null
         val editor = Proxy.newProxyInstance(SharedPreferences.Editor::class.java.classLoader, arrayOf(SharedPreferences.Editor::class.java)) { proxy, method, args ->

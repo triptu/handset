@@ -21,12 +21,13 @@ class HttpReply(val status: Int, val json: String?, val headers: Map<String, Str
 
 /**
  * What HTTP adds in front of [McpHandler]: one path, POST only, since this server keeps no stream to GET and no
- * session to DELETE, and the header that asks for a token.
+ * session to DELETE, and the header that asks for a token. [loopback] is true only for a socket connected from this
+ * phone to its loopback address, and is never read from the request.
  */
-suspend fun serveHttp(method: String, path: String, headers: Map<String, String>, body: () -> String, handler: McpHandler): HttpReply {
+suspend fun serveHttp(method: String, path: String, headers: Map<String, String>, body: () -> String, handler: McpHandler, loopback: Boolean): HttpReply {
     if (path.substringBefore('?') != PATH) return HttpReply(404, null)
     if (method != "POST") return HttpReply(405, null, mapOf("Allow" to "POST"))
-    val reply = handler.handle(body(), headers, http = true)
+    val reply = handler.handle(body(), headers, http = true, loopback = loopback)
     val challenge = if (reply.status == 401) mapOf("WWW-Authenticate" to "Bearer") else emptyMap()
     return HttpReply(reply.status, reply.json, challenge)
 }
@@ -124,6 +125,8 @@ class McpHttpServer(private val port: Int, private val handler: McpHandler) {
         val deadline = DeadlineInput(client)
         val input = BufferedInputStream(deadline)
         val output = client.getOutputStream()
+        // From the socket, never the request: an app on this phone may use its token here and nowhere else
+        val loopback = client.localAddress.isLoopbackAddress && client.inetAddress.isLoopbackAddress
         // A byte of the next request, read while watching for the peer to leave during a call
         var early = -1
         try {
@@ -152,7 +155,7 @@ class McpHttpServer(private val port: Int, private val handler: McpHandler) {
                 connection.busy = true
                 val reply = try {
                     runBlocking {
-                        val answer = async(Dispatchers.IO) { serveHttp(parts[0], parts.getOrElse(1) { "/" }, headers, { body }, handler) }
+                        val answer = async(Dispatchers.IO) { serveHttp(parts[0], parts.getOrElse(1) { "/" }, headers, { body }, handler, loopback) }
                         // A client that closes the connection mid-call has given up on it, so the call stops
                         if (withTimeoutOrNull(WATCH_AFTER_MS) { answer.join() } == null) early = watch(answer, input, deadline)
                         if (answer.isCancelled) null else answer.await()

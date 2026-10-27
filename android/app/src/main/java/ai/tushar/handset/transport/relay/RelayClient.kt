@@ -203,7 +203,7 @@ class RelayClient(private val context: Context, private val handset: Handset) {
                     val headers = relayHeaders(body, message["headers"] as? JsonObject ?: JsonObject(emptyMap()), grant)
                     require(body.toByteArray().size <= 262_144)
                     val reply = try {
-                        serveHttp(message.text("method"), "/mcp", headers, { body }, handler)
+                        serveHttp(message.text("method"), "/mcp", headers, { body }, handler, loopback = false)
                     } finally { executing.remove(id) }
                     val response = frame("response") {
                         put("id", id); put("status", reply.status)

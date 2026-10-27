@@ -84,6 +84,7 @@ class McpService : Service() {
         server = if (mcp.on.value) server ?: McpHttpServer(McpServer.PORT, Handset.instance.mcpHandler()) else {
             server?.stop()
             mcp.addresses.value = emptyList()
+            mcp.listeningLocally.value = false
             null
         }
         if (!mcp.shouldRun(localAvailable = listen())) {
@@ -116,9 +117,11 @@ class McpService : Service() {
             Log.e(TAG, "couldn't listen on port ${McpServer.PORT}")
             mcp.problem.value = "Couldn't listen on port ${McpServer.PORT}. Another app may be using it."
             mcp.addresses.value = emptyList()
+            mcp.listeningLocally.value = false
             return false
         }
         mcp.problem.value = null
+        mcp.listeningLocally.value = true
         mcp.addresses.value = reachable.filter { InetAddress.getByName(it.host) !in failed }
         Log.i(TAG, "listening on ${mcp.addresses.value.joinToString { it.host }} and loopback, port ${McpServer.PORT}")
         getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, notification(mcp.addresses.value))
@@ -137,6 +140,7 @@ class McpService : Service() {
         server?.stop()
         server = null
         Handset.instance.mcp.addresses.value = emptyList()
+        Handset.instance.mcp.listeningLocally.value = false
         wakeLock?.takeIf { it.isHeld }?.release()
         wifiLock?.takeIf { it.isHeld }?.release()
         super.onDestroy()

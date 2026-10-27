@@ -25,7 +25,7 @@ class RelayRoutingTest {
             agentFor = { grant -> Agent("a", "Inspector", "").takeIf { grant == "approved-grant" } },
             run = { ToolResult.Done(it.id, ToolOutput("battery"), 0) }, instructions = "", version = "test",
         )
-        val reply = serveHttp("POST", "/mcp", headers, { body }, handler)
+        val reply = serveHttp("POST", "/mcp", headers, { body }, handler, loopback = false)
         assertEquals(200, reply.status)
         assertTrue(reply.json!!.contains("battery"))
     }
@@ -40,7 +40,7 @@ class RelayRoutingTest {
             instructions = "", version = "test",
         )
         val body = """{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"read_sms","arguments":{}}}"""
-        suspend fun request() = serveHttp("POST", "/mcp", mapOf("authorization" to "Bearer grant"), { body }, handler)
+        suspend fun request() = serveHttp("POST", "/mcp", mapOf("authorization" to "Bearer grant"), { body }, handler, loopback = false)
         assertTrue(request().json!!.contains("Text messages access is off for Inspector"))
         assertEquals(0, executed)
         agent = agent!!.copy(sources = setOf(Source.SMS))
@@ -50,7 +50,7 @@ class RelayRoutingTest {
         agent = null
         assertEquals(401, request().status)
         assertEquals(1, executed)
-        assertEquals(405, serveHttp("GET", "/mcp", emptyMap(), { "" }, handler).status)
+        assertEquals(405, serveHttp("GET", "/mcp", emptyMap(), { "" }, handler, loopback = false).status)
     }
 
     @Test fun cancellingRelayFrameCancelsSharedRunnerCall() = runBlocking {

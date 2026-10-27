@@ -66,7 +66,19 @@ To try it from a computer over USB, forward the port with `adb forward tcp:8765 
 
 ### From another app on this phone
 
-Another app on the phone can use Handset too. This section will say how once that lands.
+An app on the same phone, such as an on-device chat app, can connect as an agent with one tap. Nobody copies a token.
+
+1. The app starts the action `ai.tushar.handset.action.CONNECT_APP` for a result, with `ActivityResultContracts.StartActivityForResult` or `startActivityForResult`. A plain `startActivity` is refused, since Handset must know which app is asking. On Android 11 and later, add `<queries><package android:name="ai.tushar.handset" /></queries>` to the app's manifest.
+2. Handset shows "<App> wants to use this phone" with the app's name, icon and package, and the same switches as any agent's page, all off. The user taps **Allow** or **Don't allow**.
+3. On Allow, Handset turns on its MCP server on the phone itself (not on Wi-Fi), waits until its own socket holds `127.0.0.1:8765`, and returns `RESULT_OK` with these String extras:
+   - `mcp_url`: `http://127.0.0.1:8765/mcp`
+   - `token`: the app's bearer token, sent as `Authorization: Bearer <token>`
+   - `agent_id`: the agent's id in Handset
+4. Otherwise it returns `RESULT_CANCELED` with `reason`: `denied` (the user said no or went back), `not_for_result`, `handset_off` (agents are switched off in Handset), or `port_in_use` (another app holds port 8765 on the phone, so Handset gave no token).
+
+Handset knows the app by its package name and the SHA-256 of its signing certificate. Connecting again from the same app gives it a new token and keeps its switches, so it can ask again whenever it lost its token. The same package signed with another key is a different agent. Uninstalling the app removes its agent, and its token stops working. The token works only at `127.0.0.1` on the phone itself, never over Wi-Fi, Tailscale or a relay.
+
+The app shows under Connected agents as "On this phone". Its calls go through every check other agents' calls do: its switches, Send and Pay approval, Stop, the activity record, and Handset's private screens.
 
 ## What agents can do
 

@@ -84,6 +84,9 @@ fun AgentScreen(id: String, agents: AgentDirectory, days: DayRepository, mcp: Mc
             if (agent.via != null) {
                 ListRow("Through the relay", text = "Signed in from ${agent.via}. Remove it here to cut it off; it has no token to renew.", textLines = 3, end = { Chevron() }, onClick = onConnections)
             }
+            if (agent.app != null) {
+                ListRow("On this phone", text = "An app on this phone, ${agent.app}, holding its own token. Remove it here, or uninstall the app, to cut it off.", textLines = 3, onClick = null)
+            }
             if (agent.canRenew) {
                 val where = when {
                     !on -> "Direct connection is off, so ${agent.name} can't reach the phone."
@@ -122,7 +125,7 @@ fun AgentScreen(id: String, agents: AgentDirectory, days: DayRepository, mcp: Mc
     if (confirmRemove) {
         ConfirmDialog(
             "Remove ${agent.name}?",
-            "Its token stops working at once. To use it again, add it again.",
+            if (agent.app != null) "Its token stops working at once. To use it again, connect it again from the app." else "Its token stops working at once. To use it again, add it again.",
             confirm = "Remove",
             onDismiss = { confirmRemove = false },
         ) {

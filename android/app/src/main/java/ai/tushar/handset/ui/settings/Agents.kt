@@ -15,10 +15,11 @@ import java.time.ZoneId
 
 /**
  * An agent the user connected and what it may read. [added] is null for an agent added before the day was kept. [via]
- * is the site an agent signed in from through the relay, such as claude.ai, which has no token to renew.
+ * is the site an agent signed in from through the relay, such as claude.ai, which has no token to renew. [app] is the
+ * package of an app on this phone that connected itself and holds its own token.
  */
-data class ConnectedAgent(val id: String, val name: String, val added: LocalDate?, val sources: Set<Source>, val via: String? = null) {
-    val canRenew: Boolean get() = via == null
+data class ConnectedAgent(val id: String, val name: String, val added: LocalDate?, val sources: Set<Source>, val via: String? = null, val app: String? = null) {
+    val canRenew: Boolean get() = via == null && app == null
 }
 
 /** An agent's token, shown once, right after it is made */
@@ -51,6 +52,7 @@ class McpAgentDirectory(private val registry: Agents, scope: CoroutineScope, pri
         agent.added.takeIf { it > 0 }?.let { Instant.ofEpochMilli(it).atZone(zone).toLocalDate() },
         agent.sources,
         agent.relayHost ?: if (agent.viaRelay) "the relay" else null,
+        agent.app?.packageName,
     )
 
     private fun find(id: String) = registry.all.value.firstOrNull { it.id == id }
@@ -75,6 +77,7 @@ class FakeAgentDirectory(private val today: LocalDate = LocalDate.now()) : Agent
             ConnectedAgent("claude", "Claude", today.minusDays(15), setOf(Source.NOTIFICATIONS, Source.CONTACTS, Source.LOCATION), via = "claude.ai"),
             ConnectedAgent("claude-code", "Claude Code", today.minusDays(13), setOf(Source.NOTIFICATIONS)),
             ConnectedAgent("chatgpt", "ChatGPT", today.minusDays(25), setOf(Source.LOCATION), via = "chatgpt.com"),
+            ConnectedAgent("nano-chat", "Nano Chat", today.minusDays(2), emptySet(), app = "ai.tushar.nanochat"),
         ),
     )
 
