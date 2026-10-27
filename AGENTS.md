@@ -28,6 +28,8 @@ Run Gradle from `android/`, through `${TSTACK_HOME:-~/Documents/code/tstack}/scr
 
 Release builds sign with `~/.config/handset/release.jks` (password in `release.password` beside it) or the `HANDSET_KEYSTORE` and `HANDSET_KEYSTORE_PASSWORD` variables, else the debug key. Never put a key in the repo.
 
+The `/release` skill in `.claude/skills/release` publishes a GitHub Release with the signed APK, which the README's download link points to.
+
 ## Rules
 
 - A new transport calls `Handset.instance.runner`, never a tool's `run` directly. The runner owns ordering, budgets, the consent prompt, the pill, the record of agent steps and Stop. Its one hook, `Host.record(call, detail, ok)`, writes each step, refused and stopped ones included, to the store through `Handset.recordAgentAction`; the MCP handler's refusals go there too.
