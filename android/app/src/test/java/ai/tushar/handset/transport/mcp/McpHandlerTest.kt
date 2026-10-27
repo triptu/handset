@@ -169,7 +169,7 @@ class McpHandlerTest {
         val refused = call("read_sms")
         assertTrue(refused["isError"]!!.jsonPrimitive.boolean)
         assertEquals(
-            "Text messages access is off for Claude Code. Ask the user to turn on Text messages for Claude Code in Handset's Settings, under Connected agents.",
+            "Text messages access is off for Claude Code. Ask the user to turn on Text messages for Claude Code in Handset's Settings, under Agents.",
             refused.text(),
         )
         assertTrue(calls.isEmpty())

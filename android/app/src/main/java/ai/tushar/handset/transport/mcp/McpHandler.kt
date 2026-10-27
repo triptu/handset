@@ -133,7 +133,7 @@ class McpHandler(
             val off = "${source.title} access is off for ${agent.name}."
             refused(toolCall, off)
             // The same words as a phone-wide access that is off, with the agent's name
-            return failure("$off Ask the user to turn on ${source.title} for ${agent.name} in Handset's Settings, under Connected agents.")
+            return failure("$off Ask the user to turn on ${source.title} for ${agent.name} in Handset's Settings, under Agents.")
         }
         val key = agent.id to id.toString()
         val result = coroutineScope {

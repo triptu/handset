@@ -24,7 +24,7 @@ You need a phone on Android 11 or newer. Build the APK as described under [Build
 
 Android greys out the Accessibility switch for an app installed from a file. Try to turn it on once, then open the app's App info, tap ⋮ and choose Allow restricted settings, and turn it on again.
 
-Setup also offers contacts, text messages, location, photos and videos, and screen time. Each one is off until you turn it on, and each has a switch in Settings. A tool that needs one that is off tells the agent so.
+Setup also offers contacts, text messages, location, photos and videos, and screen time. Each one is off until you turn it on, and each has a switch in Settings, Android permissions. A tool that needs one that is off tells the agent so.
 
 ## Connect an agent
 
