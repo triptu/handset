@@ -1,6 +1,6 @@
 # Handset
 
-An Android app that lets AI agents operate the phone. README.md covers what it does and how to turn it on.
+An Android app that lets AI agents operate the phone. README.md covers what it does, how to turn it on and how agents connect. docs/development.md covers trying tools over adb, how a call settles, the overlays and recording screens for the screen reader's tests.
 
 ## Layout
 
@@ -13,7 +13,7 @@ An Android app that lets AI agents operate the phone. README.md covers what it d
   - `transport/relay/`: `RelayClient`, the phone side of the Cloudflare relay. It connects out over a WebSocket and hands each frame to the same `McpHandler`. `pair(url)` and `unpair()` start and end it; `unpair()` removes every relay agent.
   - `events/`: phone events. `PhoneEvents` holds the switches and hears the battery broadcast, `PlaceCollector`'s visits and the notification listener, and keeps each event through `ContextStore.claimEventSend`, once per occurrence. `Delivery` and `EventSendWorker` post it with WorkManager, at most 20 POSTs an hour through `ContextStore.reserveEventPost`, and `PhoneEvents.sync` queues again any send left unqueued. A retry can deliver an event twice, so every payload carries `event_id`. `Destination` is the one address, kept encrypted with a Keystore key, and knows a Claude routine's fire URL. `Payload` builds the body.
   - `context/`: the day record. `ContextDatabase` (Room on the bundled SQLite, with FTS5 tables made in a callback), `ContextStore` (every write and query the UI, tools and MCP read), a collector per source, `Recording` (the switches, Pause and how long text is kept), `ContextWorker` (sessions, location re-request, daily cleanup), `ExcludedApps`.
-  - `ui/`: Compose screens. `theme/Theme.kt` holds every colour, size, spacing and duration; `Kit.kt` the shared rows, switches and buttons. `days/` reads the day record through `DayRepository`, which `StoreDayRepository` answers from `ContextStore`; a moment's id holds its kind, range and app, conversation or agent, so opening it queries again. `settings/` reads agents through `AgentDirectory`, which `McpAgentDirectory` answers from `Agents`. `MainActivity.appData()` picks them. A debug build started with `--ez sample_data true` shows the fakes instead, for screenshots, until started with `--ez sample_data false`.
+  - `ui/`: Compose screens. `theme/Theme.kt` holds every colour, size, spacing and duration; `Kit.kt` the shared rows, switches and buttons. `days/` reads the day record through `DayRepository`, which `StoreDayRepository` answers from `ContextStore`; a moment's id holds its kind, range and app, conversation or agent, so opening it queries again. `settings/` reads agents through `AgentDirectory`, which `McpAgentDirectory` answers from `Agents`. `MainActivity.appData()` picks them, or the fakes when a debug build is started with `--ez sample_data true`.
 - `relay/`: the Cloudflare relay, a Worker deployed with Alchemy. Its README covers deploying it and connecting Claude and ChatGPT.
 
 ## Commands
@@ -44,5 +44,5 @@ Release builds sign with `~/.config/handset/release.jks` (password in `release.p
 - An MCP call carries the agent's name as `ToolCall.agent`, which Days, the pill and the in-app line show, and its id as `ToolCall.agentId`, which each step keeps. Two agents can share a name, so own steps are matched by id. A transport that knows who is calling sets both; adb leaves them null and is recorded as adb.
 - A tool whose answer mixes sources is `scoped` in `MCP_TOOLS`. The handler sets `without_notifications`, `without_location` and `caller` (the agent's id) after the agent's own arguments, from the agent's switches, so search and the timeline leave out what the agent can't read. Another agent's steps show only the tool and whether it worked.
 - The pill hides while Handset is in front (`Handset.inFront`), since the app's own line says the same. Keep the two from stacking.
-- Settings names its sections Connected agents, What Handset records, Rules for every agent, Connections, Phone events, Android permissions and About. Error messages for agents point to these names; change both together.
+- Settings names its pages Agents, Recording, Connections, Phone events, Safety, Android permissions and About. Error messages for agents and the README point to these names; change them together.
 - No licensed fonts or other brands' assets. The app bundles Google Sans Flex (OFL) and Phosphor Icons (MIT), built by `android/tools/ui_resources.py`, with their licences in `assets/licenses`. App glyphs are generic Phosphor shapes, never brand logos.
