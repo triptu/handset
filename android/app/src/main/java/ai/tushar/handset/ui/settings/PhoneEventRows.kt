@@ -79,7 +79,7 @@ fun PhoneEventRows(events: PhoneEvents, store: ContextStore) {
         ListRow(
             "Send events to a routine",
             text = "Tell a Claude routine or any web address when the battery runs low, charging starts or stops, you come or go, or someone writes.",
-            textLines = 3,
+            textLines = 4,
             titleColor = colors.accent,
             lead = { PhIcon(R.drawable.ph_plus, tint = colors.accent) },
             onClick = { editing = true },

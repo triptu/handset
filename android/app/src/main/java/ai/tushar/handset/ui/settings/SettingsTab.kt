@@ -34,6 +34,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -46,6 +47,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import kotlinx.coroutines.delay
 import java.time.Instant
 
 /**
@@ -110,6 +112,14 @@ private fun rememberSettingsState(handset: Handset, agents: AgentDirectory, setu
         val files = PREFERENCE_FILES.map { context.getSharedPreferences(it, Context.MODE_PRIVATE) }
         files.forEach { it.registerOnSharedPreferenceChangeListener(listener) }
         onDispose { files.forEach { it.unregisterOnSharedPreferenceChangeListener(listener) } }
+    }
+    // A pause ends on the clock, not with a change to read, so the summary is read again when it does
+    LaunchedEffect(pausedUntil) {
+        val left = pausedUntil - System.currentTimeMillis()
+        if (left > 0) {
+            delay(left)
+            version++
+        }
     }
     return remember(version, connected, relay, relayUrl, direct, pausedUntil, setup) {
         val recording = handset.recording
