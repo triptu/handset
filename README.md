@@ -16,7 +16,9 @@ You install it from a file, not from Play. It drives the phone through an access
 
 ## Install and turn it on
 
-You need a phone on Android 11 or newer. Build the APK as described under [Build from source](#build-from-source), install it and open the app. Its setup screen walks through three Android settings:
+You need a phone on Android 11 or newer. On the phone, download [handset.apk](https://github.com/triptu/handset/releases/latest/download/handset.apk), the newest release, and open it to install. Each [release](https://github.com/triptu/handset/releases) lists the APK's SHA-256 and its signing certificate, so you can check what you install. A newer APK installs over the old one and keeps your settings. You can also [build it from source](#build-from-source).
+
+Open the app. Its setup screen walks through three Android settings:
 
 - **Accessibility** lets agents read the screen and act on it.
 - **Notification access** lets them read and reply to notifications and control what's playing.
@@ -163,7 +165,3 @@ adb install -r app/build/outputs/apk/release/app-release.apk
 A release build signs with the key in `~/.config/handset/` when that folder exists, or with the `HANDSET_KEYSTORE` and `HANDSET_KEYSTORE_PASSWORD` variables, and with the debug key otherwise. Android refuses an update signed with a different key, so uninstall first when you switch keys. The version code is the minutes since the start of 2026, so a newer build always installs over an older one.
 
 [docs/development.md](docs/development.md) covers trying tools over adb, turning the Android switches on from a computer, and recording screens for the screen reader's tests.
-
-## License
-
-MIT, see [LICENSE](LICENSE). The bundled Google Sans Flex font and Phosphor icons keep their own licences, in `android/app/src/main/assets/licenses`.
