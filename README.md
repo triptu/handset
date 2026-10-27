@@ -64,7 +64,7 @@ To try it from a computer over USB, forward the port with `adb forward tcp:8765 
 
 ### From another app on this phone
 
-An app on the same phone, such as an on-device chat app, can connect as an agent with one tap, and nobody copies a token. This is the contract an app builds to.
+An app on the same phone can connect as an agent with one tap, and nobody copies a token. [Nano Chat](https://github.com/triptu/nano-chat), a chat app whose models run on the phone, connects this way. This is the contract an app builds to.
 
 1. The app starts the action `ai.tushar.handset.action.CONNECT_APP` for a result, with `ActivityResultContracts.StartActivityForResult` or `startActivityForResult`. A plain `startActivity` is refused, since Handset must know which app is asking. On Android 11 and later, add `<queries><package android:name="ai.tushar.handset" /></queries>` to the app's manifest.
 2. Handset shows "<App> wants to use this phone" with the app's name, icon and package, and the same switches as any agent's page, all off. The user taps **Allow** or **Don't allow**.
