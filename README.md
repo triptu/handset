@@ -8,15 +8,11 @@ Handset gives your AI agents your phone. Claude, ChatGPT, Claude Code, Codex or 
 
 [Watch the trailer](https://github.com/triptu/handset/blob/main/site/public/media/trailer.mp4) (59 s) · [handset.tushar.ai](https://handset.tushar.ai)
 
-## It uses the apps you already have
-
-An agent reads the app in front, then taps, types, scrolls and swipes. While it works, a pill at the top of the screen says who is doing what, with Stop.
-
 ## You choose what each agent can do
 
 <img src="docs/progress/images/agent-paused.png" width="270" alt="Codex's page in Handset: a paused switch at the top, then switches for notifications, text messages, contacts, location, and photos and videos">
 
-Every agent can read the screen and act on it. Notifications, text messages, contacts, location and photos are off for each agent until you turn them on. With **Ask me before tapping Send or Pay** on, Handset asks you before tapping a button it recognises as Send, Pay or similar. Pause an agent to stop it for a while, or remove it.
+Every agent can read the screen and act on it. While it works, a pill at the top of the screen says who is doing what, with Stop. Notifications, text messages, contacts, location and photos are off for each agent until you turn them on. With **Ask me before tapping Send or Pay** on, Handset asks you before tapping a button it recognises as Send, Pay or similar. Pause an agent to stop it for a while, or remove it.
 
 ## A private record of your day
 
@@ -25,15 +21,13 @@ Every agent can read the screen and act on it. Notifications, text messages, con
 <img src="site/public/shots/search.webp" width="270" alt="Searching the day record for a place name, with matches from a chat, Chrome and Uber across days">
 </p>
 
-If you want it, Handset keeps what you saw on screen, your notifications, the apps you used and where you stayed. Each source is off until you turn it on. The Days tab shows each day by time, and you and your agents can search it. Screen text and notifications from password managers, payment apps, keyboards and the apps you add to the list are never kept.
+If you want it, Handset keeps what you saw on screen, your notifications, the apps you used and where you stayed. Each source is off until you turn it on. The Days tab shows each day by time, and you and your agents can search it. In Settings, turn off Record my day to stop recording screen text, notifications, app use and places, pause it for an hour, or delete today's record. Screen text and notifications from apps on the built-in list, and from apps you add under Apps never read, are never kept.
 
-## The phone can start a routine
-
-Handset can tell a Claude routine, or an address you give, when the battery runs low, charging starts or stops, you arrive at or leave a place, or someone you picked sends a notification. It never sends what a message says.
+Handset can also tell a Claude routine, or an address you give, when the battery runs low, charging starts or stops, you arrive at or leave a place, or someone you picked sends a notification. It never sends what a message says.
 
 ## Privacy
 
-The record and every agent's steps stay on the phone. An agent you connect gets the results it asks for, such as the screen or a search of the record. Phone events you turn on go to the address you chose. A connection through a relay for claude.ai or ChatGPT passes through Cloudflare and your own relay.
+The record and every agent's steps are stored on the phone. An agent you connect gets the results it asks for, such as the screen or a search of the record. Phone events you turn on go to the address you chose. A connection through a relay for claude.ai or ChatGPT passes through Cloudflare and your own relay.
 
 ## Install and connect
 

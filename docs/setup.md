@@ -107,7 +107,7 @@ Screen actions run one at a time, in the order they arrive, so the actions sent 
 
 Under Settings, Recording, four sources each have a switch, all off at first. Screen text keeps the text of the screens the person opens, for search. Notifications are kept as they arrive, for catching up. App use is which app was open and when. Places are where they stayed 10 minutes or more, named by tapping the place in Days.
 
-**Record my day**, at the top of Settings, stops all recording until it is turned on again, and keeps the choice of sources. **Pause for an hour** stops it for an hour, from Settings or a quick settings tile. **Delete today** removes everything since midnight. Screen text and notifications from password managers, payment apps, keyboards and the apps added under **Apps never read** are never kept. App use still lists those apps.
+**Record my day**, at the top of Settings, stops all four sources until it is turned on again, and keeps the choice of sources. **Pause for an hour** stops them for an hour, from Settings or a quick settings tile. Either way, agents' steps are still written down, and battery, charging and notification events still go out; arrived and left events stop with Places. **Delete today** removes everything since midnight. Screen text and notifications from apps on the built-in list in `ExcludedApps.kt` (system UI, launchers, keyboards, password managers, payment apps, settings and file managers) and the apps added under **Apps never read** are never kept. App use still lists those apps.
 
 Screen text and notifications are kept 7, 30 or 90 days, as the person chooses. App use, places, agent steps and phone events are kept a year. An agent sees only the sources turned on for it. Search and the day's timeline leave out what it can't read, and another agent's steps show only the tool and whether it worked.
 
@@ -120,7 +120,7 @@ Handset can tell a Claude routine, or any address that takes a POST, when someth
 - **Arrived at or left a place** named in Days, while Places is recording.
 - **A notification from someone**, from the people and apps the person picks.
 
-An event carries only an id, its type, the time, and the battery level, place name, or the person's or app's name. It never carries what a message says. Every event, sent or not, shows in Days with exactly what was sent. The address and its token are kept encrypted with a key in Android's keystore. Handset posts at most 20 times an hour, tries included. A failed post is tried again, up to 5 times, so a routine can get an event twice. Every try carries the same `event_id`.
+An event carries only an id, its type, the time, and the battery level, place name, or the person's or app's name. It never carries what a message says. Every event, sent or not, shows in Days with exactly what was sent. The address and its token are kept encrypted with a key in Android's keystore. Handset posts at most 20 times an hour, tries included. A post that times out or gets a 5xx is tried again, five tries in all, so a routine can get an event twice. A 4xx, a redirect or an address that can't be reached is not tried again. Every try carries the same `event_id`.
 
 To start a Claude routine from the phone:
 
@@ -141,7 +141,7 @@ The types are `battery_low`, `charging_started`, `charging_stopped`, `arrived`, 
 
 Tell the person these when they ask what leaves the phone.
 
-The day record and every agent's steps live in a database in the app's private storage on the phone, and are never uploaded. A tool's result goes to the agent that called it, and `search_context` and `day_timeline` return recorded screen text, notifications and places to the agent that asks, within its switches. Phone events go to the one address they gave, whether or not an agent is connected. Nothing else is sent.
+The day record and every agent's steps are stored in a database in the app's private storage on the phone. A tool's result goes to the agent that called it, and `search_context` and `day_timeline` return recorded screen text, notifications and places to the agent that asks, within its switches. Phone events go to the one address they gave, whether or not an agent is connected. Nothing else is sent.
 
 A direct connection has nobody in between. A relay connection passes through Cloudflare and their relay, which can read calls in transit, and the AI provider receives the results. The relay stores sign-in records, never call content. The [relay guide](../relay/README.md#privacy) has the detail.
 
