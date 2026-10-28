@@ -1,6 +1,6 @@
 # Developing Handset
 
-What you need to try tools without an agent, drive the Android switches from a computer, and change the screen reader. The [README](../README.md) covers installing the app and connecting agents. [AGENTS.md](../AGENTS.md) has the code map and the rules.
+What you need to try tools without an agent, drive the Android switches from a computer, and change the screen reader. The [README](../README.md) covers installing the app, and [setup.md](setup.md) covers connecting agents. [AGENTS.md](../AGENTS.md) has the code map and the rules.
 
 ## Turning the switches on over adb
 
