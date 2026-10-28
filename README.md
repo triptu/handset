@@ -48,7 +48,3 @@ Set up https://github.com/triptu/handset so you can use my Android phone. Follow
 ```
 
 Claude Code, Codex and Claude Desktop connect from your computer. For claude.ai and ChatGPT, the agent sets up a small relay in your Cloudflare account. An app on the same phone, such as [Nano Chat](https://github.com/triptu/nano-chat), connects with one tap in Handset. To add another agent or send phone events to a routine, ask the agent again.
-
-## Credits
-
-Handset uses Google Sans Flex and Phosphor Icons.
