@@ -80,11 +80,11 @@ The app shows under Settings, Agents as "On this phone". Its calls go through ev
 
 ## What the person controls
 
-Every agent can read the screen, the phone's status, the app list and screen time, search what Handset records apart from notifications, and act on the screen. Notifications, text messages, contacts, location, and photos and videos are off for each agent until the person turns them on, on its page under Settings, Agents. When a tool needs one that is off, it says which. Contacts, text messages, location, photos and videos, and screen time also need their Android permission, each with a switch under Settings, Android permissions. Agents can't open or read Handset's own screens.
+Every agent can read the screen, the phone's status, the app list and screen time, search what Handset records apart from notifications and places, and act on the screen. Notifications, text messages, contacts, location, and photos and videos are off for each agent until the person turns them on, on its page under Settings, Agents. When a tool needs one that is off, it says which. Contacts, text messages, location, photos and videos, and screen time also need their Android permission, each with a switch under Settings, Android permissions. Agents can't open or read Handset's own screens.
 
 To pause an agent without removing it, the person turns off the switch at the top of its page. Its calls get a tool error until it is turned on again, and it keeps its token or sign-in and its switches. Connecting an app again, or signing in again from the same relay client, turns a paused agent back on.
 
-With **Ask me before tapping Send or Pay** on, under Settings, Safety, a tap on an element labelled Send, Pay, Buy, Order, Transfer, Post or Publish waits for the person to tap Allow in a notification. Other screen calls wait with it, so an agent can't tap Allow itself. Run such a tap as its own call, not inside `run_steps`.
+With **Ask me before tapping Send or Pay** on, under Settings, Safety, a tap on an element whose label has the English word Send, Pay, Buy, Order, Transfer, Post or Publish waits for the person to tap Allow in a notification. Other screen calls wait with it, so an agent can't tap Allow itself. Run such a tap as its own call, not inside `run_steps`. A button in another language or with no label isn't caught, and `reply_notification` and `type_text` with `submit` send without asking.
 
 While an agent works, a pill at the top of the screen says who is doing what, with Stop. Stop ends the running call and the waiting ones, and refuses new ones until the person turns agents on again. Every step an agent takes, refused and stopped ones included, is kept in the day record and shows in Days.
 
@@ -107,7 +107,7 @@ Screen actions run one at a time, in the order they arrive, so the actions sent 
 
 Under Settings, Recording, four sources each have a switch, all off at first. Screen text keeps the text of the screens the person opens, for search. Notifications are kept as they arrive, for catching up. App use is which app was open and when. Places are where they stayed 10 minutes or more, named by tapping the place in Days.
 
-**Record my day**, at the top of Settings, stops all recording until it is turned on again, and keeps the choice of sources. **Pause for an hour** stops it for an hour, from Settings or a quick settings tile. **Delete today** removes everything since midnight. Password managers, payment apps, keyboards and the apps added under **Apps never read** are never recorded.
+**Record my day**, at the top of Settings, stops all recording until it is turned on again, and keeps the choice of sources. **Pause for an hour** stops it for an hour, from Settings or a quick settings tile. **Delete today** removes everything since midnight. Screen text and notifications from password managers, payment apps, keyboards and the apps added under **Apps never read** are never kept. App use still lists those apps.
 
 Screen text and notifications are kept 7, 30 or 90 days, as the person chooses. App use, places, agent steps and phone events are kept a year. An agent sees only the sources turned on for it. Search and the day's timeline leave out what it can't read, and another agent's steps show only the tool and whether it worked.
 
@@ -141,7 +141,7 @@ The types are `battery_low`, `charging_started`, `charging_stopped`, `arrived`, 
 
 Tell the person these when they ask what leaves the phone.
 
-The day record and every agent's steps live in a database in the app's private storage on the phone, and are never uploaded. A tool's result goes to the agent that called it. Phone events go to the one address they gave. Nothing else is sent.
+The day record and every agent's steps live in a database in the app's private storage on the phone, and are never uploaded. A tool's result goes to the agent that called it, and `search_context` and `day_timeline` return recorded screen text, notifications and places to the agent that asks, within its switches. Phone events go to the one address they gave, whether or not an agent is connected. Nothing else is sent.
 
 A direct connection has nobody in between. A relay connection passes through Cloudflare and their relay, which can read calls in transit, and the AI provider receives the results. The relay stores sign-in records, never call content. The [relay guide](../relay/README.md#privacy) has the detail.
 
